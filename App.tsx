@@ -1,6 +1,6 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import HelloWord from "./components/HelloWord";
+import HelloWord from "./src/components/HelloWord";
 
 
 
