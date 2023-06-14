@@ -4,12 +4,6 @@ This is the frontend repository for our project. It is mainly build with React N
 
 This REAMDE document details the necessary steps to get your application up and running.
 
-## Requirements
-Be sure to install first:
-
-* P
-* P
-
 ## Set up the project
 
 ### Clone the repo
