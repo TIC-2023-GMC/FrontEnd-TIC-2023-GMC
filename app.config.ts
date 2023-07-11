@@ -1,15 +1,15 @@
-import { ExpoConfig } from "@expo/config";
+import { ExpoConfig } from '@expo/config';
 import 'dotenv/config';
 
-
-
 const config: ExpoConfig = {
-  name: "Test",
-  version: "1.0.0",
-  slug: "Test",
-  extra: {
-    apiUrl: process.env.API_URL
-  },
+	name: 'Pawsitive-Quito',
+	version: '1.0.0',
+	slug: 'PAWQ',
+	extra: {
+		envType: process.env.ENV_TYPE,
+		apiLocalUrl: process.env.API_LOCAL_URL,
+		apiRemoteUrl: process.env.API_REMOTE_URL
+	}
 };
 
 export default config;
