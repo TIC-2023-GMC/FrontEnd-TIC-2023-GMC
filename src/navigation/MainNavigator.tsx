@@ -7,6 +7,7 @@ import { ExperienceScreen } from '../Screens/Experience';
 import { OrganizationScreen } from '../Screens/Organization';
 import { useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
+import { FavoriteScreen } from '../Screens/Favorite';
 
 const Tab = createBottomTabNavigator();
 
@@ -64,7 +65,7 @@ export function TabsNavigation() {
 			/>
 			<Tab.Screen
 				name="Organization"
-				component={AdoptionScreen}
+				component={OrganizationScreen}
 				options={{
 					tabBarIcon: (props) => {
 						return <Octicons {...props} name="organization" size={30} />;
@@ -73,7 +74,7 @@ export function TabsNavigation() {
 			/>
 			<Tab.Screen
 				name="Favoritos"
-				component={OrganizationScreen}
+				component={FavoriteScreen}
 				options={{
 					tabBarIcon: (props) => {
 						return <Octicons {...props} name="bookmark" size={30} />;
