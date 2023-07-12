@@ -66,6 +66,14 @@ $ yarn check-format
 $ yarn lint
 ```
 
+## Format your code
+
+You can format your code by running the following command:
+
+```
+$ yarn format
+```
+
 ## Contribution guidelines
 When you work on your code, you should checkout to "develop" branch:
 
@@ -99,7 +107,7 @@ $ git commit -m "<commit-message>"
 
 >>
 **NOTE**: The <commit-message> should have the following structure: <br>
->*TICFRONT-[#]: "[message]"*
+>*PAWQ-[#]: "[message]"*
 
 Where [#] is the number of the task you are currently working for, and [message] is the actual commit message.
 
