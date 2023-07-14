@@ -7,5 +7,10 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		flexDirection: 'column'
+	},
+	section: {
+		flex: 1,
+		flexDirection: 'column',
+		marginBottom: 65
 	}
 });
