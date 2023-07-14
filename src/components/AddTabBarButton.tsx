@@ -26,7 +26,7 @@ const createStyles = (theme: MD3Theme) =>
 		},
 		addButton: {
 			borderColor: theme.colors.secondary,
-			borderWidth: 3.5 ,
+			borderWidth: 3.5,
 			width: 60,
 			height: 65,
 			borderRadius: 35,

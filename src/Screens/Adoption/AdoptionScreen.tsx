@@ -32,7 +32,14 @@ export function AdoptionScreen() {
 			<Text style={{ marginTop: 10 }}>Cargando</Text>
 		</View>
 	) : (
-		<ScrollView style={{ ...styles.section, marginBottom: tabBarHeight ,backgroundColor: theme.colors.secondary }} ref={ref}>
+		<ScrollView
+			style={{
+				...styles.section,
+				marginBottom: tabBarHeight,
+				backgroundColor: theme.colors.secondary
+			}}
+			ref={ref}
+		>
 			<StatusBar style="auto" />
 			<PublicationCard />
 			<PublicationCard />

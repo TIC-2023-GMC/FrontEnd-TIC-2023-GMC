@@ -9,7 +9,6 @@ import { IconButton, useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
 import { FavoriteScreen } from '../Screens/Favorite';
 
-
 const Tab = createBottomTabNavigator();
 
 export function TabsNavigation() {
