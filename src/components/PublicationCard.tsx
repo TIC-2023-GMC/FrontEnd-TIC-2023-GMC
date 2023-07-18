@@ -1,11 +1,18 @@
 /* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, Card, useTheme, Text, Avatar, IconButton, List } from 'react-native-paper';
+import { StyleSheet, View, Image } from 'react-native';
+import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
 import { AdoptionPublication } from '../InterfacesModels';
 
-const LeftContent = (props: { size: number }) => <Avatar.Icon {...props} icon="account" />;
+const LeftContent = (props: { size: number; photo: string }) => (
+	<Image
+		source={{ uri: props.photo }}
+		resizeMode="cover"
+		resizeMethod="auto"
+		style={{ borderRadius: 25, width: props.size + 10, height: props.size + 10 }}
+	/>
+);
 
 const PublicationCard = (props: AdoptionPublication) => {
 	const theme = useTheme();
@@ -33,11 +40,9 @@ const PublicationCard = (props: AdoptionPublication) => {
 				subtitle={
 					<Text style={{ color: theme.colors.tertiary }}>{'Publicado el ' + publicationDate}</Text>
 				}
-				left={LeftContent}
+				left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
 				right={() => <IconButton icon="dots-vertical" onPress={() => console.log('show menu')} />}
 			/>
-			<View></View>
-
 			<Card.Cover
 				theme={{ ...theme, roundness: 0.5 }}
 				style={styles.img}

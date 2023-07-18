@@ -11,7 +11,7 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/FilterModal';
 import { AdoptionPublication } from '../../InterfacesModels';
 
-interface AdoptionScreen {
+interface AdoptionPublicationScreen {
 	0: AdoptionPublication[];
 	1: number;
 }
@@ -38,6 +38,7 @@ export function AdoptionScreen({
 	setVisibleFilter
 }: {
 	visibleFilter: boolean;
+	// eslint-disable-next-line no-unused-vars
 	setVisibleFilter: (visible: boolean) => void;
 }) {
 	const theme = useTheme();
@@ -51,7 +52,7 @@ export function AdoptionScreen({
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
 		queryKey: ['Adoption', filter],
 		queryFn: async ({ pageParam = 1 }) => {
-			const response = await get<AdoptionScreen>(
+			const response = await get<AdoptionPublicationScreen>(
 				`adoptions/adoptions?page_number=${pageParam}&page_size=${pageSize}${
 					filter?.species ? '&species=' + filter.species : ''
 				}${filter?.date ? '&date=' + formatDate(filter?.date) : ''}${

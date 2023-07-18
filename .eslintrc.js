@@ -30,6 +30,8 @@ module.exports = {
 		'react-native/no-raw-text': 'off',
 		'react-native/no-single-element-style-arrays': 'error',
 		'react-native/sort-styles': 'off',
-		'react-native/no-color-literals': 'off'
+		'react-native/no-color-literals': 'off',
+		'no-unused-vars': 'error',
+		'react/no-unused-prop-types': 'error'
 	}
 };
