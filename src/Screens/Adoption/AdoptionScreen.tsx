@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, memo } from 'react';
 import { Text, View, FlatList } from 'react-native';
 import { styles } from './AdoptionScreen.styles';
 import { StatusBar } from 'expo-status-bar';
@@ -8,7 +8,7 @@ import { ActivityIndicator, useTheme } from 'react-native-paper';
 import PublicationCard from '../../components/PublicationCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import FilterModal from '../../components/FilterModel';
+import FilterModal from '../../components/FilterModal';
 import { AdoptionPublication } from '../../InterfacesModels';
 
 interface AdoptionScreen {
@@ -30,6 +30,8 @@ function formatDate(date: Date): string {
 		return `${year}-${month}-${day}`;
 	}
 }
+const MemoizedPublicationCard = memo(PublicationCard);
+const MemoizedFilterModal = memo(FilterModal);
 
 export function AdoptionScreen({
 	visibleFilter,
@@ -42,33 +44,15 @@ export function AdoptionScreen({
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [empty, setEmpty] = useState<boolean>(false);
-	const [filter, setFilter] = useState<Filter | undefined>(undefined);
+	const [filter, setFilter] = useState<Filter>({} as Filter);
 	const pageSize = 2;
 	useScrollToTop(ref);
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
-		queryKey: ['Adoption'],
-		queryFn: async ({ pageParam = 1 }) => {
-			const response = await get<AdoptionScreen>(
-				`adoptions/adoptions?page_number=${pageParam}&page_size=${pageSize}`
-			);
-			return response.data;
-		},
-		getNextPageParam: (lastPage) => lastPage[1],
-		refetchOnWindowFocus: true,
-		enabled: !filter
-	});
-	const {
-		data: dataFiltered,
-		fetchNextPage: fetchNextPageFiltered,
-		hasNextPage: hasNextPageFiltered,
-		isFetchingNextPage: isFetchingNextPageFiltered,
-		isLoading: isLoadingFiltered
-	} = useInfiniteQuery({
 		queryKey: ['Adoption', filter],
 		queryFn: async ({ pageParam = 1 }) => {
 			const response = await get<AdoptionScreen>(
-				`adoptions/adoptions/filtered?page_number=${pageParam}&page_size=${pageSize}${
+				`adoptions/adoptions?page_number=${pageParam}&page_size=${pageSize}${
 					filter?.species ? '&species=' + filter.species : ''
 				}${filter?.date ? '&date=' + formatDate(filter?.date) : ''}${
 					filter?.location ? '&location=' + filter?.location : ''
@@ -84,14 +68,12 @@ export function AdoptionScreen({
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && !empty) {
 			fetchNextPage();
-		} else if (!isFetchingNextPageFiltered && hasNextPageFiltered && !empty) {
-			fetchNextPageFiltered();
 		} else {
 			setEmpty(true);
 		}
 	};
 
-	return (filter ? isLoadingFiltered : isLoading) ? (
+	return isLoading ? (
 		<View style={styles.container}>
 			<ActivityIndicator animating={true} size="large" />
 			<Text style={{ marginTop: 10 }}>Cargando</Text>
@@ -99,12 +81,13 @@ export function AdoptionScreen({
 	) : (
 		<>
 			<StatusBar style="light" />
-			<FilterModal
+			<MemoizedFilterModal
+				filter={filter}
 				visible={visibleFilter}
 				navBarHeight={tabBarHeight}
 				handlerVisible={() => setVisibleFilter(false)}
 				onApplyFilter={setFilter}
-				handlerCancel={() => setFilter(undefined)}
+				handlerCancel={() => setFilter({} as Filter)}
 			/>
 			<FlatList
 				style={{
@@ -112,20 +95,24 @@ export function AdoptionScreen({
 					marginBottom: tabBarHeight,
 					backgroundColor: theme.colors.secondary
 				}}
+				keyExtractor={(item) => item._id}
 				onEndReached={handleLoadMore}
 				ref={ref}
-				data={
-					filter
-						? dataFiltered?.pages.flatMap((page) => page[0])
-						: data?.pages.flatMap((page) => page[0])
-				}
-				renderItem={({ item }) => <PublicationCard {...item} />}
+				data={data?.pages.flatMap((page) => page[0])}
+				renderItem={({ item }) => <MemoizedPublicationCard {...item} />}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
+				ListEmptyComponent={
+					!empty ? (
+						<View style={styles.activityIndicator}>
+							<Text>No hay más publicaciones</Text>
+						</View>
+					) : null
+				}
 				ListFooterComponent={
 					!empty ? (
 						<>
-							{(!filter ? isFetchingNextPage : isFetchingNextPageFiltered) ? (
+							{isFetchingNextPage ? (
 								<ActivityIndicator size="large" style={styles.activityIndicator} />
 							) : null}
 						</>

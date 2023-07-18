@@ -1,10 +1,10 @@
 /* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
 import { registerTranslation, DatePickerInput } from 'react-native-paper-dates';
-import DropDownPicker from 'react-native-dropdown-picker';
+import DropDownPicker, { ValueType } from 'react-native-dropdown-picker';
 import { Filter } from '../Screens/Adoption/AdoptionScreen';
 registerTranslation('es', {
 	save: 'Guardar',
@@ -29,8 +29,9 @@ interface FilterModalProps {
 	visible: boolean;
 	navBarHeight: number;
 	handlerVisible: () => void;
-	onApplyFilter: React.Dispatch<React.SetStateAction<Filter | undefined>>;
+	onApplyFilter: React.Dispatch<React.SetStateAction<Filter>>;
 	handlerCancel: () => void;
+	filter: Filter;
 }
 
 const FilterModal = ({
@@ -38,17 +39,18 @@ const FilterModal = ({
 	navBarHeight,
 	handlerVisible,
 	onApplyFilter,
-	handlerCancel
+	handlerCancel,
+	filter
 }: FilterModalProps) => {
 	const theme = useTheme();
-	const [checkedDog, setCheckedDog] = useState<boolean | undefined>(undefined);
-	const [checkedCat, setCheckedCat] = useState<boolean | undefined>(undefined);
-	const [date, setDate] = useState<Date | undefined>(undefined);
-	const [location, setLocation] = useState(null);
+	const [checkedDog, setCheckedDog] = useState<boolean | undefined>(filter.species === 'Perro');
+	const [checkedCat, setCheckedCat] = useState<boolean | undefined>(filter.species === 'Gato');
+	const [date, setDate] = useState<Date | undefined>(filter.date);
+	const [location, setLocation] = useState(filter.location);
 	const [open, setOpen] = useState(false);
 	const [items, setItems] = useState([
-		{ label: 'Apple', value: 'apple' },
-		{ label: 'Banana', value: 'banana' }
+		{ label: 'Carapungo', value: 'Carapungo' },
+		{ label: 'Cumbayork', value: 'Cumbayork' }
 	]);
 	const handlerApplyFilter = () => {
 		onApplyFilter({
@@ -59,6 +61,12 @@ const FilterModal = ({
 
 		handlerVisible();
 	};
+	useEffect(() => {
+		setCheckedCat(filter.species === 'Gato');
+		setCheckedDog(filter.species === 'Perro');
+		setDate(filter.date);
+		setLocation(filter.location);
+	}, [filter]);
 
 	return (
 		<Portal>
@@ -121,7 +129,7 @@ const FilterModal = ({
 				<DropDownPicker
 					placeholder="Selecciona una ubicación"
 					open={open}
-					value={location}
+					value={location as ValueType}
 					items={items}
 					setOpen={setOpen}
 					setValue={setLocation}
@@ -180,7 +188,7 @@ const FilterModal = ({
 						textColor={theme.colors.secondary}
 						onPress={handlerCancel}
 					>
-						Cancelar
+						Reset
 					</Button>
 				</View>
 			</Modal>

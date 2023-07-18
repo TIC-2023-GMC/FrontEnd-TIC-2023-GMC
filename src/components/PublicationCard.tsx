@@ -12,6 +12,7 @@ const PublicationCard = (props: AdoptionPublication) => {
 	const [like, setLike] = useState<boolean>();
 	const [expanded, setExpanded] = useState<boolean>();
 	const {
+		user,
 		pet_age: petAge,
 		pet_size: petSize,
 		description,
@@ -28,7 +29,7 @@ const PublicationCard = (props: AdoptionPublication) => {
 	return (
 		<Card style={styles.card}>
 			<Card.Title
-				title="Erick Munoz"
+				title={user.first_name + ' ' + user.last_name}
 				subtitle={
 					<Text style={{ color: theme.colors.tertiary }}>{'Publicado el ' + publicationDate}</Text>
 				}
