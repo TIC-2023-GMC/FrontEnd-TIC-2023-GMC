@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
 import { registerTranslation, DatePickerInput } from 'react-native-paper-dates';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { Filter } from '../Screens/Adoption/AdoptionScreen';
 registerTranslation('es', {
 	save: 'Guardar',
@@ -43,7 +44,12 @@ const FilterModal = ({
 	const [checkedDog, setCheckedDog] = useState<boolean | undefined>(undefined);
 	const [checkedCat, setCheckedCat] = useState<boolean | undefined>(undefined);
 	const [date, setDate] = useState<Date | undefined>(undefined);
-	const [location, setLocation] = useState<string | undefined>(undefined);
+	const [location, setLocation] = useState(null);
+	const [open, setOpen] = useState(false);
+	const [items, setItems] = useState([
+		{ label: 'Apple', value: 'apple' },
+		{ label: 'Banana', value: 'banana' }
+	]);
 	const handlerApplyFilter = () => {
 		onApplyFilter({
 			species: checkedCat ? 'Gato' : checkedDog ? 'Perro' : undefined,
@@ -111,15 +117,31 @@ const FilterModal = ({
 					/>
 				</View>
 				<Divider />
-				<View style={styles.viewList}>
-					<List.Item
-						style={styles.listItems}
-						title="Ubicación"
-						left={(props) => (
-							<IconButton {...props} icon="map-marker" iconColor={theme.colors.tertiary} />
-						)}
-					/>
-				</View>
+
+				<DropDownPicker
+					placeholder="Selecciona una ubicación"
+					open={open}
+					value={location}
+					items={items}
+					setOpen={setOpen}
+					setValue={setLocation}
+					setItems={setItems}
+					style={{
+						backgroundColor: 'transparent',
+						borderColor: 'transparent',
+						width: '100%',
+						height: 60
+					}}
+					dropDownContainerStyle={{
+						width: '100%',
+						backgroundColor: theme.colors.secondary,
+						borderColor: theme.colors.primary,
+						borderWidth: 0.5
+					}}
+					listMode="SCROLLVIEW"
+					dropDownDirection='TOP'
+				/>
+
 				<Divider />
 				<DatePickerInput
 					locale="es"
