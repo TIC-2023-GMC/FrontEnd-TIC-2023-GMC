@@ -3,19 +3,56 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
-import RNDateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { registerTranslation, DatePickerInput } from 'react-native-paper-dates';
+import { Filter } from '../Screens/Adoption/AdoptionScreen';
+registerTranslation('es', {
+	save: 'Guardar',
+	selectSingle: 'Seleccionar fecha',
+	selectMultiple: 'Seleccionar fechas',
+	selectRange: 'Seleccionar período',
+	notAccordingToDateFormat: (inputFormat) => `El formato de fecha debe ser ${inputFormat}`,
+	mustBeHigherThan: (date) => `Debe ser después de ${date}`,
+	mustBeLowerThan: (date) => `Debe ser antes de ${date}`,
+	mustBeBetween: (startDate, endDate) => `Debe estar entre ${startDate} - ${endDate}`,
+	dateIsDisabled: 'Día no permitido',
+	previous: 'Anterior',
+	next: 'Siguiente',
+	typeInDate: 'Escribir fecha',
+	pickDateFromCalendar: 'Seleccionar fecha del calendario',
+	close: 'Cerrar'
+});
+
 const deviceHeight = Dimensions.get('window').height;
 
 interface FilterModalProps {
 	visible: boolean;
 	navBarHeight: number;
 	handlerVisible: () => void;
+	onApplyFilter: React.Dispatch<React.SetStateAction<Filter | undefined>>;
+	handlerCancel: () => void;
 }
 
-const FilterModal = ({ visible, navBarHeight, handlerVisible }: FilterModalProps) => {
+const FilterModal = ({
+	visible,
+	navBarHeight,
+	handlerVisible,
+	onApplyFilter,
+	handlerCancel
+}: FilterModalProps) => {
 	const theme = useTheme();
-	const [checkedDog, setCheckedDog] = useState(false);
-	const [checkedCat, setCheckedCat] = useState(false);
+	const [checkedDog, setCheckedDog] = useState<boolean | undefined>(undefined);
+	const [checkedCat, setCheckedCat] = useState<boolean | undefined>(undefined);
+	const [date, setDate] = useState<Date | undefined>(undefined);
+	const [location, setLocation] = useState<string | undefined>(undefined);
+	const handlerApplyFilter = () => {
+		onApplyFilter({
+			species: checkedCat ? 'Gato' : checkedDog ? 'Perro' : undefined,
+			date,
+			location: location ? location : undefined
+		});
+
+		handlerVisible();
+	};
 
 	return (
 		<Portal>
@@ -45,7 +82,10 @@ const FilterModal = ({ visible, navBarHeight, handlerVisible }: FilterModalProps
 					<List.Item
 						style={styles.list}
 						title="Perro"
-						onPress={() => setCheckedDog(!checkedDog)}
+						onPress={() => {
+							setCheckedDog(!checkedDog);
+							setCheckedCat(false);
+						}}
 						left={(props) => (
 							<IconButton
 								{...props}
@@ -57,7 +97,10 @@ const FilterModal = ({ visible, navBarHeight, handlerVisible }: FilterModalProps
 					<List.Item
 						style={styles.list}
 						title="Gato"
-						onPress={() => setCheckedCat(!checkedCat)}
+						onPress={() => {
+							setCheckedCat(!checkedCat);
+							setCheckedDog(false);
+						}}
 						left={(props) => (
 							<IconButton
 								{...props}
@@ -68,27 +111,35 @@ const FilterModal = ({ visible, navBarHeight, handlerVisible }: FilterModalProps
 					/>
 				</View>
 				<Divider />
-				<List.Item
-					style={styles.listItems}
-					title="Ubicación"
-					left={(props) => (
-						<IconButton {...props} icon="map-marker" iconColor={theme.colors.tertiary} />
-					)}
-				/>
-				<Divider />
 				<View style={styles.viewList}>
 					<List.Item
 						style={styles.listItems}
-						title="Ver publicaciones desde:"
+						title="Ubicación"
 						left={(props) => (
-							<IconButton {...props} icon="calendar-range" iconColor={theme.colors.tertiary} />
+							<IconButton {...props} icon="map-marker" iconColor={theme.colors.tertiary} />
 						)}
 					/>
-					<RNDateTimePicker
-						value={new Date()}
-						display="spinner"
-					/>
 				</View>
+				<Divider />
+				<DatePickerInput
+					locale="es"
+					label="Ver publicaciones desde:"
+					value={date}
+					onChange={(d) => setDate(d)}
+					inputMode="start"
+					mode="outlined"
+					style={{ backgroundColor: 'transparent', color: theme.colors.tertiary }}
+					calendarIcon="calendar-range"
+					outlineStyle={{ borderColor: 'transparent' }}
+					right={
+						<IconButton
+							icon="pet"
+							iconColor={theme.colors.tertiary}
+							style={{ alignSelf: 'center', justifyContent: 'space-around', margin: 0, height: 30 }}
+						/>
+					}
+				/>
+
 				<Divider />
 				<View style={styles.buttonView}>
 					<Button
@@ -96,9 +147,7 @@ const FilterModal = ({ visible, navBarHeight, handlerVisible }: FilterModalProps
 						mode="elevated"
 						buttonColor={theme.colors.primary}
 						textColor={theme.colors.secondary}
-						onPress={() => {
-							console.log('Pressed');
-						}}
+						onPress={handlerApplyFilter}
 					>
 						Aplicar Filtros
 					</Button>
@@ -107,7 +156,7 @@ const FilterModal = ({ visible, navBarHeight, handlerVisible }: FilterModalProps
 						mode="elevated"
 						buttonColor={theme.colors.tertiary}
 						textColor={theme.colors.secondary}
-						onPress={handlerVisible}
+						onPress={handlerCancel}
 					>
 						Cancelar
 					</Button>
