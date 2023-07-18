@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AddAdoptionScreen, AdoptionScreen } from '../Screens/Adoption';
 import { StyleSheet } from 'react-native';
@@ -13,6 +13,7 @@ const Tab = createBottomTabNavigator();
 
 export function TabsNavigation() {
 	const theme = useTheme();
+	const [visibleFilter, setVisibleFilter] = useState<boolean>(false);
 
 	const styles = StyleSheet.create({
 		tabBar: {
@@ -41,7 +42,7 @@ export function TabsNavigation() {
 						iconColor={theme.colors.secondary}
 						size={30}
 						{...props}
-						onPress={() => console.log('go to filter')}
+						onPress={() => setVisibleFilter(true)}
 					/>
 				),
 				headerLeft: (props) => (
@@ -66,13 +67,20 @@ export function TabsNavigation() {
 		>
 			<Tab.Screen
 				name="Adopciones"
-				component={AdoptionScreen}
 				options={{
 					tabBarIcon: (props) => {
 						return <MaterialIcons {...props} name="pets" size={30} />;
 					}
 				}}
-			/>
+			>
+				{(props) => (
+					<AdoptionScreen
+						{...props}
+						visibleFilter={visibleFilter}
+						setVisibleFilter={setVisibleFilter}
+					/>
+				)}
+			</Tab.Screen>
 			<Tab.Screen
 				name="Experiencias"
 				component={ExperienceScreen}

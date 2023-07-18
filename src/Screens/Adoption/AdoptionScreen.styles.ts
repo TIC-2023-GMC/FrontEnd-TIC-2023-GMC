@@ -13,4 +13,10 @@ export const styles = StyleSheet.create({
 		flexDirection: 'column',
 		marginBottom: 65
 	}
+	,
+	activityIndicator: {
+		margin: 15,
+		justifyContent: 'center',
+		alignItems: 'center'
+	}
 });

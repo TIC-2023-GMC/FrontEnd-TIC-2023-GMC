@@ -3,16 +3,25 @@ import * as React from 'react';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Card, useTheme, Text, Avatar, IconButton, List } from 'react-native-paper';
+import { AdoptionPublication } from '../InterfacesModels';
 
 const LeftContent = (props: { size: number }) => <Avatar.Icon {...props} icon="account" />;
 
-const PublicationCard = () => {
+const PublicationCard = (props: AdoptionPublication) => {
 	const theme = useTheme();
 	const [like, setLike] = useState<boolean>();
 	const [expanded, setExpanded] = useState<boolean>();
-	const petSex = 'M';
-	const carnet = true;
-	const sterilization = true;
+	const {
+		pet_age: petAge,
+		pet_size: petSize,
+		description,
+		pet_location: petLocation,
+		publication_date: publicationDate,
+		photo,
+		pet_sex: petSex,
+		vaccination_card: vaccinationCard,
+		sterilized
+	} = props;
 	const handleExpand = () => {
 		setExpanded(!expanded);
 	};
@@ -20,7 +29,9 @@ const PublicationCard = () => {
 		<Card style={styles.card}>
 			<Card.Title
 				title="Erick Munoz"
-				subtitle={<Text style={{ color: theme.colors.tertiary }}>Publicado el 11/07/2023</Text>}
+				subtitle={
+					<Text style={{ color: theme.colors.tertiary }}>{'Publicado el ' + publicationDate}</Text>
+				}
 				left={LeftContent}
 				right={() => <IconButton icon="dots-vertical" onPress={() => console.log('show menu')} />}
 			/>
@@ -31,28 +42,32 @@ const PublicationCard = () => {
 				style={styles.img}
 				resizeMode="contain"
 				resizeMethod="scale"
-				source={{ uri: 'https://tecolotito.elsiglodetorreon.com.mx/i/2007/09/27171.jpeg' }}
-				loadingIndicatorSource={{
-					uri: 'https://tecolotito.elsiglodetorreon.com.mx/i/2007/09/27171.jpeg'
-				}}
+				source={{ uri: photo.img_path }}
+				loadingIndicatorSource={{ uri: photo.img_path }}
 				progressiveRenderingEnabled={true}
 			/>
 			<Card.Content style={styles.content}>
 				<View style={styles.contentColumn}>
 					<List.Item
 						style={styles.list}
-						title={'3 años'}
+						title={
+							petAge * 12 >= 12
+								? Math.round(petAge) > 1
+									? Math.round(petAge) + ' años'
+									: Math.round(petAge) + ' año'
+								: petAge * 12 + ' meses'
+						}
 						left={() => <List.Icon color={theme.colors.tertiary} icon="cake-variant" />}
 					/>
 					<List.Item
 						style={styles.list}
 						titleNumberOfLines={2}
-						title={'San Antonio de Pichincha'}
+						title={petLocation}
 						left={() => <List.Icon color={theme.colors.tertiary} icon="map-marker" />}
 					/>
 					<List.Item
 						style={styles.list}
-						title={'Pequeño'}
+						title={petSize}
 						left={() => <List.Icon color={theme.colors.tertiary} icon="ruler" />}
 					/>
 				</View>
@@ -63,7 +78,7 @@ const PublicationCard = () => {
 						left={() => (
 							<List.Icon
 								color={theme.colors.tertiary}
-								icon={`gender-${'M' === petSex ? 'male' : 'female'}`}
+								icon={`gender-${petSex ? 'male' : 'female'}`}
 							/>
 						)}
 					/>
@@ -74,7 +89,7 @@ const PublicationCard = () => {
 						left={() => (
 							<List.Icon
 								color={theme.colors.tertiary}
-								icon={`${carnet ? 'check-circle-outline' : 'close-circle-outline'}`}
+								icon={`${vaccinationCard ? 'check-circle-outline' : 'close-circle-outline'}`}
 							/>
 						)}
 					/>
@@ -84,7 +99,7 @@ const PublicationCard = () => {
 						left={() => (
 							<List.Icon
 								color={theme.colors.tertiary}
-								icon={`${sterilization ? 'check-circle-outline' : 'close-circle-outline'}`}
+								icon={`${sterilized ? 'check-circle-outline' : 'close-circle-outline'}`}
 							/>
 						)}
 					/>
@@ -92,11 +107,7 @@ const PublicationCard = () => {
 			</Card.Content>
 			{expanded && (
 				<Card.Content>
-					<List.Item
-						style={styles.list}
-						title="Descripción"
-						description={'Se llama Atom y es jugueton, es alérgico a las fresas. Recién operado'}
-					/>
+					<List.Item style={styles.list} title="Descripción" description={description} />
 				</Card.Content>
 			)}
 
