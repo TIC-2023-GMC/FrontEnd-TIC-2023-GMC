@@ -12,8 +12,7 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'column',
 		marginBottom: 65
-	}
-	,
+	},
 	activityIndicator: {
 		margin: 15,
 		justifyContent: 'center',

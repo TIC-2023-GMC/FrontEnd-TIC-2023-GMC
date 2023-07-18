@@ -35,7 +35,7 @@ export interface Like extends Interaction {
 }
 
 export interface AdoptionPublication {
-    _id: string;
+	_id: string;
 	user: User;
 	description: string;
 	publication_date: string;

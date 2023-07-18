@@ -139,7 +139,7 @@ const FilterModal = ({
 						borderWidth: 0.5
 					}}
 					listMode="SCROLLVIEW"
-					dropDownDirection='TOP'
+					dropDownDirection="TOP"
 				/>
 
 				<Divider />
