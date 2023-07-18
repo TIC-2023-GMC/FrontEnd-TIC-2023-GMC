@@ -27,9 +27,11 @@ module.exports = {
 		'react-native/no-unused-styles': 'warn',
 		'react-native/split-platform-components': 'error',
 		'react-native/no-inline-styles': 'off',
-		'react-native/no-raw-text': 'error',
+		'react-native/no-raw-text': 'off',
 		'react-native/no-single-element-style-arrays': 'error',
 		'react-native/sort-styles': 'off',
-		'react-native/no-color-literals': 'off'
+		'react-native/no-color-literals': 'off',
+		'no-unused-vars': 'error',
+		'react/no-unused-prop-types': 'error'
 	}
 };
