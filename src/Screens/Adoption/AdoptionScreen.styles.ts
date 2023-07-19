@@ -8,7 +8,14 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		flexDirection: 'column'
 	},
-	inputText:{
-		color: "red"
+	section: {
+		flex: 1,
+		flexDirection: 'column',
+		marginBottom: 65
+	},
+	activityIndicator: {
+		margin: 15,
+		justifyContent: 'center',
+		alignItems: 'center'
 	}
 });
