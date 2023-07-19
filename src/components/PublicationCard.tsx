@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AdoptionPublication } from '../InterfacesModels';
+import { AdoptionPublication } from '../models/InterfacesModels';
 
 const LeftContent = (props: { size: number; photo: string }) => (
 	<Image

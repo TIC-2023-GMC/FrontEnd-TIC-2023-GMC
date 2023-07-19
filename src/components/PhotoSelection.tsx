@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet, Image, View } from 'react-native';
 import { Button, IconButton } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 
-interface PhotoSelectionProps {
+/* interface PhotoSelectionProps {
 	image: ImagePicker.ImagePickerResult | undefined;
 	setImage: React.Dispatch<React.SetStateAction<ImagePicker.ImagePickerResult | undefined>>;
+} */
+
+interface PhotoSelectionProps {
+	image: string | undefined;
+	setImage: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 export default function PhotoSelection({ image, setImage }: PhotoSelectionProps) {
@@ -17,13 +22,16 @@ export default function PhotoSelection({ image, setImage }: PhotoSelectionProps)
 			aspect: [4, 3],
 			quality: 1
 		});
+
 		if (!result.canceled) {
-			setImage(result);
+			//console.log(`image selected: ${result.assets?.pop()?.uri}`);
+			setImage(result.assets?.pop()?.uri);
 		}
 	};
+
 	return (
 		<View style={styles.container}>
-			<Image source={{ uri: image?.assets?.pop()?.uri }} style={styles.image} />
+			<Image source={{ uri: image }} style={styles.image} />
 			<IconButton onPress={pickImages} size={30} icon="image-plus" mode="contained-tonal" />
 		</View>
 	);
@@ -43,4 +51,3 @@ const styles = StyleSheet.create({
 		borderRadius: 10
 	}
 });
-

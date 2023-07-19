@@ -9,7 +9,7 @@ import PublicationCard from '../../components/PublicationCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/FilterModal';
-import { AdoptionPublication } from '../../InterfacesModels';
+import { AdoptionPublication } from '../../models/InterfacesModels';
 
 interface AdoptionPublicationScreen {
 	0: AdoptionPublication[];

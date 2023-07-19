@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	input: {
-		width:'100%'
+		width: '100%'
 	},
 	listItems: {
 		width: '100%',
@@ -36,8 +36,7 @@ export const styles = StyleSheet.create({
 		margin: 0,
 		height: 30
 	},
-	checkbox:{
-		width:'25%',
+	checkbox: {
+		width: '25%'
 	}
-
 });

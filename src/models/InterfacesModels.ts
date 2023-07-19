@@ -15,6 +15,7 @@ export interface User {
 	motivation: string;
 	favorite_adoption_publications: string[];
 	photo: {
+		_id: string;
 		img_path: string;
 	};
 }
