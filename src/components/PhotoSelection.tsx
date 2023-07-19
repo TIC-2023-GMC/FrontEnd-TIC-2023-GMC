@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, Image, View } from 'react-native';
-import { Button, IconButton } from 'react-native-paper';
+import { IconButton, MD3Theme, useTheme } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 
 interface PhotoSelectionProps {
@@ -9,8 +9,10 @@ interface PhotoSelectionProps {
 }
 
 export default function PhotoSelection({ image, setImage }: PhotoSelectionProps) {
+	const theme = useTheme();
+	const styles = createStyles(theme);
 	const pickImages = async () => {
-		let result = await ImagePicker.launchImageLibraryAsync({
+		const result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: true,
 			selectionLimit: 1,
@@ -24,23 +26,30 @@ export default function PhotoSelection({ image, setImage }: PhotoSelectionProps)
 	return (
 		<View style={styles.container}>
 			<Image source={{ uri: image?.assets?.pop()?.uri }} style={styles.image} />
-			<IconButton onPress={pickImages} size={30} icon="image-plus" mode="contained-tonal" />
+			<IconButton
+				onPress={pickImages}
+				size={30}
+				icon="image-plus"
+				mode="contained"
+				containerColor={theme.colors.secondary}
+				iconColor={theme.colors.primary}
+			/>
 		</View>
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		marginTop: 10,
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-	image: {
-		width: 240,
-		height: 180,
-		borderWidth: 1,
-		borderColor: '#000000',
-		borderRadius: 10
-	}
-});
-
+const createStyles = (theme: MD3Theme) =>
+	StyleSheet.create({
+		container: {
+			marginTop: 10,
+			justifyContent: 'center',
+			alignItems: 'center'
+		},
+		image: {
+			width: 240,
+			height: 180,
+			borderWidth: 1,
+			borderColor: theme.colors.tertiary,
+			borderRadius: 10
+		}
+	});

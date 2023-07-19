@@ -1,11 +1,11 @@
 import { Controller, useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
-import { Text, View, Alert, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { Text, View, ScrollView } from 'react-native';
 import { TextInput, Checkbox, Divider, RadioButton, useTheme, Button } from 'react-native-paper';
 import * as z from 'zod';
 import DropDownPicker, { ValueType } from 'react-native-dropdown-picker';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { styles } from './AddAdoptionScreen.styles';
+import { styles } from './AdoptionScreenForm.styles';
 import PhotoSelection from '../../components/PhotoSelection';
 import { ImagePickerResult } from 'expo-image-picker';
 import { useMutation } from '@tanstack/react-query';
@@ -17,7 +17,7 @@ const schema = z.object({
 	age: z.number()
 });
 
-export function AddAdoptionScreen() {
+export function AdoptionScreenForm() {
 	const {
 		control,
 		formState: { errors },
@@ -52,9 +52,8 @@ export function AddAdoptionScreen() {
 	const [image, setImage] = useState<ImagePickerResult>();
 	return (
 		<ScrollView style={{ marginBottom: tabBarHeight }}>
-			{/* Foto */}
 			<PhotoSelection image={image} setImage={setImage} />
-			{/* Especie */}
+			<Text style={styles.text}>Especie:</Text>
 			<Controller
 				control={control}
 				rules={{
@@ -62,14 +61,28 @@ export function AddAdoptionScreen() {
 				}}
 				render={({ field: { onChange, value } }) => (
 					<RadioButton.Group onValueChange={onChange} value={value}>
-						<RadioButton.Item value="dog" label="Perro" />
-						<RadioButton.Item value="cat" label="Gato" />
+						<View style={styles.viewList}>
+							<RadioButton.Item
+								position="leading"
+								value="dog"
+								label="Perro"
+								style={styles.radioButton}
+								labelStyle={styles.labelRadioButton}
+							/>
+							<RadioButton.Item
+								position="leading"
+								value="cat"
+								label="Gato"
+								style={styles.radioButton}
+								labelStyle={styles.labelRadioButton}
+							/>
+						</View>
 					</RadioButton.Group>
 				)}
 				name="species"
 			/>
 			<Divider />
-			{/* Sexo */}
+			<Text style={styles.text}>Sexo:</Text>
 			<Controller
 				control={control}
 				rules={{
@@ -77,14 +90,27 @@ export function AddAdoptionScreen() {
 				}}
 				render={({ field: { onChange, value } }) => (
 					<RadioButton.Group onValueChange={onChange} value={value}>
-						<RadioButton.Item value="male" label="Macho" />
-						<RadioButton.Item value="female" label="Hembra" />
+						<View style={styles.viewList}>
+							<RadioButton.Item
+								position="leading"
+								value="male"
+								label="Macho"
+								style={styles.radioButton}
+								labelStyle={styles.labelRadioButton}
+							/>
+							<RadioButton.Item
+								position="leading"
+								value="female"
+								label="Hembra"
+								style={styles.radioButton}
+								labelStyle={styles.labelRadioButton}
+							/>
+						</View>
 					</RadioButton.Group>
 				)}
 				name="sex"
 			/>
 			<Divider />
-			{/* Raza */}
 			<Controller
 				control={control}
 				rules={{
@@ -103,8 +129,6 @@ export function AddAdoptionScreen() {
 				name="breed"
 			/>
 			{errors.breed && <Text>Este campo es obligatorio</Text>}
-			<Divider />
-			{/* Tamaño*/}
 			<Controller
 				control={control}
 				rules={{
@@ -112,7 +136,7 @@ export function AddAdoptionScreen() {
 				}}
 				render={({ field: { onChange, value } }) => (
 					<DropDownPicker
-						placeholder="Selecciona una opción"
+						placeholder="Selecciona el sector"
 						open={openSize}
 						value={value as ValueType}
 						items={itemsSize}
@@ -120,24 +144,23 @@ export function AddAdoptionScreen() {
 						setValue={onChange}
 						setItems={setItemsSize}
 						style={{
-							backgroundColor: 'transparent',
-							borderColor: 'transparent',
-							width: '100%',
-							height: 60
+							...styles.comboItem,
+							borderColor: theme.colors.tertiary,
+							height: 50
 						}}
 						dropDownContainerStyle={{
 							width: '100%',
-							backgroundColor: theme.colors.secondary,
+							backgroundColor: 'white',
 							borderColor: theme.colors.primary,
 							borderWidth: 0.5
 						}}
 						listMode="SCROLLVIEW"
+						dropDownDirection="TOP"
 					/>
 				)}
 				name="size"
 			/>
 			<Divider />
-			{/* Ubicación */}
 			<Controller
 				control={control}
 				rules={{
@@ -145,7 +168,7 @@ export function AddAdoptionScreen() {
 				}}
 				render={({ field: { onChange, value } }) => (
 					<DropDownPicker
-						placeholder="Selecciona una opción"
+						placeholder="Selecciona el tamaño"
 						open={openLocation}
 						value={value as ValueType}
 						items={itemsLocation}
@@ -153,64 +176,63 @@ export function AddAdoptionScreen() {
 						setValue={onChange}
 						setItems={setItemsLocation}
 						style={{
-							backgroundColor: 'transparent',
-							borderColor: 'transparent',
-							width: '100%',
-							height: 60
+							...styles.comboItem,
+							borderColor: theme.colors.tertiary,
+							height: 50
 						}}
 						dropDownContainerStyle={{
 							width: '100%',
-							backgroundColor: theme.colors.secondary,
+							backgroundColor: 'white',
 							borderColor: theme.colors.primary,
 							borderWidth: 0.5
 						}}
 						listMode="SCROLLVIEW"
+						dropDownDirection="TOP"
 					/>
 				)}
 				name="location"
 			/>
 			<Divider />
-			{/* Vacunas */}
 			<Controller
 				control={control}
 				rules={{
 					required: false
 				}}
 				render={({ field: { onChange, value } }) => (
-					<View style={styles.viewList}>
-						<Checkbox
-							status={value ? 'checked' : 'unchecked'}
-							onPress={() => {
-								onChange(!value);
-							}}
-						/>
-						<Text>¿Posee carnet de vacunación?</Text>
-					</View>
+					<Checkbox.Item
+						style={styles.viewList}
+						status={value ? 'checked' : 'unchecked'}
+						onPress={() => {
+							onChange(!value);
+						}}
+						label="¿Posee carnet de vacunación?"
+						position="leading"
+						labelStyle={{ textAlign: 'center' }}
+					/>
 				)}
 				name="vaccination"
 			/>
 			<Divider />
-			{/* Esterilización*/}
 			<Controller
 				control={control}
 				rules={{
 					required: false
 				}}
 				render={({ field: { onChange, value } }) => (
-					<View style={styles.viewList}>
-						<Checkbox
-							status={value ? 'checked' : 'unchecked'}
-							onPress={() => {
-								onChange(!value);
-							}}
-						/>
-						<Text>¿Se Encuentra Esterilizado?</Text>
-					</View>
+					<Checkbox.Item
+						style={styles.viewList}
+						status={value ? 'checked' : 'unchecked'}
+						onPress={() => {
+							onChange(!value);
+						}}
+						label="¿Se Encuentra Esterilizado?"
+						position="leading"
+						labelStyle={{ textAlign: 'center' }}
+					/>
 				)}
 				name="sterilization"
 			/>
 			<Divider />
-			{/* Extra */}
 			<Controller
 				control={control}
 				rules={{
@@ -218,7 +240,7 @@ export function AddAdoptionScreen() {
 				}}
 				render={({ field: { onChange, onBlur, value } }) => (
 					<TextInput
-						placeholder="Ingrese alguna información addcional del animal"
+						placeholder="Ingrese alguna información adicional del animal"
 						onBlur={onBlur}
 						onChangeText={onChange}
 						value={value}
@@ -228,6 +250,7 @@ export function AddAdoptionScreen() {
 				)}
 				name="extra"
 			/>
+
 			<View style={styles.buttonView}>
 				<Button
 					style={styles.button}
