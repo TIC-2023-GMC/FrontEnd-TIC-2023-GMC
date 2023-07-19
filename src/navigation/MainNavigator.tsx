@@ -36,6 +36,7 @@ export function TabsNavigation() {
 				tabBarActiveTintColor: theme.colors.tertiary,
 				tabBarInactiveTintColor: theme.colors.secondary,
 				tabBarActiveBackgroundColor: 'rgba(0,0,0,0.5)',
+				tabBarHideOnKeyboard: true,
 				headerRight: (props) => (
 					<IconButton
 						icon="filter"
