@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AddAdoptionScreen, AdoptionScreen } from '../Screens/Adoption';
 import { StyleSheet } from 'react-native';
 import { MaterialIcons, Feather, Octicons } from '@expo/vector-icons';
 import { ExperienceScreen } from '../Screens/Experience';
 import { OrganizationScreen } from '../Screens/Organization';
-import { useTheme } from 'react-native-paper';
+import { IconButton, useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
 import { FavoriteScreen } from '../Screens/Favorite';
 
@@ -13,6 +13,8 @@ const Tab = createBottomTabNavigator();
 
 export function TabsNavigation() {
 	const theme = useTheme();
+	const [visibleFilter, setVisibleFilter] = useState<boolean>(false);
+
 	const styles = StyleSheet.create({
 		tabBar: {
 			position: 'absolute',
@@ -33,20 +35,54 @@ export function TabsNavigation() {
 				tabBarItemStyle: styles.tab,
 				tabBarActiveTintColor: theme.colors.tertiary,
 				tabBarInactiveTintColor: theme.colors.secondary,
-				tabBarActiveBackgroundColor: 'rgba(0,0,0,0.5)'
+				tabBarActiveBackgroundColor: 'rgba(0,0,0,0.5)',
+				headerRight: (props) => (
+					<IconButton
+						icon="filter"
+						iconColor={theme.colors.secondary}
+						size={30}
+						{...props}
+						onPress={() => setVisibleFilter(true)}
+					/>
+				),
+				headerLeft: (props) => (
+					<IconButton
+						icon="controller-classic"
+						iconColor={theme.colors.secondary}
+						size={40}
+						{...props}
+						onPress={() => console.log('go to game')}
+					/>
+				),
+				headerStyle: {
+					backgroundColor: theme.colors.primary
+				},
+				headerTitleStyle: {
+					color: theme.colors.secondary,
+					fontWeight: 'bold',
+					fontSize: 30
+				},
+				headerTitleAlign: 'center'
 			}}
 		>
 			<Tab.Screen
-				name="Adoption"
-				component={AdoptionScreen}
+				name="Adopciones"
 				options={{
 					tabBarIcon: (props) => {
 						return <MaterialIcons {...props} name="pets" size={30} />;
 					}
 				}}
-			/>
+			>
+				{(props) => (
+					<AdoptionScreen
+						{...props}
+						visibleFilter={visibleFilter}
+						setVisibleFilter={setVisibleFilter}
+					/>
+				)}
+			</Tab.Screen>
 			<Tab.Screen
-				name="Experience"
+				name="Experiencias"
 				component={ExperienceScreen}
 				options={{
 					tabBarIcon: (props) => {
@@ -64,7 +100,7 @@ export function TabsNavigation() {
 				}}
 			/>
 			<Tab.Screen
-				name="Organization"
+				name="Organizaciones"
 				component={OrganizationScreen}
 				options={{
 					tabBarIcon: (props) => {
@@ -73,11 +109,11 @@ export function TabsNavigation() {
 				}}
 			/>
 			<Tab.Screen
-				name="Favoritos"
+				name="Perfil"
 				component={FavoriteScreen}
 				options={{
 					tabBarIcon: (props) => {
-						return <Octicons {...props} name="bookmark" size={30} />;
+						return <Octicons {...props} name="person-fill" size={30} />;
 					}
 				}}
 			/>
