@@ -11,10 +11,9 @@ import { baseUrl, post } from '../../services/api';
 import * as FileSystem from 'expo-file-system';
 import { AdoptionPublication, Photo } from '../../models/InterfacesModels';
 import { useMutation } from '@tanstack/react-query';
-import { useNavigation } from '@react-navigation/native';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-const Photo = z.object({
+const PhotoSchema = z.object({
 	_id: z.string(),
 	img_path: z.string()
 });
@@ -35,7 +34,7 @@ const UserSchema = z.object({
 	pet_expenses: z.number(),
 	motivation: z.string(),
 	favorite_adoption_publications: z.array(z.string()),
-	photo: Photo
+	photo: PhotoSchema
 });
 
 const Like = z.object({
@@ -53,7 +52,7 @@ const AdoptionPublicationSchema = z.object({
 	user: UserSchema,
 	description: z.string(),
 	publication_date: z.string(),
-	photo: Photo,
+	photo: PhotoSchema,
 	likes: z.optional(z.array(Like)),
 	comments: z.optional(z.array(Comment)),
 	species: z.string(),
@@ -77,7 +76,7 @@ function formatDate(date: Date): string {
 	}
 }
 
-export function AddAdoptionScreen() {
+export function AdoptionScreenForm() {
 	const {
 		control,
 		formState: { errors },
@@ -145,7 +144,7 @@ export function AddAdoptionScreen() {
 
 	const createPublicationMutation = useMutation({
 		mutationFn: (data: AdoptionPublication) =>
-			post('/adoption/create_adoption', data).then((response) => response.data),
+			post('/adoptions/adoption', data).then((response) => response.data),
 		onSuccess: () => {
 			console.log('Publicación creada');
 		}
@@ -190,9 +189,8 @@ export function AddAdoptionScreen() {
 
 	return (
 		<ScrollView style={{ marginBottom: tabBarHeight }}>
-			{/* Foto */}
 			<PhotoSelection image={image} setImage={setImage} />
-			{/* Especie */}
+			<Text style={styles.text}>Especie:</Text>
 			<Controller
 				control={control}
 				rules={{
@@ -200,14 +198,28 @@ export function AddAdoptionScreen() {
 				}}
 				render={({ field: { onChange, value } }) => (
 					<RadioButton.Group onValueChange={onChange} value={value}>
-						<RadioButton.Item value="dog" label="Perro" />
-						<RadioButton.Item value="cat" label="Gato" />
+						<View style={styles.viewList}>
+							<RadioButton.Item
+								position="leading"
+								value="dog"
+								label="Perro"
+								style={styles.radioButton}
+								labelStyle={styles.labelRadioButton}
+							/>
+							<RadioButton.Item
+								position="leading"
+								value="cat"
+								label="Gato"
+								style={styles.radioButton}
+								labelStyle={styles.labelRadioButton}
+							/>
+						</View>
 					</RadioButton.Group>
 				)}
 				name="species"
 			/>
 			<Divider />
-			{/* Sexo */}
+			<Text style={styles.text}>Sexo:</Text>
 			<Controller
 				control={control}
 				rules={{
@@ -215,14 +227,27 @@ export function AddAdoptionScreen() {
 				}}
 				render={({ field: { onChange, value } }) => (
 					<RadioButton.Group onValueChange={onChange} value={value ? 'male' : 'female'}>
-						<RadioButton.Item value="male" label="Macho" />
-						<RadioButton.Item value="female" label="Hembra" />
+						<View style={styles.viewList}>
+							<RadioButton.Item
+								position="leading"
+								value="male"
+								label="Macho"
+								style={styles.radioButton}
+								labelStyle={styles.labelRadioButton}
+							/>
+							<RadioButton.Item
+								position="leading"
+								value="female"
+								label="Hembra"
+								style={styles.radioButton}
+								labelStyle={styles.labelRadioButton}
+							/>
+						</View>
 					</RadioButton.Group>
 				)}
 				name="pet_sex"
 			/>
 			<Divider />
-			{/* Raza */}
 			<Controller
 				control={control}
 				rules={{
@@ -250,7 +275,7 @@ export function AddAdoptionScreen() {
 				}}
 				render={({ field: { onChange, value } }) => (
 					<DropDownPicker
-						placeholder="Selecciona una opción"
+						placeholder="Selecciona el sector"
 						open={openSize}
 						value={value as ValueType}
 						items={itemsSize}
@@ -258,24 +283,23 @@ export function AddAdoptionScreen() {
 						setValue={onChange}
 						setItems={setItemsSize}
 						style={{
-							backgroundColor: 'transparent',
-							borderColor: 'transparent',
-							width: '100%',
-							height: 60
+							...styles.comboItem,
+							borderColor: theme.colors.tertiary,
+							height: 50
 						}}
 						dropDownContainerStyle={{
 							width: '100%',
-							backgroundColor: theme.colors.secondary,
+							backgroundColor: 'white',
 							borderColor: theme.colors.primary,
 							borderWidth: 0.5
 						}}
 						listMode="SCROLLVIEW"
+						dropDownDirection="TOP"
 					/>
 				)}
 				name="pet_size"
 			/>
 			<Divider />
-			{/* Ubicación */}
 			<Controller
 				control={control}
 				rules={{
@@ -283,7 +307,7 @@ export function AddAdoptionScreen() {
 				}}
 				render={({ field: { onChange, value } }) => (
 					<DropDownPicker
-						placeholder="Selecciona una opción"
+						placeholder="Selecciona el tamaño"
 						open={openLocation}
 						value={value as ValueType}
 						items={itemsLocation}
@@ -291,64 +315,63 @@ export function AddAdoptionScreen() {
 						setValue={onChange}
 						setItems={setItemsLocation}
 						style={{
-							backgroundColor: 'transparent',
-							borderColor: 'transparent',
-							width: '100%',
-							height: 60
+							...styles.comboItem,
+							borderColor: theme.colors.tertiary,
+							height: 50
 						}}
 						dropDownContainerStyle={{
 							width: '100%',
-							backgroundColor: theme.colors.secondary,
+							backgroundColor: 'white',
 							borderColor: theme.colors.primary,
 							borderWidth: 0.5
 						}}
 						listMode="SCROLLVIEW"
+						dropDownDirection="TOP"
 					/>
 				)}
 				name="pet_location"
 			/>
 			<Divider />
-			{/* Vacunas */}
 			<Controller
 				control={control}
 				rules={{
 					required: false
 				}}
 				render={({ field: { onChange, value } }) => (
-					<View style={styles.viewList}>
-						<Checkbox
-							status={value ? 'checked' : 'unchecked'}
-							onPress={() => {
-								onChange(!value);
-							}}
-						/>
-						<Text>¿Posee carnet de vacunación?</Text>
-					</View>
+					<Checkbox.Item
+						style={styles.viewList}
+						status={value ? 'checked' : 'unchecked'}
+						onPress={() => {
+							onChange(!value);
+						}}
+						label="¿Posee carnet de vacunación?"
+						position="leading"
+						labelStyle={{ textAlign: 'center' }}
+					/>
 				)}
 				name="vaccination_card"
 			/>
 			<Divider />
-			{/* Esterilización*/}
 			<Controller
 				control={control}
 				rules={{
 					required: false
 				}}
 				render={({ field: { onChange, value } }) => (
-					<View style={styles.viewList}>
-						<Checkbox
-							status={value ? 'checked' : 'unchecked'}
-							onPress={() => {
-								onChange(!value);
-							}}
-						/>
-						<Text>¿Se Encuentra Esterilizado?</Text>
-					</View>
+					<Checkbox.Item
+						style={styles.viewList}
+						status={value ? 'checked' : 'unchecked'}
+						onPress={() => {
+							onChange(!value);
+						}}
+						label="¿Se Encuentra Esterilizado?"
+						position="leading"
+						labelStyle={{ textAlign: 'center' }}
+					/>
 				)}
 				name="sterilized"
 			/>
 			<Divider />
-			{/* Extra */}
 			<Controller
 				control={control}
 				rules={{
@@ -356,7 +379,7 @@ export function AddAdoptionScreen() {
 				}}
 				render={({ field: { onChange, onBlur, value } }) => (
 					<TextInput
-						placeholder="Ingrese alguna información addcional del animal"
+						placeholder="Ingrese alguna información adicional del animal"
 						onBlur={onBlur}
 						onChangeText={onChange}
 						value={value}
@@ -366,6 +389,7 @@ export function AddAdoptionScreen() {
 				)}
 				name="description"
 			/>
+
 			<View style={styles.buttonView}>
 				<Button
 					style={styles.button}

@@ -142,7 +142,7 @@ const FilterModal = ({
 					}}
 					dropDownContainerStyle={{
 						width: '100%',
-						backgroundColor: theme.colors.secondary,
+						backgroundColor: 'white',
 						borderColor: theme.colors.primary,
 						borderWidth: 0.5
 					}}

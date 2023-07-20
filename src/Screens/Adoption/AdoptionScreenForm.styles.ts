@@ -2,25 +2,38 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		backgroundColor: '#fff',
-		alignItems: 'center',
-		justifyContent: 'center',
-		flexDirection: 'column'
+		flexDirection: 'column',
+		flex: 1
 	},
-
+	input: {
+		width: '100%',
+		height: 50,
+		marginTop: 2,
+	},
+	radioButton: {
+		justifyContent: 'space-evenly',
+		alignSelf: 'center',
+		width: '58%',
+		height: 50
+	},
+	labelRadioButton: {
+		textAlign: 'left',
+		width: '100%',
+		alignSelf: 'center',
+	},
+	checkbox: {
+		width: '25%'
+	},
 	viewList: {
 		justifyContent: 'center',
 		flexDirection: 'row',
-		alignItems: 'center'
-	},
-	input: {
+		alignItems: 'center',
 		width: '100%'
 	},
-	listItems: {
-		width: '100%',
-		justifyContent: 'center',
-		alignContent: 'center'
+	text: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		marginLeft: 10
 	},
 	buttonView: {
 		flexDirection: 'row',
@@ -36,7 +49,13 @@ export const styles = StyleSheet.create({
 		margin: 0,
 		height: 30
 	},
-	checkbox: {
-		width: '25%'
+	comboItem: {
+		backgroundColor: 'transparent',
+		borderStartWidth: 0,
+		borderEndWidth: 0,
+		borderTopWidth: 0,
+		borderRadius: 0,
+		width: '100%',
+		height: 60
 	}
 });
