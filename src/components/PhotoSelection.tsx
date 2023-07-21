@@ -16,7 +16,7 @@ export default function PhotoSelection({ image, setImage }: PhotoSelectionProps)
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: true,
 			selectionLimit: 1,
-			aspect: [4, 3],
+			aspect: [16, 9],
 			quality: 1
 		});
 

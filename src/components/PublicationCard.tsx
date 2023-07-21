@@ -49,7 +49,6 @@ const PublicationCard = (props: AdoptionPublication) => {
 				resizeMode="contain"
 				resizeMethod="scale"
 				source={{ uri: photo.img_path }}
-				loadingIndicatorSource={{ uri: photo.img_path }}
 				progressiveRenderingEnabled={true}
 			/>
 			<Card.Content style={styles.content}>
@@ -57,11 +56,11 @@ const PublicationCard = (props: AdoptionPublication) => {
 					<List.Item
 						style={styles.list}
 						title={
-							petAge * 12 >= 12
-								? Math.round(petAge) > 1
+							petAge >= 12
+								? petAge > 1
 									? Math.round(petAge) + ' años'
 									: Math.round(petAge) + ' año'
-								: petAge * 12 + ' meses'
+								: petAge + ' meses'
 						}
 						left={() => <List.Icon color={theme.colors.tertiary} icon="cake-variant" />}
 					/>

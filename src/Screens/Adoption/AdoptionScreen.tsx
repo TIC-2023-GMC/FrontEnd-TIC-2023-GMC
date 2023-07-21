@@ -1,5 +1,5 @@
-import React, { useRef, useState, memo } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import React, { useRef, useState, memo, useCallback } from 'react';
+import { Text, View, FlatList, RefreshControl } from 'react-native';
 import { styles } from './AdoptionScreen.styles';
 import { StatusBar } from 'expo-status-bar';
 import { get } from '../../services/api';
@@ -10,6 +10,8 @@ import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/FilterModal';
 import { AdoptionPublication } from '../../models/InterfacesModels';
+import { useFocusEffect } from '@react-navigation/native';
+import { formatDate } from '../../utils/utils';
 
 interface AdoptionPublicationScreen {
 	0: AdoptionPublication[];
@@ -20,16 +22,7 @@ export interface Filter {
 	date: Date | undefined;
 	location: string | undefined;
 }
-function formatDate(date: Date): string {
-	if (!date) {
-		return '';
-	} else {
-		const year = date.getFullYear();
-		const month = String(date.getMonth() + 1).padStart(2, '0');
-		const day = String(date?.getDate()).padStart(2, '0');
-		return `${year}-${month}-${day}`;
-	}
-}
+
 const MemoizedPublicationCard = memo(PublicationCard);
 const MemoizedFilterModal = memo(FilterModal);
 
@@ -44,42 +37,41 @@ export function AdoptionScreen({
 	const theme = useTheme();
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
-	const [empty, setEmpty] = useState<boolean>(false);
 	const [filter, setFilter] = useState<Filter>({} as Filter);
 	const pageSize = 2;
 	useScrollToTop(ref);
 
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
-		queryKey: ['Adoption', filter],
-		queryFn: async ({ pageParam = 1 }) => {
-			const response = await get<AdoptionPublicationScreen>(
-				`adoptions/adoptions?page_number=${pageParam}&page_size=${pageSize}${
-					filter?.species ? '&species=' + filter.species : ''
-				}${filter?.date ? '&date=' + formatDate(filter?.date) : ''}${
-					filter?.location ? '&location=' + filter?.location : ''
-				}`
-			);
-			return response.data;
-		},
-		getNextPageParam: (lastPage) => lastPage[1],
-		refetchOnWindowFocus: true,
-		enabled: !!filter
-	});
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
+		useInfiniteQuery({
+			queryKey: ['Adoption', filter],
+			queryFn: async ({ pageParam = 1 }) => {
+				const response = await get<AdoptionPublicationScreen>(
+					`adoptions/adoptions?page_number=${pageParam}&page_size=${pageSize}${
+						filter?.species ? '&species=' + filter.species : ''
+					}${filter?.date ? '&date=' + formatDate(filter?.date) : ''}${
+						filter?.location ? '&location=' + filter?.location : ''
+					}`
+				);
+				return response.data;
+			},
+			getNextPageParam: (lastPage) => lastPage[1],
+			refetchOnWindowFocus: true
+		});
 
 	const handleLoadMore = () => {
-		if (!isFetchingNextPage && hasNextPage && !empty) {
+		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
 			fetchNextPage();
-		} else {
-			setEmpty(true);
 		}
 	};
+	useFocusEffect(
+		useCallback(() => {
+			if (!isLoading) {
+				refetch();
+			}
+		}, [])
+	);
 
-	return isLoading ? (
-		<View style={styles.container}>
-			<ActivityIndicator animating={true} size="large" />
-			<Text style={{ marginTop: 10 }}>Cargando</Text>
-		</View>
-	) : (
+	return (
 		<>
 			<StatusBar style="light" />
 			<MemoizedFilterModal
@@ -102,16 +94,22 @@ export function AdoptionScreen({
 				data={data?.pages.flatMap((page) => page[0])}
 				renderItem={({ item }) => <MemoizedPublicationCard {...item} />}
 				initialNumToRender={pageSize}
-				onEndReachedThreshold={0.5}
+				onEndReachedThreshold={10}
 				ListEmptyComponent={
-					!empty ? (
-						<View style={styles.activityIndicator}>
-							<Text>No hay más publicaciones</Text>
-						</View>
-					) : null
+					<View style={styles.activityIndicator}>
+						<Text>No hay más publicaciones</Text>
+					</View>
+				}
+				refreshControl={
+					<RefreshControl
+						refreshing={isFetchingNextPage}
+						onRefresh={() => {
+							refetch();
+						}}
+					/>
 				}
 				ListFooterComponent={
-					!empty ? (
+					!hasNextPage ? (
 						<>
 							{isFetchingNextPage ? (
 								<ActivityIndicator size="large" style={styles.activityIndicator} />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {  AdoptionScreen, AdoptionScreenForm } from '../Screens/Adoption';
+import { AdoptionScreen, AdoptionScreenForm } from '../Screens/Adoption';
 import { StyleSheet } from 'react-native';
 import { MaterialIcons, Feather, Octicons } from '@expo/vector-icons';
 import { ExperienceScreen } from '../Screens/Experience';
@@ -30,6 +30,8 @@ export function TabsNavigation() {
 	});
 	return (
 		<Tab.Navigator
+			backBehavior="initialRoute"
+			initialRouteName="Adopciones"
 			screenOptions={{
 				tabBarStyle: styles.tabBar,
 				tabBarItemStyle: styles.tab,
