@@ -102,7 +102,7 @@ export function AdoptionScreen({
 				}
 				refreshControl={
 					<RefreshControl
-						refreshing={isFetchingNextPage}
+						refreshing={isFetchingNextPage || isLoading}
 						onRefresh={() => {
 							refetch();
 						}}
