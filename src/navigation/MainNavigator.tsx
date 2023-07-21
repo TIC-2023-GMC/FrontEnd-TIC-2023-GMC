@@ -20,7 +20,7 @@ export function TabsNavigation() {
 			position: 'absolute',
 			elevation: 0,
 			backgroundColor: theme.colors.primary,
-			height: 65
+			height: "auto"
 		},
 		tab: {
 			justifyContent: 'center',
