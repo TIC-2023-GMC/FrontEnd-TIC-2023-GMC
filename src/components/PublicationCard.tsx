@@ -57,9 +57,9 @@ const PublicationCard = (props: AdoptionPublication) => {
 						style={styles.list}
 						title={
 							petAge >= 12
-								? petAge > 1
-									? Math.round(petAge) + ' años'
-									: Math.round(petAge) + ' año'
+								? Math.round(petAge / 12) > 1
+									? Math.round(petAge / 12) + ' años'
+									: Math.round(petAge / 12) + ' año'
 								: petAge + ' meses'
 						}
 						left={() => <List.Icon color={theme.colors.tertiary} icon="cake-variant" />}
