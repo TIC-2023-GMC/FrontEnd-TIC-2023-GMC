@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AdoptionPublication } from '../InterfacesModels';
+import { AdoptionPublication } from '../models/InterfacesModels';
 
 const LeftContent = (props: { size: number; photo: string }) => (
 	<Image
@@ -49,7 +49,6 @@ const PublicationCard = (props: AdoptionPublication) => {
 				resizeMode="contain"
 				resizeMethod="scale"
 				source={{ uri: photo.img_path }}
-				loadingIndicatorSource={{ uri: photo.img_path }}
 				progressiveRenderingEnabled={true}
 			/>
 			<Card.Content style={styles.content}>
@@ -57,11 +56,11 @@ const PublicationCard = (props: AdoptionPublication) => {
 					<List.Item
 						style={styles.list}
 						title={
-							petAge * 12 >= 12
-								? Math.round(petAge) > 1
-									? Math.round(petAge) + ' años'
-									: Math.round(petAge) + ' año'
-								: petAge * 12 + ' meses'
+							petAge >= 12
+								? Math.round(petAge / 12) > 1
+									? Math.round(petAge / 12) + ' años'
+									: Math.round(petAge / 12) + ' año'
+								: petAge + ' meses'
 						}
 						left={() => <List.Icon color={theme.colors.tertiary} icon="cake-variant" />}
 					/>

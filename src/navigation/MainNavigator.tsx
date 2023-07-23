@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AddAdoptionScreen, AdoptionScreen } from '../Screens/Adoption';
+import { AdoptionScreen, AdoptionScreenForm } from '../Screens/Adoption';
 import { StyleSheet } from 'react-native';
 import { MaterialIcons, Feather, Octicons } from '@expo/vector-icons';
 import { ExperienceScreen } from '../Screens/Experience';
@@ -20,7 +20,7 @@ export function TabsNavigation() {
 			position: 'absolute',
 			elevation: 0,
 			backgroundColor: theme.colors.primary,
-			height: 65
+			height: 'auto'
 		},
 		tab: {
 			justifyContent: 'center',
@@ -30,12 +30,15 @@ export function TabsNavigation() {
 	});
 	return (
 		<Tab.Navigator
+			backBehavior="initialRoute"
+			initialRouteName="Adopciones"
 			screenOptions={{
 				tabBarStyle: styles.tabBar,
 				tabBarItemStyle: styles.tab,
 				tabBarActiveTintColor: theme.colors.tertiary,
 				tabBarInactiveTintColor: theme.colors.secondary,
 				tabBarActiveBackgroundColor: 'rgba(0,0,0,0.5)',
+				tabBarHideOnKeyboard: true,
 				headerRight: (props) => (
 					<IconButton
 						icon="filter"
@@ -60,7 +63,7 @@ export function TabsNavigation() {
 				headerTitleStyle: {
 					color: theme.colors.secondary,
 					fontWeight: 'bold',
-					fontSize: 30
+					fontSize: 24
 				},
 				headerTitleAlign: 'center'
 			}}
@@ -91,8 +94,8 @@ export function TabsNavigation() {
 				}}
 			/>
 			<Tab.Screen
-				name="AddAdoption"
-				component={AddAdoptionScreen}
+				name="Agregar Publicación"
+				component={AdoptionScreenForm}
 				options={{
 					tabBarButton: (props) => {
 						return <AddTabBarButton {...props}></AddTabBarButton>;
