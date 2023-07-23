@@ -11,7 +11,6 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/FilterModal';
 import { AdoptionPublication } from '../../models/InterfacesModels';
 import { useFocusEffect } from '@react-navigation/native';
-import { formatDate } from '../../utils/utils';
 
 interface AdoptionPublicationScreen {
 	0: AdoptionPublication[];
@@ -48,14 +47,18 @@ export function AdoptionScreen({
 				const response = await get<AdoptionPublicationScreen>(
 					`adoptions/adoptions?page_number=${pageParam}&page_size=${pageSize}${
 						filter?.species ? '&species=' + filter.species : ''
-					}${filter?.date ? '&date=' + formatDate(filter?.date) : ''}${
+					}${filter?.date ? '&date=' + filter?.date : ''}${
 						filter?.location ? '&location=' + filter?.location : ''
 					}`
 				);
 				return response.data;
 			},
-			getNextPageParam: (lastPage) => lastPage[1],
-			refetchOnWindowFocus: true
+			getNextPageParam: (lastPage) => {
+				if (lastPage[0].length !== 0) {
+					return lastPage[1];
+				}
+				return false;
+			}
 		});
 
 	const handleLoadMore = () => {
@@ -65,9 +68,7 @@ export function AdoptionScreen({
 	};
 	useFocusEffect(
 		useCallback(() => {
-			if (!isLoading) {
-				refetch();
-			}
+			refetch();
 		}, [])
 	);
 
@@ -94,7 +95,7 @@ export function AdoptionScreen({
 				data={data?.pages.flatMap((page) => page[0])}
 				renderItem={({ item }) => <MemoizedPublicationCard {...item} />}
 				initialNumToRender={pageSize}
-				onEndReachedThreshold={10}
+				onEndReachedThreshold={0.5}
 				ListEmptyComponent={
 					<View style={styles.activityIndicator}>
 						<Text>No hay más publicaciones</Text>

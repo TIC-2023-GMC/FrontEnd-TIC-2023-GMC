@@ -1,6 +1,6 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import {
 	TextInput,
@@ -12,7 +12,7 @@ import {
 	HelperText
 } from 'react-native-paper';
 import * as z from 'zod';
-import DropDownPicker, { ValueType } from 'react-native-dropdown-picker';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { styles } from './AdoptionScreenForm.styles';
 import PhotoSelection from '../../components/PhotoSelection';
@@ -22,7 +22,7 @@ import { AdoptionPublication, Photo } from '../../models/InterfacesModels';
 import { useMutation } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
-import { formatDate, parseNumber } from '../../utils/utils';
+import { parseNumber } from '../../utils/utils';
 
 const PhotoSchema = z.object({
 	_id: z.string(),
@@ -118,7 +118,7 @@ export function AdoptionScreenForm() {
 				}
 			},
 			description: '',
-			publication_date: formatDate(new Date()),
+			publication_date: '',
 			photo: {
 				_id: '',
 				img_path: ''
@@ -148,11 +148,19 @@ export function AdoptionScreenForm() {
 		{ label: 'Chillogallo', value: 'Chillogallo' }
 	]);
 
+	const [size, setSize] = useState<string>('');
+	const [location, setLocation] = useState<string>('');
+
 	const createPublicationMutation = useMutation({
 		mutationFn: (data: AdoptionPublication) =>
 			post('/adoptions/adoption', data).then((response) => response.data),
 		onSuccess: () => {
-			console.log('Publicación creada');
+			setLoading(false);
+			navigation.goBack();
+			reset();
+			setSize('');
+			setLocation('');
+			setImage(undefined);
 		}
 	});
 
@@ -175,24 +183,28 @@ export function AdoptionScreenForm() {
 	const onSubmit: SubmitHandler<AdoptionPublication> = async (data) => {
 		if (image) {
 			setLoading(true);
+
 			const response_body = await uploadImg(image);
 			const response = JSON.parse(response_body ? response_body : '{}');
 			const new_photo: Photo = {
 				...response
 			};
+
 			const new_publication: AdoptionPublication = {
 				...data,
+				publication_date: new Date().toLocaleString('es-ES', {
+					timeZone: 'America/Guayaquil',
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit',
+					hour: '2-digit',
+					minute: '2-digit'
+				}),
 				photo: new_photo
 			};
 			createPublicationMutation.mutate(new_publication);
 		}
 	};
-	useEffect(() => {
-		if (createPublicationMutation.isSuccess) {
-			setLoading(false);
-			navigation.goBack();
-		}
-	}, [createPublicationMutation.isSuccess, navigation]);
 
 	return (
 		<ScrollView style={{ marginBottom: tabBarHeight }}>
@@ -329,15 +341,15 @@ export function AdoptionScreenForm() {
 				rules={{
 					required: true
 				}}
-				render={({ field: { onChange, value } }) => (
+				render={({ field: { onChange } }) => (
 					<>
 						<DropDownPicker
 							placeholder="Selecciona el tamaño del animal"
 							open={openSize}
-							value={value}
+							value={size}
 							items={itemsSize}
 							setOpen={setOpenSize}
-							setValue={onChange}
+							setValue={setSize}
 							setItems={setItemsSize}
 							onChangeValue={onChange}
 							style={{
@@ -365,14 +377,14 @@ export function AdoptionScreenForm() {
 				rules={{
 					required: true
 				}}
-				render={({ field: { onChange, value } }) => (
+				render={({ field: { onChange } }) => (
 					<>
 						<DropDownPicker
 							placeholder="Selecciona el sector"
 							open={openLocation}
-							value={value as ValueType}
+							value={location}
 							items={itemsLocation}
-							setValue={onChange}
+							setValue={setLocation}
 							setOpen={setOpenLocation}
 							setItems={setItemsLocation}
 							onChangeValue={onChange}

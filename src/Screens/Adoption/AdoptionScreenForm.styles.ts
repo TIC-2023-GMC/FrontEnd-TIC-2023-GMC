@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
 	input: {
 		width: '100%',
 		height: 50,
-		marginTop: 2,
+		marginTop: 2
 	},
 	radioButton: {
 		justifyContent: 'space-evenly',
@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
 	labelRadioButton: {
 		textAlign: 'left',
 		width: '100%',
-		alignSelf: 'center',
+		alignSelf: 'center'
 	},
 	checkbox: {
 		width: '25%'
