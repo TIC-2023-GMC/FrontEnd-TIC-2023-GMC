@@ -51,3 +51,14 @@ export interface AdoptionPublication {
 	sterilized: boolean;
 	vaccination_card: boolean;
 }
+
+export interface ExperiencePublication {
+	_id: string;
+	user: User;
+	description: string;
+	publication_date: string;
+	photo: Photo;
+	likes: Like[];
+	comments: Comment[];
+	species: string;
+}
