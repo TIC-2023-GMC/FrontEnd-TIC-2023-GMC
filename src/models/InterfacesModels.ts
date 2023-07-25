@@ -15,6 +15,7 @@ export interface User {
 	motivation: string;
 	favorite_adoption_publications: string[];
 	photo: {
+		_id: string;
 		img_path: string;
 	};
 }
@@ -46,7 +47,7 @@ export interface AdoptionPublication {
 	pet_size: string;
 	pet_breed: string;
 	pet_age: number;
-	pet_sex: boolean;
+	pet_sex: boolean | undefined;
 	pet_location: string;
 	sterilized: boolean;
 	vaccination_card: boolean;

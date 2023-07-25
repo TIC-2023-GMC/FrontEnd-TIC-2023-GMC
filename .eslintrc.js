@@ -24,7 +24,7 @@ module.exports = {
 	plugins: ['react', 'react-native'],
 	rules: {
 		// Aquí puedes personalizar las reglas de ESLint según tus preferencias
-		'react-native/no-unused-styles': 'warn',
+		'react-native/no-unused-styles': 'off',
 		'react-native/split-platform-components': 'error',
 		'react-native/no-inline-styles': 'off',
 		'react-native/no-raw-text': 'off',
