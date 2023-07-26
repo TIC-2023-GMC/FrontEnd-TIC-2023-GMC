@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
 import { registerTranslation, DatePickerInput } from 'react-native-paper-dates';
-import DropDownPicker, { ValueType } from 'react-native-dropdown-picker';
+import DropDownPicker, { ItemType, ValueType } from 'react-native-dropdown-picker';
 import { Filter } from '../Screens/Adoption/AdoptionScreen';
+import { useQuery } from '@tanstack/react-query';
+import { get } from '../services/api';
 registerTranslation('es', {
 	save: 'Guardar',
 	selectSingle: 'Seleccionar fecha',
@@ -48,10 +50,19 @@ const FilterModal = ({
 	const [date, setDate] = useState<Date | undefined>(filter.date);
 	const [location, setLocation] = useState(filter.location);
 	const [open, setOpen] = useState(false);
-	const [items, setItems] = useState([
-		{ label: 'Carapungo', value: 'Carapungo' },
-		{ label: 'Cumbayork', value: 'Cumbayork' }
-	]);
+	const [items, setItems] = useState<Location[]>([]);
+
+	const { isLoading } = useQuery({
+		queryKey: ['location'],
+		queryFn: async () => {
+			const response = await get<Location[]>('/parish/get_all');
+			return response.data;
+		},
+		onSuccess: (data) => {
+			setItems(data);
+		}
+	});
+
 	const handlerApplyFilter = () => {
 		onApplyFilter({
 			species: checkedCat ? 'Gato' : checkedDog ? 'Perro' : undefined,
@@ -127,27 +138,23 @@ const FilterModal = ({
 				<Divider />
 
 				<DropDownPicker
-					placeholder="Selecciona una ubicación"
+					placeholder="Selecciona un sector"
 					open={open}
 					value={location as ValueType}
-					items={items}
+					items={items as ItemType<string>[]}
 					setOpen={setOpen}
 					setValue={setLocation}
 					setItems={setItems}
+					loading={isLoading}
+					modalTitle="Selecciona un sector"
+					modalContentContainerStyle={{ backgroundColor: theme.colors.secondary }}
 					style={{
 						backgroundColor: 'transparent',
 						borderColor: 'transparent',
 						width: '100%',
 						height: 60
 					}}
-					dropDownContainerStyle={{
-						width: '100%',
-						backgroundColor: 'white',
-						borderColor: theme.colors.primary,
-						borderWidth: 0.5
-					}}
-					listMode="SCROLLVIEW"
-					dropDownDirection="TOP"
+					listMode="MODAL"
 				/>
 
 				<Divider />

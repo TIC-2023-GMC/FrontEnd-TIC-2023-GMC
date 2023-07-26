@@ -1,6 +1,6 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, {useState } from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import {
 	TextInput,
@@ -12,17 +12,18 @@ import {
 	HelperText
 } from 'react-native-paper';
 import * as z from 'zod';
-import DropDownPicker from 'react-native-dropdown-picker';
+import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { styles } from './AdoptionScreenForm.styles';
 import PhotoSelection from '../../components/PhotoSelection';
 import { baseUrl, post } from '../../services/api';
 import * as FileSystem from 'expo-file-system';
 import { AdoptionPublication, Photo } from '../../models/InterfacesModels';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import { parseNumber } from '../../utils/utils';
+import { get } from '../../services/api';
 
 const PhotoSchema = z.object({
 	_id: z.string(),
@@ -142,12 +143,18 @@ export function AdoptionScreenForm() {
 		{ label: 'Grande', value: 'Grande' }
 	]);
 	const [openLocation, setOpenLocation] = useState(false);
-	const [itemsLocation, setItemsLocation] = useState([
-		{ label: 'Carapungo', value: 'Carapungo' }, //valores que van a tener los va
-		{ label: 'Cumbayork', value: 'Cumbayork' },
-		{ label: 'Chillogallo', value: 'Chillogallo' }
-	]);
+	const [itemsLocation, setItemsLocation] = useState<Location[]>([]);
 
+	const { isLoading } = useQuery({
+		queryKey: ['location'],
+		queryFn: async () => {
+			const response = await get<Location[]>('/parish/get_all');
+			return response.data;
+		},
+		onSuccess: (data) => {
+			setItemsLocation(data);
+		}
+	});
 	const [size, setSize] = useState<string>('');
 	const [location, setLocation] = useState<string>('');
 
@@ -363,7 +370,6 @@ export function AdoptionScreenForm() {
 								borderColor: theme.colors.primary,
 								borderWidth: 0.5
 							}}
-							listMode="SCROLLVIEW"
 							dropDownDirection="TOP"
 						/>
 						{errors.pet_size && <HelperText type="error">{errors.pet_size.message}</HelperText>}
@@ -383,11 +389,16 @@ export function AdoptionScreenForm() {
 							placeholder="Selecciona el sector"
 							open={openLocation}
 							value={location}
-							items={itemsLocation}
+							items={itemsLocation as ItemType<string>[]}
 							setValue={setLocation}
 							setOpen={setOpenLocation}
 							setItems={setItemsLocation}
 							onChangeValue={onChange}
+							loading={isLoading}
+							listMode="MODAL"
+							modalTitle="Seleccione el sector"
+							modalAnimationType="slide"
+							modalContentContainerStyle={{ backgroundColor: theme.colors.secondary }}
 							style={{
 								...styles.comboItem,
 								borderColor: theme.colors.tertiary,
@@ -399,8 +410,6 @@ export function AdoptionScreenForm() {
 								borderColor: theme.colors.primary,
 								borderWidth: 0.5
 							}}
-							listMode="SCROLLVIEW"
-							dropDownDirection="TOP"
 						/>
 						{errors.pet_location && (
 							<HelperText type="error">{errors.pet_location.message}</HelperText>

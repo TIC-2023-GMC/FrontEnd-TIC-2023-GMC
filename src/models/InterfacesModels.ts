@@ -52,3 +52,8 @@ export interface AdoptionPublication {
 	sterilized: boolean;
 	vaccination_card: boolean;
 }
+
+export interface Location {
+	name: string;
+	value: string;
+}
