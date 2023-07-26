@@ -11,73 +11,19 @@ import {
 	Button,
 	HelperText
 } from 'react-native-paper';
-import * as z from 'zod';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { styles } from './AdoptionScreenForm.styles';
 import PhotoSelection from '../../components/PhotoSelection';
-import { baseUrl, post } from '../../services/api';
-import * as FileSystem from 'expo-file-system';
+import { post } from '../../services/api';
+
 import { AdoptionPublication, Photo } from '../../models/InterfacesModels';
 import { useMutation } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
-import { parseNumber } from '../../utils/utils';
-
-const PhotoSchema = z.object({
-	_id: z.string(),
-	img_path: z.string()
-});
-
-const UserSchema = z.object({
-	_id: z.string(),
-	first_name: z.string(),
-	last_name: z.string(),
-	mobile_phone: z.string(),
-	neighborhood: z.string(),
-	email: z.string().email(),
-	password: z.string(),
-	num_previous_pets: z.number(),
-	num_current_pets: z.number(),
-	outdoor_hours: z.number(),
-	house_space: z.number(),
-	has_yard: z.boolean(),
-	main_pet_food: z.string(),
-	pet_expenses: z.number(),
-	motivation: z.string(),
-	favorite_adoption_publications: z.array(z.string()),
-	photo: PhotoSchema
-});
-
-const Like = z.object({
-	_id: z.string()
-});
-
-const Comment = z.object({
-	_id: z.string(),
-	comment_text: z.string(),
-	comment_date: z.string()
-});
-
-const AdoptionPublicationSchema = z.object({
-	_id: z.string(),
-	user: UserSchema,
-	description: z.string().nonempty('La descripción es requerida'),
-	publication_date: z.string(),
-	photo: PhotoSchema,
-	likes: z.optional(z.array(Like)),
-	comments: z.optional(z.array(Comment)),
-	species: z.string().nonempty('La especie del animal es requerida'),
-	pet_size: z.string().nonempty('El tamaño del animal es requerido'),
-	pet_breed: z.string().nonempty('La raza del animal es requerida'),
-	pet_age: z.number().positive('La edad del animal debe ser un número positivo'),
-	pet_sex: z.boolean({
-		required_error: 'El sexo del animal es requerido'
-	}),
-	pet_location: z.string().nonempty('La ubicación del animal es requerida'),
-	sterilized: z.boolean({ required_error: 'Selecciona si se encuentra esterilizado' }),
-	vaccination_card: z.boolean({ required_error: 'Selecciona si posee carnet de vacunación' })
-});
+import { parseNumber, uploadImg } from '../../utils/utils';
+import { AdoptionPublicationSchema } from '../../models/Schemas';
+import { SnackBarError } from '../../components/SnackBarError';
 
 export function AdoptionScreenForm() {
 	const theme = useTheme();
@@ -85,6 +31,8 @@ export function AdoptionScreenForm() {
 	const tabBarHeight = useBottomTabBarHeight();
 	const [image, setImage] = useState<string>();
 	const [loading, setLoading] = useState<boolean>(false);
+	const [failUpload, setFailUpload] = useState<string>('');
+
 	const {
 		control,
 		formState: { errors },
@@ -164,27 +112,10 @@ export function AdoptionScreenForm() {
 		}
 	});
 
-	const uploadImg = async (uri: string) => {
-		try {
-			const response = await FileSystem.uploadAsync(`${baseUrl}/photo/upload_photo`, uri, {
-				fieldName: 'photo',
-				httpMethod: 'POST',
-				uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-				headers: {
-					'Content-Type': 'multipart'
-				}
-			});
-			return response.body;
-		} catch (error) {
-			console.log('ERROR', error);
-		}
-	};
-
 	const onSubmit: SubmitHandler<AdoptionPublication> = async (data) => {
 		if (image) {
 			setLoading(true);
-
-			const response_body = await uploadImg(image);
+			const response_body = await uploadImg(image, setFailUpload);
 			const response = JSON.parse(response_body ? response_body : '{}');
 			const new_photo: Photo = {
 				...response
@@ -507,6 +438,7 @@ export function AdoptionScreenForm() {
 					Publicar
 				</Button>
 			</View>
+			<SnackBarError setFailUpload={setFailUpload} failUpload={failUpload} reset={reset} />
 		</ScrollView>
 	);
 }

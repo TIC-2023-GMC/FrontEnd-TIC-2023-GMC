@@ -3,16 +3,33 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AdoptionScreen, AdoptionScreenForm } from '../Screens/Adoption';
 import { StyleSheet } from 'react-native';
 import { MaterialIcons, Feather, Octicons } from '@expo/vector-icons';
-import { ExperienceScreen } from '../Screens/Experience';
+import { ExperienceScreen, ExperienceScreenForm } from '../Screens/Experience';
 import { OrganizationScreen } from '../Screens/Organization';
 import { IconButton, useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
 import { FavoriteScreen } from '../Screens/Favorite';
+import { createStackNavigator } from '@react-navigation/stack';
+
+const Stack = createStackNavigator();
+
+export function AddNavigationStack() {
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerShown: false
+			}}
+		>
+			<Stack.Screen name="Agregar Adopción" component={AdoptionScreenForm} />
+			<Stack.Screen name="Agregar Experiencia" component={ExperienceScreenForm} />
+		</Stack.Navigator>
+	);
+}
 
 const Tab = createBottomTabNavigator();
 
 export function TabsNavigation() {
 	const theme = useTheme();
+
 	const [visibleFilter, setVisibleFilter] = useState<boolean>(false);
 
 	const styles = StyleSheet.create({
@@ -32,7 +49,7 @@ export function TabsNavigation() {
 		<Tab.Navigator
 			backBehavior="initialRoute"
 			initialRouteName="Adopciones"
-			screenOptions={{
+			screenOptions={() => ({
 				tabBarStyle: styles.tabBar,
 				tabBarItemStyle: styles.tab,
 				tabBarActiveTintColor: theme.colors.tertiary,
@@ -54,7 +71,7 @@ export function TabsNavigation() {
 						iconColor={theme.colors.secondary}
 						size={40}
 						{...props}
-						onPress={() => console.log('go to game')}
+						onPress={() => console.log('')}
 					/>
 				),
 				headerStyle: {
@@ -66,7 +83,7 @@ export function TabsNavigation() {
 					fontSize: 24
 				},
 				headerTitleAlign: 'center'
-			}}
+			})}
 		>
 			<Tab.Screen
 				name="Adopciones"
@@ -94,11 +111,11 @@ export function TabsNavigation() {
 				}}
 			/>
 			<Tab.Screen
+				component={AddNavigationStack}
 				name="Agregar Publicación"
-				component={AdoptionScreenForm}
 				options={{
 					tabBarButton: (props) => {
-						return <AddTabBarButton {...props}></AddTabBarButton>;
+						return <AddTabBarButton {...props} />;
 					}
 				}}
 			/>
