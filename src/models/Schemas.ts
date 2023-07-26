@@ -38,7 +38,7 @@ export const AdoptionPublicationSchema = z.object({
 	_id: z.string(),
 	user: UserSchema,
 	description: z.string().nonempty('La descripción es requerida'),
-	publication_date: z.string(),
+	publication_date: z.date(),
 	photo: PhotoSchema,
 	likes: z.optional(z.array(Like)),
 	comments: z.optional(z.array(Comment)),

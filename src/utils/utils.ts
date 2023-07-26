@@ -1,4 +1,4 @@
-import FileSystem from 'expo-file-system';
+import { uploadAsync, FileSystemUploadType } from 'expo-file-system';
 import { baseUrl } from '../services/api';
 import React from 'react';
 
@@ -15,16 +15,18 @@ export const uploadImg = async (
 	setError: React.Dispatch<React.SetStateAction<string>>
 ) => {
 	try {
-		const response = await FileSystem.uploadAsync(`${baseUrl}/photo/upload_photo`, uri, {
+		const response = await uploadAsync(`${baseUrl}/photo/upload`, uri, {
 			fieldName: 'photo',
 			httpMethod: 'POST',
-			uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+			uploadType: FileSystemUploadType.MULTIPART,
 			headers: {
 				'Content-Type': 'multipart'
 			}
 		});
 		return response.body;
 	} catch (error) {
+		console.log(error);
+
 		setError('Error al subir la imagen');
 	}
 };
