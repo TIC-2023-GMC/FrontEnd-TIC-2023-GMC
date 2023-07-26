@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { get } from '../../services/api';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
-import PublicationCard from '../../components/PublicationCard';
+import AdoptionCard from '../../components/AdoptionCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/AdoptionsFilterModal';
@@ -22,7 +22,7 @@ export interface Filter {
 	location: string | undefined;
 }
 
-const MemoizedPublicationCard = memo(PublicationCard);
+const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedFilterModal = memo(FilterModal);
 
 export function AdoptionScreen({
@@ -44,22 +44,18 @@ export function AdoptionScreen({
 		useInfiniteQuery({
 			queryKey: ['Adoption', filter],
 			queryFn: async ({ pageParam = 1 }) => {
+				const new_date = filter?.date ? new Date(filter?.date) : undefined;
+
+				if (new_date) {
+					new_date.setUTCHours(0, 0, 0, 0);
+				}
+
 				const response = await get<AdoptionPublicationScreen>(
 					`adoptions/list?page_number=${pageParam}&page_size=${pageSize}${
 						filter?.species ? '&species=' + filter.species : ''
-					}${
-						filter?.date
-							? '&date=' +
-								filter?.date.toLocaleString('es-ES', {
-									timeZone: 'America/Guayaquil',
-									year: 'numeric',
-									month: '2-digit',
-									day: '2-digit',
-									hour: '2-digit',
-									minute: '2-digit'
-								})
-							: ''
-					}${filter?.location ? '&location=' + filter?.location : ''}`
+					}${filter?.date ? '&date=' + new_date?.toISOString() : ''}${
+						filter?.location ? '&location=' + filter?.location : ''
+					}`
 				);
 
 				return response.data;
@@ -68,7 +64,7 @@ export function AdoptionScreen({
 				if (lastPage[0].length !== 0) {
 					return lastPage[1];
 				}
-				return false;
+				return undefined;
 			}
 		});
 
@@ -104,7 +100,7 @@ export function AdoptionScreen({
 				onEndReached={handleLoadMore}
 				ref={ref}
 				data={data?.pages.flatMap((page) => page[0])}
-				renderItem={({ item }) => <MemoizedPublicationCard {...item} />}
+				renderItem={({ item }) => <MemoizedAdoptionCard {...item} />}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={

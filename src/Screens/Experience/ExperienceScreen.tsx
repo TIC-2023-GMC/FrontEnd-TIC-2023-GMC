@@ -42,22 +42,16 @@ export function ExperienceScreen({
 		useInfiniteQuery({
 			queryKey: ['Experience', filter],
 			queryFn: async ({ pageParam = 1 }) => {
+				const new_date = filter?.date ? new Date(filter?.date) : undefined;
+
+				if (new_date) {
+					new_date.setUTCHours(0, 0, 0, 0);
+				}
+
 				const response = await get<ExperiencePublicationScreen>(
 					`experiences/list?page_number=${pageParam}&page_size=${pageSize}${
 						filter?.species ? '&species=' + filter.species : ''
-					}${
-						filter?.date
-							? '&date=' +
-								filter?.date.toLocaleString('es-ES', {
-									timeZone: 'America/Guayaquil',
-									year: 'numeric',
-									month: '2-digit',
-									day: '2-digit',
-									hour: '2-digit',
-									minute: '2-digit'
-								})
-							: ''
-					}`
+					}${filter?.date ? '&date=' + new_date?.toISOString() : ''}`
 				);
 				return response.data;
 			},

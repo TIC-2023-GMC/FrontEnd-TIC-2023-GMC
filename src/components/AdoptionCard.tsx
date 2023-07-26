@@ -38,7 +38,19 @@ const PublicationCard = (props: AdoptionPublication) => {
 			<Card.Title
 				title={user.first_name + ' ' + user.last_name}
 				subtitle={
-					<Text style={{ color: theme.colors.tertiary }}>{'Publicado el ' + publicationDate}</Text>
+					<Text style={{ color: theme.colors.tertiary }}>
+						{'Publicado el ' +
+							new Date(publicationDate).toLocaleString('es-ES', {
+								timeZone: 'America/Guayaquil',
+								year: 'numeric',
+								month: '2-digit',
+								day: '2-digit',
+								hour: '2-digit',
+								minute: '2-digit',
+								hour12: false, // Force 24-hour format
+								hourCycle: 'h23' // Ensure two digits for hours
+							})}
+					</Text>
 				}
 				left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
 				right={() => <IconButton icon="dots-vertical" onPress={() => console.log('show menu')} />}
