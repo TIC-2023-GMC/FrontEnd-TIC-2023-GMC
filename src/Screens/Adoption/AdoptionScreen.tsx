@@ -8,7 +8,7 @@ import { ActivityIndicator, useTheme } from 'react-native-paper';
 import PublicationCard from '../../components/PublicationCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import FilterModal from '../../components/FilterModal';
+import FilterModal from '../../components/AdoptionsFilterModal';
 import { AdoptionPublication } from '../../models/InterfacesModels';
 import { useFocusEffect } from '@react-navigation/native';
 

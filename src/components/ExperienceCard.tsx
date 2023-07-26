@@ -6,12 +6,10 @@ import {
 	View,
 	Image,
 	TextLayoutEventData,
-	LayoutChangeEvent,
 	NativeSyntheticEvent
 } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
 import { ExperiencePublication } from '../models/InterfacesModels';
-import { Layout } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
 
 const LeftContent = (props: { size: number; photo: string }) => (
 	<Image

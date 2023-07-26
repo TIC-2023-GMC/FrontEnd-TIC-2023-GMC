@@ -13,7 +13,8 @@ const Tab = createBottomTabNavigator();
 
 export function TabsNavigation() {
 	const theme = useTheme();
-	const [visibleFilter, setVisibleFilter] = useState<boolean>(false);
+	const [adoptionsVisibleFilter, setAdoptionsVisibleFilter] = useState<boolean>(false);
+	const [experiencesVisibleFilter, setExperienceVisibleFilter] = useState<boolean>(false);
 
 	const styles = StyleSheet.create({
 		tabBar: {
@@ -39,15 +40,6 @@ export function TabsNavigation() {
 				tabBarInactiveTintColor: theme.colors.secondary,
 				tabBarActiveBackgroundColor: 'rgba(0,0,0,0.5)',
 				tabBarHideOnKeyboard: true,
-				headerRight: (props) => (
-					<IconButton
-						icon="filter"
-						iconColor={theme.colors.secondary}
-						size={30}
-						{...props}
-						onPress={() => setVisibleFilter(true)}
-					/>
-				),
 				headerLeft: (props) => (
 					<IconButton
 						icon="controller-classic"
@@ -73,26 +65,57 @@ export function TabsNavigation() {
 				options={{
 					tabBarIcon: (props) => {
 						return <MaterialIcons {...props} name="pets" size={30} />;
-					}
+					},
+
+					headerRight: (props) => (
+						<IconButton
+							icon="filter"
+							iconColor={theme.colors.secondary}
+							size={30}
+							{...props}
+							onPress={() => {
+								setAdoptionsVisibleFilter(true);
+							}}
+						/>
+					)
 				}}
 			>
 				{(props) => (
 					<AdoptionScreen
 						{...props}
-						visibleFilter={visibleFilter}
-						setVisibleFilter={setVisibleFilter}
+						visibleFilter={adoptionsVisibleFilter}
+						setVisibleFilter={setAdoptionsVisibleFilter}
 					/>
 				)}
 			</Tab.Screen>
 			<Tab.Screen
 				name="Experiencias"
-				component={ExperienceScreen}
 				options={{
 					tabBarIcon: (props) => {
 						return <Feather {...props} name="message-square" size={30} />;
-					}
+					},
+					headerRight: (props) => (
+						<IconButton
+							icon="filter"
+							iconColor={theme.colors.secondary}
+							size={30}
+							{...props}
+							onPress={() => {
+								setExperienceVisibleFilter(true);
+							}}
+						/>
+					)
 				}}
-			/>
+			>
+				{(props) => (
+					<ExperienceScreen
+						{...props}
+						visibleFilter={experiencesVisibleFilter}
+						setVisibleFilter={setExperienceVisibleFilter}
+					/>
+				)}
+			</Tab.Screen>
+
 			<Tab.Screen
 				name="Agregar Publicación"
 				component={AdoptionScreenForm}

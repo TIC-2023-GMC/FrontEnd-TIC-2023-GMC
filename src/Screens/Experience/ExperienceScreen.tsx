@@ -7,7 +7,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import FilterModal from '../../components/FilterModal';
+import FilterModal from '../../components/ExperiencesFilterModal';
 import { ExperiencePublication } from '../../models/InterfacesModels';
 import ExperienceCard from '../../components/ExperienceCard';
 
@@ -18,7 +18,6 @@ interface ExperiencePublicationScreen {
 export interface Filter {
 	species: string | undefined;
 	date: Date | undefined;
-	location: string | undefined;
 }
 
 const MemoizedExperienceCard = memo(ExperienceCard);
@@ -58,7 +57,7 @@ export function ExperienceScreen({
 									minute: '2-digit'
 								})
 							: ''
-					}${filter?.location ? '&location=' + filter?.location : ''}`
+					}`
 				);
 				return response.data;
 			},
