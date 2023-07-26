@@ -54,7 +54,6 @@ export const AdoptionPublicationSchema = z.object({
 	vaccination_card: z.boolean({ required_error: 'Selecciona si posee carnet de vacunación' })
 });
 
-
 export const ExperiencePublicationSchema = z.object({
 	_id: z.string(),
 	user: UserSchema,
