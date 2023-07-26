@@ -153,7 +153,7 @@ export function AdoptionScreenForm() {
 
 	const createPublicationMutation = useMutation({
 		mutationFn: (data: AdoptionPublication) =>
-			post('/adoptions/adoption', data).then((response) => response.data),
+			post('/adoptions/add', data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
 			navigation.goBack();
@@ -166,7 +166,7 @@ export function AdoptionScreenForm() {
 
 	const uploadImg = async (uri: string) => {
 		try {
-			const response = await FileSystem.uploadAsync(`${baseUrl}/photo/upload_photo`, uri, {
+			const response = await FileSystem.uploadAsync(`${baseUrl}/photo/upload`, uri, {
 				fieldName: 'photo',
 				httpMethod: 'POST',
 				uploadType: FileSystem.FileSystemUploadType.MULTIPART,

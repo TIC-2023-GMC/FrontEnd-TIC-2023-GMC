@@ -1,9 +1,17 @@
 /* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
 import { useState } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import {
+	StyleSheet,
+	View,
+	Image,
+	TextLayoutEventData,
+	LayoutChangeEvent,
+	NativeSyntheticEvent
+} from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AdoptionPublication } from '../InterfacesModels';
+import { ExperiencePublication } from '../models/InterfacesModels';
+import { Layout } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
 
 const LeftContent = (props: { size: number; photo: string }) => (
 	<Image
@@ -14,19 +22,26 @@ const LeftContent = (props: { size: number; photo: string }) => (
 	/>
 );
 
-const ExperienceCard = (props: AdoptionPublication) => {
+const ExperienceCard = (props: ExperiencePublication) => {
 	const theme = useTheme();
 	const [like, setLike] = useState<boolean>();
+	const { user, description, publication_date: publicationDate, photo } = props;
 	const [expanded, setExpanded] = useState<boolean>();
-	const {
-		user,
-		description,
-		publication_date: publicationDate,
-		photo
-	} = props;
+	const [isTruncated, setIsTruncated] = useState<boolean>(false);
+
 	const handleExpand = () => {
 		setExpanded(!expanded);
 	};
+
+	const handleTextLayout = (event: NativeSyntheticEvent<TextLayoutEventData>) => {
+		const { lines } = event.nativeEvent;
+		if (lines.length > 2) {
+			setIsTruncated(true);
+		} else {
+			setIsTruncated(false);
+		}
+	};
+
 	return (
 		<Card style={styles.card}>
 			<Card.Title
@@ -46,31 +61,28 @@ const ExperienceCard = (props: AdoptionPublication) => {
 				progressiveRenderingEnabled={true}
 			/>
 			<Card.Content style={styles.content}>
-				<View style={styles.contentColumn}>
-					<List.Item
-						style={styles.list}
-						title={'Mi experiencia'}
-					/>
-
-					<List.Item
-						style={styles.list}
-						title={'Esterilización'}
-					/>
-				</View>
-                <Text> {description} </Text>
+				<List.Item
+					style={styles.list}
+					titleStyle={styles.title}
+					title={'Mi experiencia'}
+					left={() => <List.Icon color={theme.colors.tertiary} icon="account-heart" />}
+				/>
+				<Text
+					style={styles.description}
+					numberOfLines={expanded ? undefined : 2}
+					onTextLayout={handleTextLayout}
+				>
+					{description}
+				</Text>
 			</Card.Content>
-			{expanded && (
-				<Card.Content>
-					<List.Item style={styles.list} title="Descripción" description={description} />
-				</Card.Content>
-			)}
 
 			<View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
 				<View style={styles.actionMore}>
-					<Button mode="text" onPress={handleExpand}>
+					<Button mode="text" onPress={handleExpand} disabled={!isTruncated}>
 						{expanded ? 'Ver menos' : 'Ver más'}
 					</Button>
 				</View>
+
 				<View style={styles.actionsContainer}>
 					<View style={styles.actions}>
 						<IconButton
@@ -113,23 +125,17 @@ const styles = StyleSheet.create({
 		justifySelf: 'flex-start',
 		alignSelf: 'center',
 		height: 'auto',
+		flexGrow: 1,
 		width: '95%',
 		borderRadius: 10,
 		backgroundColor: 'white',
 		marginTop: 15
 	},
-	contentColumn: {
-		width: '50%',
-		flexDirection: 'column',
-		justifyContent: 'space-between',
-		alignItems: 'flex-start'
-	},
 	content: {
-		flexDirection: 'row',
+		//flexDirection: 'row',
 		marginTop: 10,
 		paddingHorizontal: 15,
-		justifyContent: 'space-between',
-		gap: 20
+		justifyContent: 'space-between'
 	},
 	actionsContainer: {
 		padding: 0,
@@ -148,6 +154,14 @@ const styles = StyleSheet.create({
 	actionMore: {
 		alignItems: 'center',
 		justifyContent: 'center'
+	},
+	title: {
+		fontSize: 16,
+		fontWeight: '700'
+	},
+	description: {
+		fontSize: 15,
+		textAlign: 'justify'
 	},
 	list: {
 		paddingVertical: 0,

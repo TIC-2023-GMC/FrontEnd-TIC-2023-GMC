@@ -45,12 +45,23 @@ export function AdoptionScreen({
 			queryKey: ['Adoption', filter],
 			queryFn: async ({ pageParam = 1 }) => {
 				const response = await get<AdoptionPublicationScreen>(
-					`adoptions/adoptions?page_number=${pageParam}&page_size=${pageSize}${
+					`adoptions/list?page_number=${pageParam}&page_size=${pageSize}${
 						filter?.species ? '&species=' + filter.species : ''
-					}${filter?.date ? '&date=' + filter?.date : ''}${
-						filter?.location ? '&location=' + filter?.location : ''
-					}`
+					}${
+						filter?.date
+							? '&date=' +
+								filter?.date.toLocaleString('es-ES', {
+									timeZone: 'America/Guayaquil',
+									year: 'numeric',
+									month: '2-digit',
+									day: '2-digit',
+									hour: '2-digit',
+									minute: '2-digit'
+								})
+							: ''
+					}${filter?.location ? '&location=' + filter?.location : ''}`
 				);
+
 				return response.data;
 			},
 			getNextPageParam: (lastPage) => {
