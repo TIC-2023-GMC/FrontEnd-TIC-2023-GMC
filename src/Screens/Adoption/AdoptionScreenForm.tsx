@@ -1,6 +1,6 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
-import React, {useState } from 'react';
+import React, { useState } from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import {
 	TextInput,
