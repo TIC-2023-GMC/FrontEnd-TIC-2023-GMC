@@ -39,7 +39,7 @@ export interface AdoptionPublication {
 	_id: string;
 	user: User;
 	description: string;
-	publication_date: string;
+	publication_date: Date;
 	photo: Photo;
 	likes: Like[];
 	comments: Comment[];
@@ -51,4 +51,15 @@ export interface AdoptionPublication {
 	pet_location: string;
 	sterilized: boolean;
 	vaccination_card: boolean;
+}
+
+export interface ExperiencePublication {
+	_id: string;
+	user: User;
+	description: string;
+	publication_date: string;
+	photo: Photo;
+	likes: Like[];
+	comments: Comment[];
+	species: string;
 }

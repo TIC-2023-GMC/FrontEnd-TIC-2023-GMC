@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
 import { useState } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, TextLayoutEventData, NativeSyntheticEvent } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AdoptionPublication } from '../models/InterfacesModels';
+import { ExperiencePublication } from '../models/InterfacesModels';
 
 const LeftContent = (props: { size: number; photo: string }) => (
 	<Image
@@ -14,34 +14,46 @@ const LeftContent = (props: { size: number; photo: string }) => (
 	/>
 );
 
-const PublicationCard = (props: AdoptionPublication) => {
+const ExperienceCard = (props: ExperiencePublication) => {
 	const theme = useTheme();
 	const [like, setLike] = useState<boolean>();
+	const { user, description, publication_date: publicationDate, photo } = props;
 	const [expanded, setExpanded] = useState<boolean>();
-	const {
-		user,
-		pet_age: petAge,
-		pet_size: petSize,
-		description,
-		pet_location: petLocation,
-		publication_date: publicationDate,
-		photo,
-		pet_sex: petSex,
-		vaccination_card: vaccinationCard,
-		sterilized
-	} = props;
+	const [isTruncated, setIsTruncated] = useState<boolean>(false);
+
 	const handleExpand = () => {
 		setExpanded(!expanded);
 	};
+
+	const handleTextLayout = (event: NativeSyntheticEvent<TextLayoutEventData>) => {
+		const { lines } = event.nativeEvent;
+		if (lines.length > 2) {
+			setIsTruncated(true);
+		} else {
+			setIsTruncated(false);
+		}
+	};
+
 	return (
 		<Card style={styles.card}>
 			<Card.Title
 				title={user.first_name + ' ' + user.last_name}
 				subtitle={
-					<Text style={{ color: theme.colors.tertiary }}>{'Publicado el ' + publicationDate}</Text>
+					<Text style={{ color: theme.colors.tertiary }}>
+						{'Publicado el ' +
+							new Date(publicationDate).toLocaleString('es-ES', {
+								timeZone: 'America/Guayaquil',
+								year: 'numeric',
+								month: '2-digit',
+								day: '2-digit',
+								hour: '2-digit',
+								minute: '2-digit',
+								hour12: false, // Force 24-hour format
+								hourCycle: 'h23' // Ensure two digits for hours
+							})}
+					</Text>
 				}
 				left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
-				right={() => <IconButton icon="dots-vertical" onPress={() => console.log('show menu')} />}
 			/>
 			<Card.Cover
 				theme={{ ...theme, roundness: 0.5 }}
@@ -49,79 +61,32 @@ const PublicationCard = (props: AdoptionPublication) => {
 				resizeMode="contain"
 				resizeMethod="scale"
 				source={{ uri: photo.img_path }}
+				loadingIndicatorSource={{ uri: photo.img_path }}
 				progressiveRenderingEnabled={true}
 			/>
 			<Card.Content style={styles.content}>
-				<View style={styles.contentColumn}>
-					<List.Item
-						style={styles.list}
-						title={
-							petAge >= 12
-								? Math.round(petAge / 12) > 1
-									? Math.round(petAge / 12) + ' años'
-									: Math.round(petAge / 12) + ' año'
-								: petAge + ' meses'
-						}
-						left={() => <List.Icon color={theme.colors.tertiary} icon="cake-variant" />}
-					/>
-					<List.Item
-						style={styles.list}
-						titleNumberOfLines={2}
-						title={petLocation}
-						left={() => <List.Icon color={theme.colors.tertiary} icon="map-marker" />}
-					/>
-					<List.Item
-						style={styles.list}
-						title={petSize}
-						left={() => <List.Icon color={theme.colors.tertiary} icon="ruler" />}
-					/>
-				</View>
-				<View style={styles.contentColumn}>
-					<List.Item
-						style={styles.list}
-						title={'Sexo'}
-						left={() => (
-							<List.Icon
-								color={theme.colors.tertiary}
-								icon={`gender-${petSex ? 'male' : 'female'}`}
-							/>
-						)}
-					/>
-					<List.Item
-						style={styles.list}
-						titleNumberOfLines={2}
-						title={'Carnet de Vacunación'}
-						left={() => (
-							<List.Icon
-								color={theme.colors.tertiary}
-								icon={`${vaccinationCard ? 'check-circle-outline' : 'close-circle-outline'}`}
-							/>
-						)}
-					/>
-					<List.Item
-						style={styles.list}
-						title={'Esterilización'}
-						left={() => (
-							<List.Icon
-								color={theme.colors.tertiary}
-								icon={`${sterilized ? 'check-circle-outline' : 'close-circle-outline'}`}
-							/>
-						)}
-					/>
-				</View>
+				<List.Item
+					style={styles.list}
+					titleStyle={styles.title}
+					title={'Mi experiencia'}
+					left={() => <List.Icon color={theme.colors.tertiary} icon="account-heart" />}
+				/>
+				<Text
+					style={styles.description}
+					numberOfLines={expanded ? undefined : 2}
+					onTextLayout={handleTextLayout}
+				>
+					{description}
+				</Text>
 			</Card.Content>
-			{expanded && (
-				<Card.Content>
-					<List.Item style={styles.list} title="Descripción" description={description} />
-				</Card.Content>
-			)}
 
 			<View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
 				<View style={styles.actionMore}>
-					<Button mode="text" onPress={handleExpand}>
+					<Button mode="text" onPress={handleExpand} disabled={!isTruncated}>
 						{expanded ? 'Ver menos' : 'Ver más'}
 					</Button>
 				</View>
+
 				<View style={styles.actionsContainer}>
 					<View style={styles.actions}>
 						<IconButton
@@ -164,23 +129,17 @@ const styles = StyleSheet.create({
 		justifySelf: 'flex-start',
 		alignSelf: 'center',
 		height: 'auto',
+		flexGrow: 1,
 		width: '95%',
 		borderRadius: 10,
 		backgroundColor: 'white',
 		marginTop: 15
 	},
-	contentColumn: {
-		width: '50%',
-		flexDirection: 'column',
-		justifyContent: 'space-between',
-		alignItems: 'flex-start'
-	},
 	content: {
-		flexDirection: 'row',
+		//flexDirection: 'row',
 		marginTop: 10,
 		paddingHorizontal: 15,
-		justifyContent: 'space-between',
-		gap: 20
+		justifyContent: 'space-between'
 	},
 	actionsContainer: {
 		padding: 0,
@@ -200,10 +159,18 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center'
 	},
+	title: {
+		fontSize: 16,
+		fontWeight: '700'
+	},
+	description: {
+		fontSize: 15,
+		textAlign: 'justify'
+	},
 	list: {
 		paddingVertical: 0,
 		paddingRight: 0,
 		marginVertical: 0
 	}
 });
-export default PublicationCard;
+export default ExperienceCard;
