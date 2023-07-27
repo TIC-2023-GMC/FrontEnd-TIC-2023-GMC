@@ -62,3 +62,8 @@ export interface ExperiencePublication {
 	comments: Comment[];
 	species: string;
 }
+
+export interface Location {
+	name: string;
+	value: string;
+}

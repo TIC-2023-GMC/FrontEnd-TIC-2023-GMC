@@ -11,19 +11,20 @@ import {
 	Button,
 	HelperText
 } from 'react-native-paper';
-import DropDownPicker from 'react-native-dropdown-picker';
+import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { styles } from './AdoptionScreenForm.styles';
 import PhotoSelection from '../../components/PhotoSelection';
 import { post } from '../../services/api';
-
 import { AdoptionPublication, Photo } from '../../models/InterfacesModels';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import { parseNumber, uploadImg } from '../../utils/utils';
 import { AdoptionPublicationSchema } from '../../models/Schemas';
 import { SnackBarError } from '../../components/SnackBarError';
+import { get } from '../../services/api';
+
 
 export function AdoptionScreenForm() {
 	const theme = useTheme();
@@ -91,12 +92,18 @@ export function AdoptionScreenForm() {
 		{ label: 'Grande', value: 'Grande' }
 	]);
 	const [openLocation, setOpenLocation] = useState(false);
-	const [itemsLocation, setItemsLocation] = useState([
-		{ label: 'Carapungo', value: 'Carapungo' }, //valores que van a tener los va
-		{ label: 'Cumbayork', value: 'Cumbayork' },
-		{ label: 'Chillogallo', value: 'Chillogallo' }
-	]);
+	const [itemsLocation, setItemsLocation] = useState<Location[]>([]);
 
+	const { isLoading } = useQuery({
+		queryKey: ['location'],
+		queryFn: async () => {
+			const response = await get<Location[]>('/parish/get_all');
+			return response.data;
+		},
+		onSuccess: (data) => {
+			setItemsLocation(data);
+		}
+	});
 	const [size, setSize] = useState<string>('');
 	const [location, setLocation] = useState<string>('');
 
@@ -291,7 +298,6 @@ export function AdoptionScreenForm() {
 								borderColor: theme.colors.primary,
 								borderWidth: 0.5
 							}}
-							listMode="SCROLLVIEW"
 							dropDownDirection="TOP"
 						/>
 						{errors.pet_size && <HelperText type="error">{errors.pet_size.message}</HelperText>}
@@ -311,11 +317,16 @@ export function AdoptionScreenForm() {
 							placeholder="Selecciona el sector"
 							open={openLocation}
 							value={location}
-							items={itemsLocation}
+							items={itemsLocation as ItemType<string>[]}
 							setValue={setLocation}
 							setOpen={setOpenLocation}
 							setItems={setItemsLocation}
 							onChangeValue={onChange}
+							loading={isLoading}
+							listMode="MODAL"
+							modalTitle="Seleccione el sector"
+							modalAnimationType="slide"
+							modalContentContainerStyle={{ backgroundColor: theme.colors.secondary }}
 							style={{
 								...styles.comboItem,
 								borderColor: theme.colors.tertiary,
@@ -327,8 +338,6 @@ export function AdoptionScreenForm() {
 								borderColor: theme.colors.primary,
 								borderWidth: 0.5
 							}}
-							listMode="SCROLLVIEW"
-							dropDownDirection="TOP"
 						/>
 						{errors.pet_location && (
 							<HelperText type="error">{errors.pet_location.message}</HelperText>
