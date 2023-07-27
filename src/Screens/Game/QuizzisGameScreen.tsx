@@ -1,34 +1,82 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { Card, useTheme } from 'react-native-paper';
+import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import { Button, Card, MD3Theme, useTheme } from 'react-native-paper';
+import { transformer } from 'zod';
 
 //función que tomes las pregunta y las opciones de la api
-const theme = useTheme();
+const image = {uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg'};
+
 export function QuizzisGameScreen() {
-	const question = ''; //halar de la api
-	const options = ['', '', '', '']; //halar de la api
+	const theme = useTheme();
+	const styles = createStyles(theme);
+	const question = 'Esta es una pregunta'; //halar de la api
+	const options = ['opcion 1', 'opcion 2', 'opcion 3', 'opcion 4']; //halar de la api
+
 	return (
-		<View>
-			<Card>
-				<Text>{question}</Text>
+		<ImageBackground source={image} resizeMode="cover"style={styles.container}>
+			<Text style={[{ margin: 25 }]}>Quizzis Game Screen</Text>
+			<Card style={[styles.cardContainer, { transform: [{ rotateZ: '4deg' }] }]}>
+				<Card style={[styles.cardContainer, { transform: [{ rotateZ: '-8deg' }] }]}>
+					<Card style={[styles.cardContainer, { transform: [{ rotateZ: '4deg' }] }]}>
+						<Text>{question}</Text>
+					</Card>
+				</Card>
 			</Card>
-         
-            <Card>{options[0]}</Card>
-            <Card>{options[1]}</Card>
-            <Card>{options[2]}</Card>
-            <Card>{options[3]}</Card>
-		</View>
+			<View style={[{ marginTop: 25 }]}>
+				<Button style={styles.answer}
+				mode='elevated' 
+				rippleColor={'#40FF49'} //llevar al onPress
+				uppercase={true}
+				onPress={() => {}} 
+				>
+					<Text>{options[0]}</Text>
+				</Button>
+				<Button style={styles.answer}
+				mode='elevated' 
+				rippleColor={theme.colors.error} //llevar al onPress
+				uppercase={true}
+				onPress={() => {}} 
+				>
+					<Text>{options[0]}</Text>
+				</Button>
+				<Button style={styles.answer}
+				mode='elevated' 
+				rippleColor={theme.colors.error} //llevar al onPress
+				uppercase={true}
+				onPress={() => {}} 
+				>
+					<Text>{options[0]}</Text>
+				</Button>
+				<Button style={styles.answer}
+				mode='elevated' 
+				rippleColor={theme.colors.error} //llevar al onPress
+				uppercase={true}
+				onPress={() => {}} 
+				>
+					<Text>{options[0]}</Text>
+				</Button>
+			</View>
+		</ImageBackground>
 	);
 }
 
-const styles = StyleSheet.create({ 
-    questionCard: {
-        backgroundColor: theme.colors.primary,
-        borderRadius: 10,
-        width: 384,
-        height: 234,
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center', 
-        marginBottom: 50
-    }
-});
+const createStyles = (theme: MD3Theme) =>
+	StyleSheet.create({
+		container: {
+			height: '100%',
+			alignItems: 'center',
+			paddingTop: 50
+		},
+		cardContainer: {
+			width: 325,
+			height: 150,
+			justifyContent: 'center',
+			alignItems: 'center'
+		},
+		answer: {
+			width: 250,
+			height: 40,
+			margin: 15,
+			borderRadius: 10,
+			backgroundColor: '#ffffff'
+		}
+	});
