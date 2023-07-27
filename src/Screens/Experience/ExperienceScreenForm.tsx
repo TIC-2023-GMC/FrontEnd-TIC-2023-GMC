@@ -113,14 +113,14 @@ export function ExperienceScreenForm() {
 							<View style={styles.viewList}>
 								<RadioButton.Item
 									position="leading"
-									value="dog"
+									value="Perro"
 									label="Perro"
 									style={styles.radioButton}
 									labelStyle={styles.labelRadioButton}
 								/>
 								<RadioButton.Item
 									position="leading"
-									value="cat"
+									value="Gato"
 									label="Gato"
 									style={styles.radioButton}
 									labelStyle={styles.labelRadioButton}
