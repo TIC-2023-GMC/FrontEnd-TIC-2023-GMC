@@ -1,41 +1,37 @@
 /* eslint-disable react-native/no-unused-styles */
-import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
-import React from 'react';
-import { AntDesign } from '@expo/vector-icons';
-import { TouchableWithoutFeedback, View, StyleSheet } from 'react-native';
-import { MD3Theme, useTheme } from 'react-native-paper';
+import React, { useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { IconButton, MD3Theme, useTheme } from 'react-native-paper';
+import MenuAdd from './MenuAdd';
 
-export default function AddTabBarButton(props: BottomTabBarButtonProps) {
+export default function AddTabBarButton() {
 	const theme = useTheme();
 	const styles = createStyles(theme);
+	const [visible, setVisible] = useState(false);
+	const openMenu = () => setVisible(true);
+	const closeMenu = () => setVisible(false);
 	return (
-		<View style={styles.addButtonContainer}>
-			<TouchableWithoutFeedback onPress={props.onPress}>
-				<View style={styles.addButton}>
-					<AntDesign {...styles.icon} name="plus" size={35} />
-				</View>
-			</TouchableWithoutFeedback>
-		</View>
+		<MenuAdd visible={visible} closeMenu={closeMenu}>
+			<IconButton
+				onPress={openMenu}
+				size={40}
+				icon="plus"
+				style={styles.addButton}
+				iconColor={theme.colors.secondary}
+				animated={true}
+				mode="outlined"
+			/>
+		</MenuAdd>
 	);
 }
 const createStyles = (theme: MD3Theme) =>
 	StyleSheet.create({
-		addButtonContainer: {
-			justifyContent: 'center',
-			alignItems: 'center'
-		},
 		addButton: {
 			borderColor: theme.colors.secondary,
-			borderWidth: 3.5,
-			width: 60,
 			height: 65,
-			borderRadius: 35,
+			width: 60,
+			borderWidth: 3.5,
 			backgroundColor: theme.colors.primary,
-			justifyContent: 'center',
-			alignItems: 'center',
-			elevation: 6
-		},
-		icon: {
-			color: theme.colors.secondary
+			margin: 0
 		}
 	});
