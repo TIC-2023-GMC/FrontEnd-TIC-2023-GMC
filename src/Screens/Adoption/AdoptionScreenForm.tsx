@@ -15,7 +15,7 @@ import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { styles } from './AdoptionScreenForm.styles';
 import PhotoSelection from '../../components/PhotoSelection';
-import { post } from '../../services/api';
+import { post, get } from '../../services/api';
 import { AdoptionPublication, Photo } from '../../models/InterfacesModels';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,8 +23,6 @@ import { useNavigation } from '@react-navigation/native';
 import { parseNumber, uploadImg } from '../../utils/utils';
 import { AdoptionPublicationSchema } from '../../models/Schemas';
 import { SnackBarError } from '../../components/SnackBarError';
-import { get } from '../../services/api';
-
 
 export function AdoptionScreenForm() {
 	const theme = useTheme();
