@@ -4,10 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
 import { registerTranslation, DatePickerInput } from 'react-native-paper-dates';
-import DropDownPicker, { ItemType, ValueType } from 'react-native-dropdown-picker';
-import { Filter } from '../Screens/Adoption/AdoptionScreen';
-import { useQuery } from '@tanstack/react-query';
-import { get } from '../services/api';
+import { Filter } from '../Screens/Experience/ExperienceScreen';
 registerTranslation('es', {
 	save: 'Guardar',
 	selectSingle: 'Seleccionar fecha',
@@ -48,26 +45,11 @@ const FilterModal = ({
 	const [checkedDog, setCheckedDog] = useState<boolean | undefined>(filter.species === 'Perro');
 	const [checkedCat, setCheckedCat] = useState<boolean | undefined>(filter.species === 'Gato');
 	const [date, setDate] = useState<Date | undefined>(filter.date);
-	const [location, setLocation] = useState(filter.location);
-	const [open, setOpen] = useState(false);
-	const [items, setItems] = useState<Location[]>([]);
-
-	const { isLoading } = useQuery({
-		queryKey: ['location'],
-		queryFn: async () => {
-			const response = await get<Location[]>('/parish/get_all');
-			return response.data;
-		},
-		onSuccess: (data) => {
-			setItems(data);
-		}
-	});
 
 	const handlerApplyFilter = () => {
 		onApplyFilter({
 			species: checkedCat ? 'Gato' : checkedDog ? 'Perro' : undefined,
-			date,
-			location: location ? location : undefined
+			date
 		});
 
 		handlerVisible();
@@ -76,7 +58,6 @@ const FilterModal = ({
 		setCheckedCat(filter.species === 'Gato');
 		setCheckedDog(filter.species === 'Perro');
 		setDate(filter.date);
-		setLocation(filter.location);
 	}, [filter]);
 
 	return (
@@ -89,14 +70,14 @@ const FilterModal = ({
 					backgroundColor: theme.colors.secondary,
 					justifyContent: 'flex-start',
 					alignContent: 'center',
-					height: 300,
+					height: 250,
 					borderTopEndRadius: 20,
 					borderTopStartRadius: 20,
-					transform: [{ translateY: deviceHeight / 2 - navBarHeight - 150 }]
+					transform: [{ translateY: deviceHeight / 2 - navBarHeight - 125 }]
 				}}
 			>
 				<IconButton
-					icon="minus-thick"
+					icon="chevron-down"
 					style={styles.iconButton}
 					iconColor={theme.colors.tertiary}
 					size={30}
@@ -135,28 +116,6 @@ const FilterModal = ({
 						)}
 					/>
 				</View>
-				<Divider />
-
-				<DropDownPicker
-					placeholder="Selecciona un sector"
-					open={open}
-					value={location as ValueType}
-					items={items as ItemType<string>[]}
-					setOpen={setOpen}
-					setValue={setLocation}
-					setItems={setItems}
-					loading={isLoading}
-					modalTitle="Selecciona un sector"
-					modalContentContainerStyle={{ backgroundColor: theme.colors.secondary }}
-					style={{
-						backgroundColor: 'transparent',
-						borderColor: 'transparent',
-						width: '100%',
-						height: 60
-					}}
-					listMode="MODAL"
-				/>
-
 				<Divider />
 				<DatePickerInput
 					locale="es"

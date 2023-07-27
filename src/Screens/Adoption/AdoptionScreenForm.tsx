@@ -64,7 +64,7 @@ const AdoptionPublicationSchema = z.object({
 	_id: z.string(),
 	user: UserSchema,
 	description: z.string().nonempty('La descripción es requerida'),
-	publication_date: z.string(),
+	publication_date: z.date(),
 	photo: PhotoSchema,
 	likes: z.optional(z.array(Like)),
 	comments: z.optional(z.array(Comment)),
@@ -119,7 +119,7 @@ export function AdoptionScreenForm() {
 				}
 			},
 			description: '',
-			publication_date: '',
+			publication_date: new Date(),
 			photo: {
 				_id: '',
 				img_path: ''
@@ -160,7 +160,7 @@ export function AdoptionScreenForm() {
 
 	const createPublicationMutation = useMutation({
 		mutationFn: (data: AdoptionPublication) =>
-			post('/adoptions/adoption', data).then((response) => response.data),
+			post('/adoptions/add', data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
 			navigation.goBack();
@@ -173,7 +173,7 @@ export function AdoptionScreenForm() {
 
 	const uploadImg = async (uri: string) => {
 		try {
-			const response = await FileSystem.uploadAsync(`${baseUrl}/photo/upload_photo`, uri, {
+			const response = await FileSystem.uploadAsync(`${baseUrl}/photo/upload`, uri, {
 				fieldName: 'photo',
 				httpMethod: 'POST',
 				uploadType: FileSystem.FileSystemUploadType.MULTIPART,
@@ -197,16 +197,12 @@ export function AdoptionScreenForm() {
 				...response
 			};
 
+			const currentDateUTC = new Date();
+			const timezoneOffset = currentDateUTC.getTimezoneOffset() * 60000;
+			const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);
 			const new_publication: AdoptionPublication = {
 				...data,
-				publication_date: new Date().toLocaleString('es-ES', {
-					timeZone: 'America/Guayaquil',
-					year: 'numeric',
-					month: '2-digit',
-					day: '2-digit',
-					hour: '2-digit',
-					minute: '2-digit'
-				}),
+				publication_date: currentDateLocal,
 				photo: new_photo
 			};
 			createPublicationMutation.mutate(new_publication);
@@ -229,14 +225,14 @@ export function AdoptionScreenForm() {
 							<View style={styles.viewList}>
 								<RadioButton.Item
 									position="leading"
-									value="dog"
+									value="Perro"
 									label="Perro"
 									style={styles.radioButton}
 									labelStyle={styles.labelRadioButton}
 								/>
 								<RadioButton.Item
 									position="leading"
-									value="cat"
+									value="Gato"
 									label="Gato"
 									style={styles.radioButton}
 									labelStyle={styles.labelRadioButton}
