@@ -1,57 +1,64 @@
 /* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
-import { registerTranslation, DatePickerInput } from 'react-native-paper-dates';
 import { Filter } from '../Screens/Experience/ExperienceScreen';
-registerTranslation('es', {
-	save: 'Guardar',
-	selectSingle: 'Seleccionar fecha',
-	selectMultiple: 'Seleccionar fechas',
-	selectRange: 'Seleccionar período',
-	notAccordingToDateFormat: (inputFormat) => `El formato de fecha debe ser ${inputFormat}`,
-	mustBeHigherThan: (date) => `Debe ser después de ${date}`,
-	mustBeLowerThan: (date) => `Debe ser antes de ${date}`,
-	mustBeBetween: (startDate, endDate) => `Debe estar entre ${startDate} - ${endDate}`,
-	dateIsDisabled: 'Día no permitido',
-	previous: 'Anterior',
-	next: 'Siguiente',
-	typeInDate: 'Escribir fecha',
-	pickDateFromCalendar: 'Seleccionar fecha del calendario',
-	close: 'Cerrar'
-});
+import { AdoptionPublication, User } from '../models/InterfacesModels';
 
 const deviceHeight = Dimensions.get('window').height;
 
 interface FilterModalProps {
+	publication: AdoptionPublication;
 	visible: boolean;
 	navBarHeight: number;
 	handlerVisible: () => void;
-	handlerCancel: () => void;
+	onSaveAsFavorite: (p: AdoptionPublication) => void;
 	filter: Filter;
 }
 
 const MoreOptionsModal = ({
+	publication,
 	visible,
 	navBarHeight,
 	handlerVisible,
-	handlerCancel,
+	onSaveAsFavorite,
 	filter
 }: FilterModalProps) => {
 	const theme = useTheme();
-	const [checkedDog, setCheckedDog] = useState<boolean | undefined>(filter.species === 'Perro');
-	const [checkedCat, setCheckedCat] = useState<boolean | undefined>(filter.species === 'Gato');
-	const [date, setDate] = useState<Date | undefined>(filter.date);
+	
 
-	const handlerApplyFilter = () => {
+	const user: User = {
+		first_name: 'Test',
+		last_name: 'Test',
+		mobile_phone: '0983473043',
+		neighborhood: 'Cumbayá',
+		email: 'gandhygarcia@outlook.es',
+		password: 'password123',
+		num_previous_pets: 2,
+		num_current_pets: 1,
+		outdoor_hours: 6,
+		house_space: 100,
+		has_yard: false,
+		main_pet_food: 'homemade',
+		pet_expenses: 40.5,
+		motivation: 'Love for animals',
+		favorite_adoption_publications: [],
+		photo: {
+			_id: '2',
+			img_path: 'https://scontent.fgye1-1.fna.fbcdn.net/v/t1.6435-9/74242360_3195954163812838_4274861617784553472_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeFRCjYsTZuQlf2PHyTPJ3HYymegSJbxrSjKZ6BIlvGtKPYIzlm5LEqBr9cR0tDl-FEvtHfkBqZQ6LHCgw-pkTlW&_nc_ohc=dye6H3TWD6QAX-v2xOF&_nc_ht=scontent.fgye1-1.fna&oh=00_AfCF85oDfvg1CEtIJ1We_mJ3gV49fRwyklxfDfl8SouHOA&oe=64D84DE2',
+		}
+	};
+
+	const [checkedFavorite, setCheckedFavorite] = useState<boolean | undefined>(
+		user.favorite_adoption_publications.includes(publication._id)
+	);
+
+
+	const handlerSavedAsFavorite = () => {
 		handlerVisible();
 	};
-	useEffect(() => {
-		setCheckedCat(filter.species === 'Gato');
-		setCheckedDog(filter.species === 'Perro');
-		setDate(filter.date);
-	}, [filter]);
+	useEffect(() => {}, [filter]);
 
 	return (
 		<Portal>
@@ -63,93 +70,81 @@ const MoreOptionsModal = ({
 					backgroundColor: theme.colors.secondary,
 					justifyContent: 'flex-start',
 					alignContent: 'center',
-					height: 250,
+					height: 270,
 					borderTopEndRadius: 20,
 					borderTopStartRadius: 20,
-					transform: [{ translateY: deviceHeight / 2 - navBarHeight - 125 }]
+					transform: [{ translateY: deviceHeight / 2 - navBarHeight - 135 }]
 				}}
 			>
-				<IconButton
-					icon="chevron-down"
-					style={styles.iconButton}
-					iconColor={theme.colors.tertiary}
-					size={30}
-					onPress={handlerVisible}
-				/>
-				<Divider />
-				<View style={styles.viewList}>
-					<List.Item
-						style={styles.list}
-						title="Perro"
-						onPress={() => {
-							setCheckedDog(!checkedDog);
-							setCheckedCat(false);
-						}}
-						left={(props) => (
-							<IconButton
-								{...props}
-								icon={`check-circle${!checkedDog ? '-outline' : ''}`}
-								iconColor={!checkedDog ? theme.colors.tertiary : theme.colors.primary}
-							/>
-						)}
+				<TouchableOpacity>
+					<IconButton
+						icon="chevron-down"
+						style={styles.iconButton}
+						iconColor={theme.colors.tertiary}
+						size={30}
+						onTouchEnd={handlerVisible}
 					/>
-					<List.Item
-						style={styles.list}
-						title="Gato"
-						onPress={() => {
-							setCheckedCat(!checkedCat);
-							setCheckedDog(false);
-						}}
-						left={(props) => (
-							<IconButton
-								{...props}
-								icon={`check-circle${!checkedCat ? '-outline' : ''}`}
-								iconColor={!checkedCat ? theme.colors.tertiary : theme.colors.primary}
-							/>
-						)}
-					/>
-				</View>
-				<Divider />
-				<DatePickerInput
-					locale="es"
-					label="Ver publicaciones desde:"
-					value={date}
-					onChange={(d) => setDate(d)}
-					inputMode="start"
-					mode="outlined"
-					style={{ backgroundColor: 'transparent', color: theme.colors.tertiary }}
-					calendarIcon="calendar-range"
-					outlineStyle={{ borderColor: 'transparent' }}
-					right={
-						<IconButton
-							icon="pet"
-							iconColor={theme.colors.tertiary}
-							style={{ alignSelf: 'center', justifyContent: 'space-around', margin: 0, height: 30 }}
-						/>
-					}
-				/>
+				</TouchableOpacity>
 
 				<Divider />
-				<View style={styles.buttonView}>
-					<Button
-						style={styles.button}
-						mode="elevated"
-						buttonColor={theme.colors.primary}
-						textColor={theme.colors.secondary}
-						onPress={handlerApplyFilter}
-					>
-						Aplicar Filtros
-					</Button>
-					<Button
-						style={styles.button}
-						mode="elevated"
-						buttonColor={theme.colors.tertiary}
-						textColor={theme.colors.secondary}
-						onPress={handlerCancel}
-					>
-						Reset
-					</Button>
-				</View>
+				<TouchableOpacity style={styles.viewList}>
+					<List.Item
+						style={styles.list}
+						titleStyle={{ fontWeight: 'bold' }}
+						title="Guardar en favoritos"
+						onPress={() => {
+							setCheckedFavorite(!checkedFavorite);
+						}}
+						left={(props) => (
+							<IconButton
+								{...props}
+								style={{ margin: 0, padding: 0 }}
+								icon={`bookmark${!checkedFavorite ? '-outline' : ''}`}
+								iconColor={theme.colors.primary}
+								size={50}
+							/>
+						)}
+					/>
+				</TouchableOpacity>
+
+				<Divider />
+				<TouchableOpacity style={styles.viewList}>
+					<List.Item
+						style={styles.list}
+						titleStyle={{ fontWeight: 'bold' }}
+						title={`Enviar mensaje a ${publication.user.first_name}`}
+						onPress={() => {}}
+						left={(props) => (
+							<IconButton
+								{...props}
+								style={{ margin: 0, padding: 0 }}
+								icon={'whatsapp'}
+								iconColor={theme.colors.primary}
+								size={50}
+							/>
+						)}
+					/>
+				</TouchableOpacity>
+
+				<Divider />
+				<TouchableOpacity style={styles.viewList}>
+					<List.Item
+						style={styles.list}
+						titleStyle={{ fontWeight: 'bold' }}
+						title={`Enviar mensaje a ${publication.user.first_name}`}
+						onPress={() => {}}
+						left={(props) => (
+							<IconButton
+								{...props}
+								style={{ margin: 0, padding: 0 }}
+								icon={'phone'}
+								iconColor={theme.colors.primary}
+								size={50}
+							/>
+						)}
+					/>
+				</TouchableOpacity>
+				<Divider />
 			</Modal>
 		</Portal>
 	);
@@ -158,10 +153,14 @@ const styles = StyleSheet.create({
 	viewList: {
 		justifyContent: 'center',
 		flexDirection: 'row',
-		alignItems: 'center'
+		alignItems: 'center',
+		height: '25%'
 	},
 	list: {
-		width: '50%'
+		justifyContent: 'center',
+		height: '100%',
+		width: '100%',
+		fontWeight: 'bold'
 	},
 	listItems: {
 		width: '100%',
@@ -177,6 +176,7 @@ const styles = StyleSheet.create({
 		width: '45%'
 	},
 	iconButton: {
+		width: '100%',
 		alignSelf: 'center',
 		justifyContent: 'space-around',
 		margin: 0,

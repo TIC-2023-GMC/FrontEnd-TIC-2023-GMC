@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
 import { registerTranslation, DatePickerInput } from 'react-native-paper-dates';
 import DropDownPicker, { ItemType, ValueType } from 'react-native-dropdown-picker';
@@ -95,13 +95,15 @@ const FilterModal = ({
 					transform: [{ translateY: deviceHeight / 2 - navBarHeight - 150 }]
 				}}
 			>
-				<IconButton
-					icon="chevron-down"
-					style={styles.iconButton}
-					iconColor={theme.colors.tertiary}
-					size={30}
-					onPress={handlerVisible}
-				/>
+				<TouchableOpacity>
+					<IconButton
+						icon="chevron-down"
+						style={styles.iconButton}
+						iconColor={theme.colors.tertiary}
+						size={30}
+						onTouchEnd={handlerVisible}
+					/>
+				</TouchableOpacity>
 				<Divider />
 				<View style={styles.viewList}>
 					<List.Item
@@ -225,6 +227,7 @@ const styles = StyleSheet.create({
 		width: '45%'
 	},
 	iconButton: {
+		width: '100%',
 		alignSelf: 'center',
 		justifyContent: 'space-around',
 		margin: 0,
