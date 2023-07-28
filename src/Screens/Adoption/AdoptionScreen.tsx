@@ -18,7 +18,7 @@ interface AdoptionPublicationScreen {
 	1: number;
 }
 
-interface SaveAsFavoriteProps {
+interface SaveOrRemoveFavoriteProps {
 	userId: string;
 	publicationId: string;
 }
@@ -89,6 +89,7 @@ export function AdoptionScreen({
 		sterilized: false,
 		vaccination_card: false
 	});
+	const userId = '60f0b0b0b3b3c3b3c3b3c3b3';
 	const pageSize = 2;
 	useScrollToTop(ref);
 
@@ -132,8 +133,16 @@ export function AdoptionScreen({
 	);
 
 	const savePublicationAsFavoriteMutation = useMutation({
-		mutationFn: (data: SaveAsFavoriteProps) =>
+		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
 			post('/user/add_favorite', data).then((response) => response.data),
+		onSuccess: () => {
+			refetch();
+		}
+	});
+
+	const removePublicationFromFavoritesMutation = useMutation({
+		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
+			post('/user/remove_favorite', data).then((response) => response.data),
 		onSuccess: () => {
 			refetch();
 		}
@@ -149,11 +158,20 @@ export function AdoptionScreen({
 			<StatusBar style="light" />
 			<MemoizedMoreOptionsModal
 				publication={publicationSelected!}
-				filter={filter}
 				visible={isMoreModalVisible}
 				handlerVisible={() => setIsMoreModalVisible(false)}
 				onSaveAsFavorite={() => {
-					//savePublicationAsFavoriteMutation.mutate(publicationSelected?._id);
+					//savePublicationAsFavoriteMutation.mutate(({userId, publicationId: publicationSelected?._id});
+					console.log('saved as favorite');
+					
+				}}
+				onRemoveFromFavorites={() => {
+					/* removePublicationFromFavoritesMutation.mutate({
+						userId,
+						publicationId: publicationSelected?._id
+					}); */
+					console.log('removed from favorites');
+					
 				}}
 				navBarHeight={tabBarHeight}
 			/>

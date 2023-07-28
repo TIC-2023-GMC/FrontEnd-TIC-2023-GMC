@@ -2,19 +2,19 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
-import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
+import { useTheme, Portal, Modal, List, IconButton, Divider} from 'react-native-paper';
 import { Filter } from '../Screens/Experience/ExperienceScreen';
 import { AdoptionPublication, User } from '../models/InterfacesModels';
 
 const deviceHeight = Dimensions.get('window').height;
 
-interface FilterModalProps {
+interface MoreOptionsModalProps {
 	publication: AdoptionPublication;
 	visible: boolean;
 	navBarHeight: number;
 	handlerVisible: () => void;
 	onSaveAsFavorite: (p: AdoptionPublication) => void;
-	filter: Filter;
+	onRemoveFromFavorites: (p: AdoptionPublication) => void;
 }
 
 const MoreOptionsModal = ({
@@ -23,8 +23,8 @@ const MoreOptionsModal = ({
 	navBarHeight,
 	handlerVisible,
 	onSaveAsFavorite,
-	filter
-}: FilterModalProps) => {
+	onRemoveFromFavorites
+}: MoreOptionsModalProps) => {
 	const theme = useTheme();
 	
 
@@ -53,12 +53,6 @@ const MoreOptionsModal = ({
 	const [checkedFavorite, setCheckedFavorite] = useState<boolean | undefined>(
 		user.favorite_adoption_publications.includes(publication._id)
 	);
-
-
-	const handlerSavedAsFavorite = () => {
-		handlerVisible();
-	};
-	useEffect(() => {}, [filter]);
 
 	return (
 		<Portal>
@@ -93,7 +87,13 @@ const MoreOptionsModal = ({
 						titleStyle={{ fontWeight: 'bold' }}
 						title="Guardar en favoritos"
 						onPress={() => {
-							setCheckedFavorite(!checkedFavorite);
+							if (!checkedFavorite){
+								onSaveAsFavorite(publication);
+								setCheckedFavorite(true);
+							} else {
+								onRemoveFromFavorites(publication);
+								setCheckedFavorite(false);
+							}
 						}}
 						left={(props) => (
 							<IconButton
