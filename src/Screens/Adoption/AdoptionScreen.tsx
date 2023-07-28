@@ -11,6 +11,7 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/AdoptionsFilterModal';
 import { AdoptionPublication } from '../../models/InterfacesModels';
 import { useFocusEffect } from '@react-navigation/native';
+import MoreOptionsModal from '../../components/MoreOptionsModal';
 
 interface AdoptionPublicationScreen {
 	0: AdoptionPublication[];
@@ -24,6 +25,7 @@ export interface Filter {
 
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedFilterModal = memo(FilterModal);
+const MemoizedMoreOptionsModal = memo(MoreOptionsModal);
 
 export function AdoptionScreen({
 	visibleFilter,
@@ -37,6 +39,7 @@ export function AdoptionScreen({
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [filter, setFilter] = useState<Filter>({} as Filter);
+	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
 	const pageSize = 2;
 	useScrollToTop(ref);
 
@@ -79,9 +82,20 @@ export function AdoptionScreen({
 		}, [])
 	);
 
+	const handleOpenModal = () => {
+		setIsMoreModalVisible(true);
+	};
+
 	return (
 		<>
 			<StatusBar style="light" />
+			<MemoizedMoreOptionsModal
+				filter={filter}
+				visible={isMoreModalVisible}
+				handlerVisible={() => setIsMoreModalVisible(false)}
+				navBarHeight={tabBarHeight}
+				handlerCancel={() => setFilter({} as Filter)}
+			/>
 			<MemoizedFilterModal
 				filter={filter}
 				visible={visibleFilter}
@@ -100,7 +114,7 @@ export function AdoptionScreen({
 				onEndReached={handleLoadMore}
 				ref={ref}
 				data={data?.pages.flatMap((page) => page[0])}
-				renderItem={({ item }) => <MemoizedAdoptionCard {...item} />}
+				renderItem={({ item }) => <MemoizedAdoptionCard {...item} onOpenModal={handleOpenModal} />}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={
