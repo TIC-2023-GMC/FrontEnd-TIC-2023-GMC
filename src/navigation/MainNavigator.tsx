@@ -7,7 +7,7 @@ import { ExperienceScreen, ExperienceScreenForm } from '../Screens/Experience';
 import { OrganizationScreen } from '../Screens/Organization';
 import { IconButton, useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
-import { FavoriteScreen } from '../Screens/Favorite';
+import { FavoritesScreen } from '../Screens/Favorites';
 import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
@@ -152,7 +152,7 @@ export function TabsNavigation() {
 			/>
 			<Tab.Screen
 				name="Perfil"
-				component={FavoriteScreen}
+				component={FavoritesScreen}
 				options={{
 					tabBarIcon: (props) => {
 						return <Octicons {...props} name="person-fill" size={30} />;
