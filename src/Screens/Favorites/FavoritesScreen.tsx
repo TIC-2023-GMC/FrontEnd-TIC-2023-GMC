@@ -2,7 +2,7 @@ import React, { useRef, useState, memo, useCallback } from 'react';
 import { Text, View, FlatList, RefreshControl } from 'react-native';
 import { styles } from './FavoritesScreen.styles';
 import { StatusBar } from 'expo-status-bar';
-import { get } from '../../services/api';
+import { get, post } from '../../services/api';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
 import AdoptionCard from '../../components/AdoptionCard';
@@ -29,10 +29,16 @@ export function FavoritesScreen() {
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
 		useInfiniteQuery({
-			queryKey: ['Adoption'],
+			queryKey: ['Favorites'],
 			queryFn: async ({ pageParam = 1 }) => {
-				const response = await get<FavoritesScreen>(
-					`/user/list_favorite_adoptions?page_number=${pageParam}&page_size=${pageSize}`
+				const favoriteAdoptionPublications: string[] = [
+					'64c304097f723d556764fa0b',
+					'64c304097f723d556764fa0a'
+				];
+
+				const response = await post<FavoritesScreen>(
+					`/user/list_favorite_adoptions?page_number=${pageParam}&page_size=${pageSize}`,
+					favoriteAdoptionPublications
 				);
 
 				return response.data;
