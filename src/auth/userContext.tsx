@@ -2,8 +2,8 @@ import React, { ReactNode, createContext, useState } from 'react';
 import { User } from '../models/InterfacesModels';
 const userDefault: User = {
 	_id: '64c1b0ef0fd89c04b7114eb7',
-	first_name: 'Test',
-	last_name: 'Test',
+	first_name: 'Gandhy',
+	last_name: 'Garcia',
 	mobile_phone: '0983473043',
 	neighborhood: 'Cumbayá',
 	email: 'gandhygarcia@outlook.es',
