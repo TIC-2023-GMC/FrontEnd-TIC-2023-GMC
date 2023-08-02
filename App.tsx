@@ -3,16 +3,18 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DefaultTheme, MD3Theme, Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { TabsNavigation } from './src/navigation/MainNavigator';
+import { AuthProvider } from './src/auth/userContext';
 
 export default function App() {
 	return (
 		<QueryClientProvider client={new QueryClient()}>
-			<PaperProvider theme={theme}>
-				<NavigationContainer>
-					<TabsNavigation />
-					{/* <HelloWord></HelloWord> */}
-				</NavigationContainer>
-			</PaperProvider>
+			<AuthProvider>
+				<PaperProvider theme={theme}>
+					<NavigationContainer>
+						<TabsNavigation />
+					</NavigationContainer>
+				</PaperProvider>
+			</AuthProvider>
 		</QueryClientProvider>
 	);
 }

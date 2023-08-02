@@ -6,7 +6,7 @@ import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-pap
 import { AdoptionPublication } from '../models/InterfacesModels';
 
 interface OnOpenModalProp {
-	onOpenModal: (p: AdoptionPublication) => void;
+	onOpenModal: (_p: AdoptionPublication) => void;
 }
 
 const LeftContent = (props: { size: number; photo: string }) => (
@@ -60,7 +60,7 @@ const PublicationCard = (props: AdoptionPublication & OnOpenModalProp) => {
 					</Text>
 				}
 				left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
-				right={() => <IconButton icon="dots-vertical" onPress={() => props.onOpenModal(adoption)} />}
+				right={() => <IconButton icon="dots-vertical" onPress={() => onOpenModal(adoption)} />}
 			/>
 			<Card.Cover
 				theme={{ ...theme, roundness: 0.5 }}

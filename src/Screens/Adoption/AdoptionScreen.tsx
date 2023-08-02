@@ -1,26 +1,22 @@
-import React, { useRef, useState, memo, useCallback } from 'react';
+import React, { useRef, useState, memo, useCallback, useContext } from 'react';
 import { Text, View, FlatList, RefreshControl } from 'react-native';
 import { styles } from './AdoptionScreen.styles';
 import { StatusBar } from 'expo-status-bar';
-import { get, post } from '../../services/api';
+import { get, post, del } from '../../services/api';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
 import AdoptionCard from '../../components/AdoptionCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/AdoptionsFilterModal';
-import { AdoptionPublication } from '../../models/InterfacesModels';
+import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../../models/InterfacesModels';
 import { useFocusEffect } from '@react-navigation/native';
 import MoreOptionsModal from '../../components/MoreOptionsModal';
+import { UserContext, UserContextParams } from '../../auth/userContext';
 
 interface AdoptionPublicationScreen {
 	0: AdoptionPublication[];
 	1: number;
-}
-
-interface SaveOrRemoveFavoriteProps {
-	userId: string;
-	publicationId: string;
 }
 
 export interface Filter {
@@ -41,37 +37,16 @@ export function AdoptionScreen({
 	// eslint-disable-next-line no-unused-vars
 	setVisibleFilter: (visible: boolean) => void;
 }) {
+	const { user, setUser } = useContext<UserContextParams>(UserContext);
 	const theme = useTheme();
+
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [filter, setFilter] = useState<Filter>({} as Filter);
 	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
-
-	//The publiation by default is just to not initialize it as undefined
 	const [publicationSelected, setPublicationSelected] = useState<AdoptionPublication>({
 		_id: '',
-		user: {
-			first_name: 'Test',
-			last_name: 'Test',
-			mobile_phone: '0983473043',
-			neighborhood: 'Cumbayá',
-			email: 'gandhygarcia@outlook.es',
-			password: 'password123',
-			num_previous_pets: 2,
-			num_current_pets: 1,
-			outdoor_hours: 6,
-			house_space: 100,
-			has_yard: false,
-			main_pet_food: 'homemade',
-			pet_expenses: 40.5,
-			motivation: 'Love for animals',
-			favorite_adoption_publications: [],
-			photo: {
-				_id: '2',
-				img_path:
-					'https://scontent.fgye1-1.fna.fbcdn.net/v/t1.6435-9/74242360_3195954163812838_4274861617784553472_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeFRCjYsTZuQlf2PHyTPJ3HYymegSJbxrSjKZ6BIlvGtKPYIzlm5LEqBr9cR0tDl-FEvtHfkBqZQ6LHCgw-pkTlW&_nc_ohc=dye6H3TWD6QAX-v2xOF&_nc_ht=scontent.fgye1-1.fna&oh=00_AfCF85oDfvg1CEtIJ1We_mJ3gV49fRwyklxfDfl8SouHOA&oe=64D84DE2'
-			}
-		},
+		user: user,
 		description: '',
 		publication_date: new Date(),
 		photo: {
@@ -89,7 +64,9 @@ export function AdoptionScreen({
 		sterilized: false,
 		vaccination_card: false
 	});
-	const userId = '60f0b0b0b3b3c3b3c3b3c3b3';
+	const [checkedFavorite, setCheckedFavorite] = useState<boolean | undefined>(
+		publicationSelected.user.favorite_adoption_publications.includes(publicationSelected._id)
+	);
 	const pageSize = 2;
 	useScrollToTop(ref);
 
@@ -133,22 +110,43 @@ export function AdoptionScreen({
 	);
 
 	const savePublicationAsFavoriteMutation = useMutation({
-		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
-			post('/user/add_favorite', data).then((response) => response.data),
+		mutationFn: (data: SaveOrRemoveFavoriteProps) => {
+			return post('/user/add_favorite_adoption', data).then((response) => response.data);
+		},
 		onSuccess: () => {
-			refetch();
+			setCheckedFavorite(true);
+			setUser({
+				...user,
+				favorite_adoption_publications: [
+					...user.favorite_adoption_publications,
+					publicationSelected._id
+				]
+			});
+		},
+		onError: (error) => {
+			console.log(error);
 		}
 	});
 
 	const removePublicationFromFavoritesMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
-			post('/user/remove_favorite', data).then((response) => response.data),
+			del('/user/remove_favorite_adoption', { data: data }).then((response) => response.data),
 		onSuccess: () => {
-			refetch();
+			setCheckedFavorite(false);
+			setUser({
+				...user,
+				favorite_adoption_publications: user.favorite_adoption_publications.filter(
+					(id) => id !== publicationSelected._id
+				)
+			});
+		},
+		onError: (error) => {
+			console.log(error);
 		}
 	});
 
 	const handleOpenModal = (publication: AdoptionPublication) => {
+		setCheckedFavorite(user.favorite_adoption_publications.includes(publication._id));
 		setPublicationSelected(publication);
 		setIsMoreModalVisible(true);
 	};
@@ -157,23 +155,23 @@ export function AdoptionScreen({
 		<>
 			<StatusBar style="light" />
 			<MemoizedMoreOptionsModal
-				publication={publicationSelected!}
+				publication={publicationSelected}
 				visible={isMoreModalVisible}
 				handlerVisible={() => setIsMoreModalVisible(false)}
 				onSaveAsFavorite={() => {
-					//savePublicationAsFavoriteMutation.mutate(({userId, publicationId: publicationSelected?._id});
-					console.log('saved as favorite');
-					
+					savePublicationAsFavoriteMutation.mutate({
+						user_id: publicationSelected.user._id ? publicationSelected.user._id : '',
+						pub_id: publicationSelected._id
+					});
 				}}
 				onRemoveFromFavorites={() => {
-					/* removePublicationFromFavoritesMutation.mutate({
-						userId,
-						publicationId: publicationSelected?._id
-					}); */
-					console.log('removed from favorites');
-					
+					removePublicationFromFavoritesMutation.mutate({
+						user_id: publicationSelected.user._id ? publicationSelected.user._id : '',
+						pub_id: publicationSelected._id
+					});
 				}}
 				navBarHeight={tabBarHeight}
+				checkedFavorite={checkedFavorite}
 			/>
 			<MemoizedFilterModal
 				filter={filter}

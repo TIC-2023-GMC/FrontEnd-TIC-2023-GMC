@@ -1,67 +1,37 @@
-import React, { useRef, useState, memo, useCallback } from 'react';
+import React, { useRef, useState, memo, useCallback, useContext } from 'react';
 import { Text, View, FlatList, RefreshControl } from 'react-native';
 import { styles } from './FavoritesScreen.styles';
 import { StatusBar } from 'expo-status-bar';
-import { get, post } from '../../services/api';
+import { del, post } from '../../services/api';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
 import AdoptionCard from '../../components/AdoptionCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import FilterModal from '../../components/AdoptionsFilterModal';
-import { AdoptionPublication } from '../../models/InterfacesModels';
+import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../../models/InterfacesModels';
 import { useFocusEffect } from '@react-navigation/native';
 import MoreOptionsModal from '../../components/MoreOptionsModal';
-import { Filter } from '../Adoption';
+import { UserContext, UserContextParams } from '../../auth/userContext';
 
-interface FavoritesScreen {
+interface FavoritesScreenValues {
 	0: AdoptionPublication[];
 	1: number;
-}
-
-interface RemoveFromFavoriteProps {
-	userId: string;
-	publicationId: string;
 }
 
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedMoreOptionsModal = memo(MoreOptionsModal);
 
 export function FavoritesScreen() {
-
-	const [filter, setFilter] = useState<Filter>({} as Filter);
-
-
 	const theme = useTheme();
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
 
-	//The publiation by default is just to not initialize it as undefined
+	const { user, setUser } = useContext<UserContextParams>(UserContext);
+
 	const [publicationSelected, setPublicationSelected] = useState<AdoptionPublication>({
 		_id: '',
-		user: {
-			first_name: 'Test',
-			last_name: 'Test',
-			mobile_phone: '0983473043',
-			neighborhood: 'Cumbayá',
-			email: 'gandhygarcia@outlook.es',
-			password: 'password123',
-			num_previous_pets: 2,
-			num_current_pets: 1,
-			outdoor_hours: 6,
-			house_space: 100,
-			has_yard: false,
-			main_pet_food: 'homemade',
-			pet_expenses: 40.5,
-			motivation: 'Love for animals',
-			favorite_adoption_publications: [],
-			photo: {
-				_id: '2',
-				img_path:
-					'https://scontent.fgye1-1.fna.fbcdn.net/v/t1.6435-9/74242360_3195954163812838_4274861617784553472_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeFRCjYsTZuQlf2PHyTPJ3HYymegSJbxrSjKZ6BIlvGtKPYIzlm5LEqBr9cR0tDl-FEvtHfkBqZQ6LHCgw-pkTlW&_nc_ohc=dye6H3TWD6QAX-v2xOF&_nc_ht=scontent.fgye1-1.fna&oh=00_AfCF85oDfvg1CEtIJ1We_mJ3gV49fRwyklxfDfl8SouHOA&oe=64D84DE2'
-			}
-		},
+		user: user,
 		description: '',
 		publication_date: new Date(),
 		photo: {
@@ -79,6 +49,9 @@ export function FavoritesScreen() {
 		sterilized: false,
 		vaccination_card: false
 	});
+	const [checkedFavorite, setCheckedFavorite] = useState<boolean | undefined>(
+		publicationSelected.user.favorite_adoption_publications.includes(publicationSelected._id)
+	);
 	const pageSize = 2;
 	useScrollToTop(ref);
 
@@ -86,14 +59,9 @@ export function FavoritesScreen() {
 		useInfiniteQuery({
 			queryKey: ['Favorites'],
 			queryFn: async ({ pageParam = 1 }) => {
-				const favoriteAdoptionPublications: string[] = [
-					'64c304097f723d556764fa0b',
-					'64c304097f723d556764fa0a'
-				];
-
-				const response = await post<FavoritesScreen>(
+				const response = await post<FavoritesScreenValues>(
 					`/user/list_favorite_adoptions?page_number=${pageParam}&page_size=${pageSize}`,
-					favoriteAdoptionPublications
+					user.favorite_adoption_publications
 				);
 
 				return response.data;
@@ -117,15 +85,27 @@ export function FavoritesScreen() {
 		}, [])
 	);
 
-	const removePublicationFromeFavoritesMutation = useMutation({
-		mutationFn: (data: RemoveFromFavoriteProps) =>
-			post('/user/add_favorite', data).then((response) => response.data),
+	const removePublicationFromFavoritesMutation = useMutation({
+		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
+			del('/user/remove_favorite_adoption', { data: data }).then((response) => response.data),
 		onSuccess: () => {
+			setIsMoreModalVisible(false);
+			setCheckedFavorite(false);
+			setUser({
+				...user,
+				favorite_adoption_publications: user.favorite_adoption_publications.filter(
+					(id) => id !== publicationSelected._id
+				)
+			});
 			refetch();
+		},
+		onError: (error) => {
+			console.log(error);
 		}
 	});
 
 	const handleOpenModal = (publication: AdoptionPublication) => {
+		setCheckedFavorite(user.favorite_adoption_publications.includes(publication._id));
 		setPublicationSelected(publication);
 		setIsMoreModalVisible(true);
 	};
@@ -134,22 +114,17 @@ export function FavoritesScreen() {
 		<>
 			<StatusBar style="light" />
 			<MemoizedMoreOptionsModal
-				publication={publicationSelected!}
+				publication={publicationSelected}
 				visible={isMoreModalVisible}
 				handlerVisible={() => setIsMoreModalVisible(false)}
-				onSaveAsFavorite={() => {
-					//savePublicationAsFavoriteMutation.mutate(({userId, publicationId: publicationSelected?._id});
-					console.log('saved as favorite');
-				}}
 				onRemoveFromFavorites={() => {
-					/* removePublicationFromFavoritesMutation.mutate({
-						userId,
-						publicationId: publicationSelected?._id
-					}); */
-					console.log('removed from favorites');
-					
+					removePublicationFromFavoritesMutation.mutate({
+						user_id: publicationSelected.user._id ? publicationSelected.user._id : '',
+						pub_id: publicationSelected._id
+					});
 				}}
 				navBarHeight={tabBarHeight}
+				checkedFavorite={checkedFavorite}
 			/>
 			<FlatList
 				style={{
@@ -161,7 +136,7 @@ export function FavoritesScreen() {
 				onEndReached={handleLoadMore}
 				ref={ref}
 				data={data?.pages.flatMap((page) => page[0])}
-				renderItem={({ item }) => <MemoizedAdoptionCard {...item} onOpenModal={handleOpenModal}/>}
+				renderItem={({ item }) => <MemoizedAdoptionCard {...item} onOpenModal={handleOpenModal} />}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={

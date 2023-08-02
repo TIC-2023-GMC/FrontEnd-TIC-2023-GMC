@@ -1,4 +1,5 @@
 export interface User {
+	_id?: string;
 	first_name: string;
 	last_name: string;
 	mobile_phone: string;
@@ -66,4 +67,8 @@ export interface ExperiencePublication {
 export interface Location {
 	name: string;
 	value: string;
+}
+export interface SaveOrRemoveFavoriteProps {
+	user_id: string;
+	pub_id: string;
 }
