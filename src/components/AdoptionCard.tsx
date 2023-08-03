@@ -5,6 +5,10 @@ import { StyleSheet, View, Image } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
 import { AdoptionPublication } from '../models/InterfacesModels';
 
+interface OnOpenModalProp {
+	onOpenModal: (_p: AdoptionPublication) => void;
+}
+
 const LeftContent = (props: { size: number; photo: string }) => (
 	<Image
 		source={{ uri: props.photo }}
@@ -14,7 +18,7 @@ const LeftContent = (props: { size: number; photo: string }) => (
 	/>
 );
 
-const PublicationCard = (props: AdoptionPublication) => {
+const PublicationCard = (props: AdoptionPublication & OnOpenModalProp) => {
 	const theme = useTheme();
 	const [like, setLike] = useState<boolean>();
 	const [expanded, setExpanded] = useState<boolean>();
@@ -33,6 +37,9 @@ const PublicationCard = (props: AdoptionPublication) => {
 	const handleExpand = () => {
 		setExpanded(!expanded);
 	};
+
+	const { onOpenModal, ...adoption } = props;
+
 	return (
 		<Card style={styles.card}>
 			<Card.Title
@@ -53,7 +60,7 @@ const PublicationCard = (props: AdoptionPublication) => {
 					</Text>
 				}
 				left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
-				right={() => <IconButton icon="dots-vertical" onPress={() => console.log('show menu')} />}
+				right={() => <IconButton icon="dots-vertical" onPress={() => onOpenModal(adoption)} />}
 			/>
 			<Card.Cover
 				theme={{ ...theme, roundness: 0.5 }}
