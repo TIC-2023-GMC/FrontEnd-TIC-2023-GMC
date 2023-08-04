@@ -1,15 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, ImageBackground, Image, TouchableHighlight } from 'react-native';
-import {
-	ActivityIndicator,
-	Button,
-	Card,
-	MD3Theme,
-	useTheme,
-	Text,
-	Modal,
-	Portal
-} from 'react-native-paper';
+import { ActivityIndicator, Button, Card, Text, Modal, Portal } from 'react-native-paper';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { GameQuiz, UserScore } from '../../models/InterfacesModels';
 import { get, put } from '../../services/api';
@@ -19,7 +10,13 @@ import { UserContext, UserContextParams } from '../../auth/userContext';
 //get from API
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
 const level_images = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
-export function QuizGameScreen() {
+export function QuizGameScreen({
+	visible,
+	setVisible
+}: {
+	visible: boolean;
+	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
 	const { user } = useContext<UserContextParams>(UserContext);
 	const [quizzGame, setQuizzGame] = useState<GameQuiz>({
 		_id: '',
@@ -32,15 +29,13 @@ export function QuizGameScreen() {
 		game_questions: [],
 		game_time: 0
 	});
-	const [question, setQuestion] = useState(0);
+	const [question, setQuestion] = useState(-1);
 	const [modalVisible, setModalVisible] = useState(false);
-	const { totalSeconds, seconds, minutes, hours, days, isRunning, start, pause } = useStopwatch({
+	const { totalSeconds, seconds, minutes, pause, reset } = useStopwatch({
 		autoStart: true
 	});
 
-	const [score, setScore] = useState(0);
-
-	const {} = useQuery({
+	useQuery({
 		queryKey: ['question'],
 		queryFn: async () => {
 			const response = await get<GameQuiz>(`game/quiz_game?user_id=${user._id}`);
@@ -57,27 +52,28 @@ export function QuizGameScreen() {
 		mutationFn: (data: GameQuiz) => put('/game/quiz_game', data).then((response) => response.data)
 	});
 
-	const { data, isSuccess, isLoading } = useQuery({
+	const { data, isSuccess, isLoading, isFetching } = useQuery({
 		queryKey: ['leaderboard'],
 		queryFn: async () => {
 			const response = await get(`/game/leaderboard?user_id=${user._id}`);
 			return response.data;
 		},
-		enabled: modalVisible
+		enabled: sendScoreQuizzGame.isSuccess
 	});
 
-	const theme = useTheme();
-	const styles = createStyles(theme);
+	const styles = createStyles();
 	useEffect(() => {
-		sendScoreQuizzGame.mutate(quizzGame);
-	}, [quizzGame.game_score, quizzGame.game_time]);
+		if (question === 0) {
+			sendScoreQuizzGame.mutate(quizzGame);
+		}
+	}, [quizzGame.game_score]);
 
 	return (
 		<ImageBackground source={image} resizeMode="cover" style={styles.container}>
 			<Text>
 				{minutes < 10 ? '0' + minutes : minutes}:{seconds < 10 ? '0' + seconds : seconds}
 			</Text>
-			<Text style={[{ margin: 25 }]}>{quizzGame?.game_description}</Text>
+			<Text style={{ margin: 25 }}>{quizzGame?.game_description}</Text>
 			<Card style={[styles.cardContainer, { transform: [{ rotateZ: '4deg' }] }]}>
 				<Card style={[styles.cardContainer, { transform: [{ rotateZ: '-8deg' }] }]}>
 					<Card
@@ -94,7 +90,7 @@ export function QuizGameScreen() {
 					</Card>
 				</Card>
 			</Card>
-			<View style={[{ marginTop: 25 }]}>
+			<View style={{ marginTop: 25 }}>
 				{quizzGame.game_questions.length > 0 &&
 					quizzGame.game_questions[question].answers.map((data, index) => (
 						<TouchableHighlight
@@ -119,10 +115,15 @@ export function QuizGameScreen() {
 										const object: GameQuiz = {
 											...prevQuizzGame,
 											game_time: totalSeconds,
-											game_score: Math.trunc(prevQuizzGame.game_score * (100 / totalSeconds))
+
+											game_score: Math.round(
+												prevQuizzGame.game_score * 10 +
+													(10 * Math.pow(prevQuizzGame.game_score, 2)) / totalSeconds
+											)
 										};
 										return object;
 									});
+
 									setModalVisible(true);
 								}
 							}}
@@ -147,41 +148,65 @@ export function QuizGameScreen() {
 						}}
 					>
 						<Image source={level_images} style={styles.backgroundImage} />
-						{isLoading ? (
+						{isFetching || isLoading ? (
 							<ActivityIndicator animating={true} size="large"></ActivityIndicator>
 						) : (
-							<>
-								<View style={styles.match}>
-									<Text style={styles.modalText}>¡Felcidades! {'\n'}Has Completado el Juego</Text>
-									<Text style={styles.modalText}>
-										Tiempo: {minutes < 10 ? '0' + minutes : minutes}:
-										{seconds < 10 ? '0' + seconds : seconds}
-									</Text>
-									<Text style={styles.modalText}>Puntuación: {quizzGame.game_score}</Text>
-								</View>
-								<View style={styles.leaderboard}>
-									<Text style={styles.leaderboardTextitle}>Tabla de Posiciones</Text>
-									<Text style={styles.leaderboardHeader}>   N   Puntaje    Jugador</Text>
-									{isSuccess &&
-										data[0]?.map((entry: UserScore, index: number) => (
-											<Card.Title
-												key={index}
-												title={`${index + 1}       ${entry.game_score}        ${
-													entry.user_first_name
-												} ${entry.user_last_name}`}
-												titleStyle={styles.leaderboardText}
-											/>
-										))}
-								</View>
-								<Button
-									mode="contained"
-									onPress={() => {
-										setModalVisible(!modalVisible);
-									}}
-								>
-									ACEPTAR
-								</Button>
-							</>
+							sendScoreQuizzGame.isSuccess &&
+							isSuccess && (
+								<>
+									<View style={styles.match}>
+										<Text style={styles.modalText}>¡Felcidades! {'\n'}Has Completado el Quiz</Text>
+										<Text style={styles.modalText}>
+											Tiempo: {minutes < 10 ? '0' + minutes : minutes}:
+											{seconds < 10 ? '0' + seconds : seconds}
+										</Text>
+										<Text style={styles.modalText}>Puntuación: {quizzGame.game_score}</Text>
+									</View>
+									<View style={styles.leaderboard}>
+										<Text style={styles.leaderboardTextitle}>Tabla de Posiciones</Text>
+										<View
+											style={{
+												flexDirection: 'row',
+												justifyContent: 'space-between'
+											}}
+										>
+											<Text style={{ ...styles.leaderboardHeader, width: '15%', marginLeft: 15 }}>
+												Pos
+											</Text>
+											<Text style={{ ...styles.leaderboardHeader, width: '22%' }}>Puntos</Text>
+											<Text style={{ ...styles.leaderboardHeader, width: '40%', marginRight: 20 }}>
+												Jugador
+											</Text>
+										</View>
+										{isSuccess &&
+											data[0]?.map((entry: UserScore, index: number) => (
+												<Card.Title
+													key={index}
+													title={`${index + 1}°       ${entry.game_score}           ${
+														entry.user_first_name
+													} ${entry.user_last_name}`}
+													titleStyle={styles.leaderboardText}
+												/>
+											))}
+										<Text style={styles.leaderboardTextitle}>Tu posición:</Text>
+										<Card.Title
+											title={`${data[1]}°       ${quizzGame.game_score}             ${user.first_name} ${user.last_name}`}
+											titleStyle={styles.leaderboardText}
+										/>
+									</View>
+									<Button
+										style={styles.acceptButton}
+										mode="contained"
+										onPress={() => {
+											setModalVisible(!modalVisible);
+											reset();
+											setVisible(!visible);
+										}}
+									>
+										ACEPTAR
+									</Button>
+								</>
+							)
 						)}
 					</Modal>
 				</Portal>
@@ -190,7 +215,7 @@ export function QuizGameScreen() {
 	);
 }
 
-const createStyles = (theme: MD3Theme) =>
+const createStyles = () =>
 	StyleSheet.create({
 		container: {
 			height: '100%',
@@ -228,7 +253,7 @@ const createStyles = (theme: MD3Theme) =>
 			height: '23%',
 			borderRadius: 10,
 			marginBottom: 20,
-			alignSelf: 'center',
+			alignSelf: 'center'
 		},
 
 		textStyle: {
@@ -251,7 +276,7 @@ const createStyles = (theme: MD3Theme) =>
 		leaderboard: {
 			backgroundColor: '#B2AAED',
 			width: '88%',
-			height: '48%',
+			height: '50%',
 			borderRadius: 10,
 			marginBottom: 20,
 			alignSelf: 'center'
@@ -265,19 +290,24 @@ const createStyles = (theme: MD3Theme) =>
 		},
 		leaderboardHeader: {
 			backgroundColor: '#EDE4AB',
-			paddingHorizontal: 20,
+			paddingHorizontal: 5,
+			textAlign: 'center',
 			fontFamily: 'sans-serif',
-			fontSize: 18,
+			fontSize: 17,
 			color: '#000000',
-			width: '100%'
+			width: '35%'
 		},
 		leaderboardText: {
 			paddingHorizontal: 20,
 			fontFamily: 'sans-serif',
-			fontSize: 18,
+			fontSize: 17,
 			color: '#534F6E',
 			backgroundColor: 'rgba(255,255,255,0.5)',
 			marginRight: 15,
 			borderRadius: 5
+		},
+		acceptButton: {
+			width: '88%',
+			alignSelf: 'center'
 		}
 	});

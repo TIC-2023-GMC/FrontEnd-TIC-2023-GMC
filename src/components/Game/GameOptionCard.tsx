@@ -1,5 +1,6 @@
-import {Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { Button, Card, useTheme } from 'react-native-paper';
+import React from 'react';
 
 interface CardGameSeleccionProps {
 	title: string;

@@ -72,7 +72,7 @@ export interface SaveOrRemoveFavoriteProps {
 	user_id: string;
 	pub_id: string;
 }
-export interface Answer{
+export interface Answer {
 	answer_text: string;
 	is_correct: boolean;
 }
@@ -82,7 +82,7 @@ export interface Question {
 	answers: Answer[];
 }
 
-export interface GameQuiz{
+export interface GameQuiz {
 	_id: string;
 	user_id: string;
 	game_name: string;
@@ -94,7 +94,7 @@ export interface GameQuiz{
 	game_time: number;
 }
 
-export interface UserScore{
+export interface UserScore {
 	user_first_name: string;
 	user_last_name: string;
 	user_photo: Photo;
@@ -102,11 +102,11 @@ export interface UserScore{
 	game_time: number;
 }
 
-export interface UserPosition{
+export interface UserPosition {
 	position: number;
 	user: UserScore;
 }
-export interface LeaderBoard{ 
-	0: UserPosition[],
-	1: number
+export interface LeaderBoard {
+	0: UserPosition[];
+	1: number;
 }
