@@ -37,7 +37,6 @@ export function QuizGameScreen() {
 	const { totalSeconds, seconds, minutes, hours, days, isRunning, start, pause } = useStopwatch({
 		autoStart: true
 	});
-	
 
 	const [score, setScore] = useState(0);
 
@@ -73,7 +72,6 @@ export function QuizGameScreen() {
 		sendScoreQuizzGame.mutate(quizzGame);
 	}, [quizzGame.game_score, quizzGame.game_time]);
 
-	
 	return (
 		<ImageBackground source={image} resizeMode="cover" style={styles.container}>
 			<Text>
@@ -82,7 +80,12 @@ export function QuizGameScreen() {
 			<Text style={[{ margin: 25 }]}>{quizzGame?.game_description}</Text>
 			<Card style={[styles.cardContainer, { transform: [{ rotateZ: '4deg' }] }]}>
 				<Card style={[styles.cardContainer, { transform: [{ rotateZ: '-8deg' }] }]}>
-					<Card style={[styles.cardContainer, { transform: [{ rotateZ: '4deg' }], paddingHorizontal:20 }]}>
+					<Card
+						style={[
+							styles.cardContainer,
+							{ transform: [{ rotateZ: '4deg' }], paddingHorizontal: 20 }
+						]}
+					>
 						<Text style={styles.questionStyle}>
 							{quizzGame.game_questions.length > 0
 								? quizzGame.game_questions[question].question_text
@@ -116,20 +119,16 @@ export function QuizGameScreen() {
 										const object: GameQuiz = {
 											...prevQuizzGame,
 											game_time: totalSeconds,
-											game_score: Math.trunc(prevQuizzGame.game_score*(100/totalSeconds))
+											game_score: Math.trunc(prevQuizzGame.game_score * (100 / totalSeconds))
 										};
 										return object;
 									});
 									setModalVisible(true);
 								}
-
 							}}
 							underlayColor={data.is_correct ? '#40FF49' : '#FF4040'}
 						>
-							<Text style={styles.buttonText}>
-							{data.answer_text}
-							</Text>
-							
+							<Text style={styles.buttonText}>{data.answer_text}</Text>
 						</TouchableHighlight>
 					))}
 				<Portal>
@@ -152,19 +151,26 @@ export function QuizGameScreen() {
 							<ActivityIndicator animating={true} size="large"></ActivityIndicator>
 						) : (
 							<>
-								<Text style={styles.modalText}>Felcidades!! {'\n'}Has Completado el Juego</Text>
-								<Text style={styles.modalText}>
-									Tiempo: {minutes < 10 ? '0' + minutes : minutes}:
-									{seconds < 10 ? '0' + seconds : seconds}
-								</Text>
-								<Text style={styles.modalText}>Puntuación: {quizzGame.game_score}</Text>
+								<View style={styles.match}>
+									<Text style={styles.modalText}>¡Felcidades! {'\n'}Has Completado el Juego</Text>
+									<Text style={styles.modalText}>
+										Tiempo: {minutes < 10 ? '0' + minutes : minutes}:
+										{seconds < 10 ? '0' + seconds : seconds}
+									</Text>
+									<Text style={styles.modalText}>Puntuación: {quizzGame.game_score}</Text>
+								</View>
 								<View style={styles.leaderboard}>
-									<Text style={[styles.modalText, { color: '#4E11F7' }]}>Tabla de Posiciones</Text>
+									<Text style={styles.leaderboardTextitle}>Tabla de Posiciones</Text>
+									<Text style={styles.leaderboardHeader}>   N   Puntaje    Jugador</Text>
 									{isSuccess &&
 										data[0]?.map((entry: UserScore, index: number) => (
-											<Text key={index} style={styles.modalText}>
-												{entry.game_score}| {entry.user_first_name} {entry.user_last_name}
-											</Text>
+											<Card.Title
+												key={index}
+												title={`${index + 1}       ${entry.game_score}        ${
+													entry.user_first_name
+												} ${entry.user_last_name}`}
+												titleStyle={styles.leaderboardText}
+											/>
 										))}
 								</View>
 								<Button
@@ -197,10 +203,10 @@ const createStyles = (theme: MD3Theme) =>
 			justifyContent: 'center',
 			alignItems: 'center'
 		},
-		questionStyle:{
+		questionStyle: {
 			fontSize: 20,
 			fontWeight: 'bold',
-			textAlign: 'center',
+			textAlign: 'center'
 		},
 		buttonAnswer: {
 			width: 'auto',
@@ -208,13 +214,21 @@ const createStyles = (theme: MD3Theme) =>
 			borderRadius: 10,
 			backgroundColor: '#ffffff',
 			textAlign: 'center',
-			paddingHorizontal: 20,
+			paddingHorizontal: 20
 		},
 		buttonText: {
 			textAlign: 'center',
 			fontSize: 18,
 			paddingVertical: 2,
 			paddingHorizontal: 2
+		},
+		match: {
+			backgroundColor: '#EDE4AB',
+			width: '88%',
+			height: '23%',
+			borderRadius: 10,
+			marginBottom: 20,
+			alignSelf: 'center',
 		},
 
 		textStyle: {
@@ -226,8 +240,8 @@ const createStyles = (theme: MD3Theme) =>
 			marginBottom: 15,
 			textAlign: 'center',
 			fontWeight: 'bold',
-			color: '#30009C',
-			fontSize: 20
+			fontSize: 20,
+			color: '#534F6E'
 		},
 		backgroundImage: {
 			position: 'absolute',
@@ -235,10 +249,35 @@ const createStyles = (theme: MD3Theme) =>
 			height: '100%'
 		},
 		leaderboard: {
-			backgroundColor: 'rgba(255, 255, 255, 0.8)',
-			width: '99%',
-			height: '50%',
+			backgroundColor: '#B2AAED',
+			width: '88%',
+			height: '48%',
 			borderRadius: 10,
-			color: '#30009C'
+			marginBottom: 20,
+			alignSelf: 'center'
+		},
+		leaderboardTextitle: {
+			color: '#ffffff',
+			fontWeight: 'bold',
+			fontSize: 20,
+			textAlign: 'center',
+			fontFamily: 'sans-serif'
+		},
+		leaderboardHeader: {
+			backgroundColor: '#EDE4AB',
+			paddingHorizontal: 20,
+			fontFamily: 'sans-serif',
+			fontSize: 18,
+			color: '#000000',
+			width: '100%'
+		},
+		leaderboardText: {
+			paddingHorizontal: 20,
+			fontFamily: 'sans-serif',
+			fontSize: 18,
+			color: '#534F6E',
+			backgroundColor: 'rgba(255,255,255,0.5)',
+			marginRight: 15,
+			borderRadius: 5
 		}
 	});
