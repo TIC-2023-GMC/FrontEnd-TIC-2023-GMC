@@ -10,6 +10,11 @@ import AddTabBarButton from '../components/AddTabBarButton';
 import { FavoritesScreen } from '../Screens/Favorites';
 import { createStackNavigator } from '@react-navigation/stack';
 
+interface TabsNavigationProps {
+	visible: boolean;
+	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 const Stack = createStackNavigator();
 
 export function AddNavigationStack() {
@@ -27,7 +32,7 @@ export function AddNavigationStack() {
 
 const Tab = createBottomTabNavigator();
 
-export function TabsNavigation() {
+export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 	const theme = useTheme();
 	const [adoptionsVisibleFilter, setAdoptionsVisibleFilter] = useState<boolean>(false);
 	const [experiencesVisibleFilter, setExperienceVisibleFilter] = useState<boolean>(false);
@@ -62,7 +67,7 @@ export function TabsNavigation() {
 						iconColor={theme.colors.secondary}
 						size={40}
 						{...props}
-						onPress={() => console.log('')}
+						onPress={() => setVisible(!visible)}
 					/>
 				),
 				headerStyle: {
