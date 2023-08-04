@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, StyleSheet, ImageBackground, Image, TouchableHighlight } from 'react-native';
 import {
 	ActivityIndicator,
 	Button,
@@ -37,6 +37,9 @@ export function QuizGameScreen() {
 	const { totalSeconds, seconds, minutes, hours, days, isRunning, start, pause } = useStopwatch({
 		autoStart: true
 	});
+	
+
+	const [score, setScore] = useState(0);
 
 	const {} = useQuery({
 		queryKey: ['question'],
@@ -79,8 +82,8 @@ export function QuizGameScreen() {
 			<Text style={[{ margin: 25 }]}>{quizzGame?.game_description}</Text>
 			<Card style={[styles.cardContainer, { transform: [{ rotateZ: '4deg' }] }]}>
 				<Card style={[styles.cardContainer, { transform: [{ rotateZ: '-8deg' }] }]}>
-					<Card style={[styles.cardContainer, { transform: [{ rotateZ: '4deg' }] }]}>
-						<Text>
+					<Card style={[styles.cardContainer, { transform: [{ rotateZ: '4deg' }], paddingHorizontal:20 }]}>
+						<Text style={styles.questionStyle}>
 							{quizzGame.game_questions.length > 0
 								? quizzGame.game_questions[question].question_text
 								: ''}
@@ -91,12 +94,9 @@ export function QuizGameScreen() {
 			<View style={[{ marginTop: 25 }]}>
 				{quizzGame.game_questions.length > 0 &&
 					quizzGame.game_questions[question].answers.map((data, index) => (
-						<Button
+						<TouchableHighlight
 							key={index}
-							style={styles.answer}
-								
-							mode="elevated"
-							uppercase={true}
+							style={styles.buttonAnswer}
 							onPress={() => {
 								setQuestion((prevQuestion) => (prevQuestion === 0 ? 0 : prevQuestion - 1));
 								setQuizzGame((prevQuizzGame) => {
@@ -115,20 +115,22 @@ export function QuizGameScreen() {
 									setQuizzGame((prevQuizzGame) => {
 										const object: GameQuiz = {
 											...prevQuizzGame,
-											game_time: totalSeconds
+											game_time: totalSeconds,
+											game_score: Math.trunc(prevQuizzGame.game_score*(100/totalSeconds))
 										};
 										return object;
 									});
 									setModalVisible(true);
 								}
+
 							}}
-							rippleColor={data.is_correct ? '#40FF49' : '#FF4040'}
+							underlayColor={data.is_correct ? '#40FF49' : '#FF4040'}
 						>
 							<Text style={styles.buttonText}>
 							{data.answer_text}
 							</Text>
 							
-						</Button>
+						</TouchableHighlight>
 					))}
 				<Portal>
 					<Modal
@@ -195,15 +197,22 @@ const createStyles = (theme: MD3Theme) =>
 			justifyContent: 'center',
 			alignItems: 'center'
 		},
-		answer: {
+		questionStyle:{
+			fontSize: 20,
+			fontWeight: 'bold',
+			textAlign: 'center',
+		},
+		buttonAnswer: {
 			width: 'auto',
-			margin: 15,
+			marginTop: 20,
 			borderRadius: 10,
 			backgroundColor: '#ffffff',
-			textAlign: 'center'
+			textAlign: 'center',
+			paddingHorizontal: 20,
 		},
 		buttonText: {
-			fontSize: 10,
+			textAlign: 'center',
+			fontSize: 18,
 			paddingVertical: 2,
 			paddingHorizontal: 2
 		},
