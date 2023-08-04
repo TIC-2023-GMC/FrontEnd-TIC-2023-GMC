@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, ImageBackground, Image } from 'react-native';
 import {
 	ActivityIndicator,
@@ -14,14 +14,16 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { GameQuiz, UserScore } from '../../models/InterfacesModels';
 import { get, put } from '../../services/api';
 import { useStopwatch } from 'react-timer-hook';
+import { UserContext, UserContextParams } from '../../auth/userContext';
 
 //get from API
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
 const level_images = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
 export function QuizGameScreen() {
+	const { user } = useContext<UserContextParams>(UserContext);
 	const [quizzGame, setQuizzGame] = useState<GameQuiz>({
 		_id: '',
-		user_id: '',
+		user_id: user._id ? user._id : '',
 		game_name: '',
 		game_description: '',
 		game_image: { _id: '', img_path: '' },
@@ -32,7 +34,6 @@ export function QuizGameScreen() {
 	});
 	const [question, setQuestion] = useState(0);
 	const [modalVisible, setModalVisible] = useState(false);
-
 	const { totalSeconds, seconds, minutes, hours, days, isRunning, start, pause } = useStopwatch({
 		autoStart: true
 	});
@@ -40,7 +41,7 @@ export function QuizGameScreen() {
 	const {} = useQuery({
 		queryKey: ['question'],
 		queryFn: async () => {
-			const response = await get<GameQuiz>('game/quiz_game?user_id=64c1b0ef0fd89c04b7114eb7');
+			const response = await get<GameQuiz>(`game/quiz_game?user_id=${user._id}`);
 			return response.data;
 		},
 		onSuccess: (data: GameQuiz) => {
@@ -57,7 +58,7 @@ export function QuizGameScreen() {
 	const { data, isSuccess, isLoading } = useQuery({
 		queryKey: ['leaderboard'],
 		queryFn: async () => {
-			const response = await get('/game/leaderboard?user_id=64c1b0ef0fd89c04b7114eb7');
+			const response = await get(`/game/leaderboard?user_id=${user._id}`);
 			return response.data;
 		},
 		enabled: modalVisible
@@ -68,6 +69,8 @@ export function QuizGameScreen() {
 	useEffect(() => {
 		sendScoreQuizzGame.mutate(quizzGame);
 	}, [quizzGame.game_score, quizzGame.game_time]);
+
+	
 	return (
 		<ImageBackground source={image} resizeMode="cover" style={styles.container}>
 			<Text>
@@ -91,6 +94,7 @@ export function QuizGameScreen() {
 						<Button
 							key={index}
 							style={styles.answer}
+								
 							mode="elevated"
 							uppercase={true}
 							onPress={() => {
@@ -120,12 +124,21 @@ export function QuizGameScreen() {
 							}}
 							rippleColor={data.is_correct ? '#40FF49' : '#FF4040'}
 						>
-							<Text style={styles.buttonText}>{data.answer_text}</Text>
+							<Text style={styles.buttonText}>
+							{data.answer_text}
+							</Text>
+							
 						</Button>
 					))}
 				<Portal>
 					<Modal
-					contentContainerStyle={{width:'80%', borderRadius:20, justifyContent:'center', alignSelf:'center', backgroundColor:'#ffffff'}}
+						contentContainerStyle={{
+							width: '90%',
+							borderRadius: 20,
+							justifyContent: 'center',
+							alignSelf: 'center',
+							backgroundColor: '#ffffff'
+						}}
 						dismissable={false}
 						visible={modalVisible}
 						onDismiss={() => {
@@ -148,12 +161,12 @@ export function QuizGameScreen() {
 									{isSuccess &&
 										data[0]?.map((entry: UserScore, index: number) => (
 											<Text key={index} style={styles.modalText}>
-												{''}| {entry.user_first_name} {entry.user_last_name} |{entry.game_time}
+												{entry.game_score}| {entry.user_first_name} {entry.user_last_name}
 											</Text>
 										))}
 								</View>
 								<Button
-								mode="contained"
+									mode="contained"
 									onPress={() => {
 										setModalVisible(!modalVisible);
 									}}
@@ -194,7 +207,7 @@ const createStyles = (theme: MD3Theme) =>
 			paddingVertical: 2,
 			paddingHorizontal: 2
 		},
-		
+
 		textStyle: {
 			color: 'white',
 			fontWeight: 'bold',

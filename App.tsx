@@ -1,18 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DefaultTheme, MD3Theme, Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { TabsNavigation } from './src/navigation/MainNavigator';
 import { AuthProvider } from './src/auth/userContext';
+import { GameNavigationStack } from './src/navigation/GameNavigator';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
+	const [visible, setVisible] = useState<boolean>(true);
 	return (
 		<QueryClientProvider client={new QueryClient()}>
 			<AuthProvider>
 				<PaperProvider theme={theme}>
-					<NavigationContainer>
-						<TabsNavigation />
-					</NavigationContainer>
+					<SafeAreaProvider>
+						<NavigationContainer>
+							{visible ? (
+								<TabsNavigation visible={visible} setVisible={setVisible} />
+							) : (
+								<GameNavigationStack visible={visible} setVisible={setVisible} />
+							)}
+						</NavigationContainer>
+					</SafeAreaProvider>
 				</PaperProvider>
 			</AuthProvider>
 		</QueryClientProvider>
