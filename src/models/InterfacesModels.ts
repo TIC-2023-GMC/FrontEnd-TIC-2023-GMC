@@ -1,4 +1,5 @@
 export interface User {
+	_id?: string;
 	first_name: string;
 	last_name: string;
 	mobile_phone: string;
@@ -39,7 +40,7 @@ export interface AdoptionPublication {
 	_id: string;
 	user: User;
 	description: string;
-	publication_date: string;
+	publication_date: Date;
 	photo: Photo;
 	likes: Like[];
 	comments: Comment[];
@@ -51,6 +52,25 @@ export interface AdoptionPublication {
 	pet_location: string;
 	sterilized: boolean;
 	vaccination_card: boolean;
+}
+export interface ExperiencePublication {
+	_id: string;
+	user: User;
+	description: string;
+	publication_date: Date;
+	photo: Photo;
+	likes: Like[];
+	comments: Comment[];
+	species: string;
+}
+
+export interface Location {
+	name: string;
+	value: string;
+}
+export interface SaveOrRemoveFavoriteProps {
+	user_id: string;
+	pub_id: string;
 }
 export interface Answer{
 	answer_text: string;
@@ -86,7 +106,6 @@ export interface UserPosition{
 	position: number;
 	user: UserScore;
 }
-
 export interface LeaderBoard{ 
 	0: UserPosition[],
 	1: number

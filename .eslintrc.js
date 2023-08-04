@@ -31,7 +31,7 @@ module.exports = {
 		'react-native/no-single-element-style-arrays': 'error',
 		'react-native/sort-styles': 'off',
 		'react-native/no-color-literals': 'off',
-		'no-unused-vars': 'error',
+		'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
 		'react/no-unused-prop-types': 'error'
 	}
 };

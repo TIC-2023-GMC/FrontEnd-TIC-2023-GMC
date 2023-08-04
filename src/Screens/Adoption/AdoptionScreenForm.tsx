@@ -1,6 +1,6 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import {
 	TextInput,
@@ -11,80 +11,29 @@ import {
 	Button,
 	HelperText
 } from 'react-native-paper';
-import * as z from 'zod';
-import DropDownPicker from 'react-native-dropdown-picker';
+import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { styles } from './AdoptionScreenForm.styles';
 import PhotoSelection from '../../components/PhotoSelection';
-import { baseUrl, post } from '../../services/api';
-import * as FileSystem from 'expo-file-system';
+import { post, get } from '../../services/api';
 import { AdoptionPublication, Photo } from '../../models/InterfacesModels';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
-import { parseNumber } from '../../utils/utils';
-
-const PhotoSchema = z.object({
-	_id: z.string(),
-	img_path: z.string()
-});
-
-const UserSchema = z.object({
-	_id: z.string(),
-	first_name: z.string(),
-	last_name: z.string(),
-	mobile_phone: z.string(),
-	neighborhood: z.string(),
-	email: z.string().email(),
-	password: z.string(),
-	num_previous_pets: z.number(),
-	num_current_pets: z.number(),
-	outdoor_hours: z.number(),
-	house_space: z.number(),
-	has_yard: z.boolean(),
-	main_pet_food: z.string(),
-	pet_expenses: z.number(),
-	motivation: z.string(),
-	favorite_adoption_publications: z.array(z.string()),
-	photo: PhotoSchema
-});
-
-const Like = z.object({
-	_id: z.string()
-});
-
-const Comment = z.object({
-	_id: z.string(),
-	comment_text: z.string(),
-	comment_date: z.string()
-});
-
-const AdoptionPublicationSchema = z.object({
-	_id: z.string(),
-	user: UserSchema,
-	description: z.string().nonempty('La descripción es requerida'),
-	publication_date: z.string(),
-	photo: PhotoSchema,
-	likes: z.optional(z.array(Like)),
-	comments: z.optional(z.array(Comment)),
-	species: z.string().nonempty('La especie del animal es requerida'),
-	pet_size: z.string().nonempty('El tamaño del animal es requerido'),
-	pet_breed: z.string().nonempty('La raza del animal es requerida'),
-	pet_age: z.number().positive('La edad del animal debe ser un número positivo'),
-	pet_sex: z.boolean({
-		required_error: 'El sexo del animal es requerido'
-	}),
-	pet_location: z.string().nonempty('La ubicación del animal es requerida'),
-	sterilized: z.boolean({ required_error: 'Selecciona si se encuentra esterilizado' }),
-	vaccination_card: z.boolean({ required_error: 'Selecciona si posee carnet de vacunación' })
-});
+import { parseNumber, uploadImg } from '../../utils/utils';
+import { AdoptionPublicationSchema } from '../../models/Schemas';
+import { SnackBarError } from '../../components/SnackBarError';
+import { UserContext, UserContextParams } from '../../auth/userContext';
 
 export function AdoptionScreenForm() {
 	const theme = useTheme();
+	const { user } = useContext<UserContextParams>(UserContext);
 	const navigation = useNavigation();
 	const tabBarHeight = useBottomTabBarHeight();
 	const [image, setImage] = useState<string>();
 	const [loading, setLoading] = useState<boolean>(false);
+	const [failUpload, setFailUpload] = useState<string>('');
+
 	const {
 		control,
 		formState: { errors },
@@ -94,31 +43,9 @@ export function AdoptionScreenForm() {
 		resolver: zodResolver(AdoptionPublicationSchema),
 		defaultValues: {
 			_id: '',
-			user: {
-				_id: '1',
-				first_name: 'Gandhy',
-				last_name: 'García',
-				mobile_phone: '0983473043',
-				neighborhood: 'Cumbayá',
-				email: 'gandhygarcia@outlook.es',
-				password: 'password123',
-				num_previous_pets: 2,
-				num_current_pets: 1,
-				outdoor_hours: 6,
-				house_space: 100,
-				has_yard: false,
-				main_pet_food: 'homemade',
-				pet_expenses: 40.5,
-				motivation: 'Love for animals',
-				favorite_adoption_publications: [],
-				photo: {
-					_id: '2',
-					img_path:
-						'https://scontent.fgye1-1.fna.fbcdn.net/v/t1.6435-9/74242360_3195954163812838_4274861617784553472_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeFRCjYsTZuQlf2PHyTPJ3HYymegSJbxrSjKZ6BIlvGtKPYIzlm5LEqBr9cR0tDl-FEvtHfkBqZQ6LHCgw-pkTlW&_nc_ohc=dye6H3TWD6QAX-v2xOF&_nc_ht=scontent.fgye1-1.fna&oh=00_AfCF85oDfvg1CEtIJ1We_mJ3gV49fRwyklxfDfl8SouHOA&oe=64D84DE2'
-				}
-			},
+			user: user,
 			description: '',
-			publication_date: '',
+			publication_date: new Date(),
 			photo: {
 				_id: '',
 				img_path: ''
@@ -135,6 +62,7 @@ export function AdoptionScreenForm() {
 			vaccination_card: false
 		}
 	});
+
 	const [openSize, setOpenSize] = useState(false);
 	const [itemsSize, setItemsSize] = useState([
 		{ label: 'Pequeño', value: 'Pequeño' }, //valores que van a tener los va
@@ -142,18 +70,24 @@ export function AdoptionScreenForm() {
 		{ label: 'Grande', value: 'Grande' }
 	]);
 	const [openLocation, setOpenLocation] = useState(false);
-	const [itemsLocation, setItemsLocation] = useState([
-		{ label: 'Carapungo', value: 'Carapungo' }, //valores que van a tener los va
-		{ label: 'Cumbayork', value: 'Cumbayork' },
-		{ label: 'Chillogallo', value: 'Chillogallo' }
-	]);
+	const [itemsLocation, setItemsLocation] = useState<Location[]>([]);
 
+	const { isLoading } = useQuery({
+		queryKey: ['location'],
+		queryFn: async () => {
+			const response = await get<Location[]>('/parish/get_all');
+			return response.data;
+		},
+		onSuccess: (data) => {
+			setItemsLocation(data);
+		}
+	});
 	const [size, setSize] = useState<string>('');
 	const [location, setLocation] = useState<string>('');
 
 	const createPublicationMutation = useMutation({
 		mutationFn: (data: AdoptionPublication) =>
-			post('/adoptions/adoption', data).then((response) => response.data),
+			post('/adoptions/add', data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
 			navigation.goBack();
@@ -164,42 +98,21 @@ export function AdoptionScreenForm() {
 		}
 	});
 
-	const uploadImg = async (uri: string) => {
-		try {
-			const response = await FileSystem.uploadAsync(`${baseUrl}/photo/upload_photo`, uri, {
-				fieldName: 'photo',
-				httpMethod: 'POST',
-				uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-				headers: {
-					'Content-Type': 'multipart'
-				}
-			});
-			return response.body;
-		} catch (error) {
-			console.log('ERROR', error);
-		}
-	};
-
 	const onSubmit: SubmitHandler<AdoptionPublication> = async (data) => {
 		if (image) {
 			setLoading(true);
-
-			const response_body = await uploadImg(image);
+			const response_body = await uploadImg(image, setFailUpload);
 			const response = JSON.parse(response_body ? response_body : '{}');
 			const new_photo: Photo = {
 				...response
 			};
 
+			const currentDateUTC = new Date();
+			const timezoneOffset = currentDateUTC.getTimezoneOffset() * 60000;
+			const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);
 			const new_publication: AdoptionPublication = {
 				...data,
-				publication_date: new Date().toLocaleString('es-ES', {
-					timeZone: 'America/Guayaquil',
-					year: 'numeric',
-					month: '2-digit',
-					day: '2-digit',
-					hour: '2-digit',
-					minute: '2-digit'
-				}),
+				publication_date: currentDateLocal,
 				photo: new_photo
 			};
 			createPublicationMutation.mutate(new_publication);
@@ -222,14 +135,14 @@ export function AdoptionScreenForm() {
 							<View style={styles.viewList}>
 								<RadioButton.Item
 									position="leading"
-									value="dog"
+									value="Perro"
 									label="Perro"
 									style={styles.radioButton}
 									labelStyle={styles.labelRadioButton}
 								/>
 								<RadioButton.Item
 									position="leading"
-									value="cat"
+									value="Gato"
 									label="Gato"
 									style={styles.radioButton}
 									labelStyle={styles.labelRadioButton}
@@ -363,8 +276,8 @@ export function AdoptionScreenForm() {
 								borderColor: theme.colors.primary,
 								borderWidth: 0.5
 							}}
-							listMode="SCROLLVIEW"
 							dropDownDirection="TOP"
+							listMode="SCROLLVIEW"
 						/>
 						{errors.pet_size && <HelperText type="error">{errors.pet_size.message}</HelperText>}
 					</>
@@ -383,11 +296,16 @@ export function AdoptionScreenForm() {
 							placeholder="Selecciona el sector"
 							open={openLocation}
 							value={location}
-							items={itemsLocation}
+							items={itemsLocation as ItemType<string>[]}
 							setValue={setLocation}
 							setOpen={setOpenLocation}
 							setItems={setItemsLocation}
 							onChangeValue={onChange}
+							loading={isLoading}
+							listMode="MODAL"
+							modalTitle="Seleccione el sector"
+							modalAnimationType="slide"
+							modalContentContainerStyle={{ backgroundColor: theme.colors.secondary }}
 							style={{
 								...styles.comboItem,
 								borderColor: theme.colors.tertiary,
@@ -399,8 +317,6 @@ export function AdoptionScreenForm() {
 								borderColor: theme.colors.primary,
 								borderWidth: 0.5
 							}}
-							listMode="SCROLLVIEW"
-							dropDownDirection="TOP"
 						/>
 						{errors.pet_location && (
 							<HelperText type="error">{errors.pet_location.message}</HelperText>
@@ -507,6 +423,7 @@ export function AdoptionScreenForm() {
 					Publicar
 				</Button>
 			</View>
+			<SnackBarError setFailUpload={setFailUpload} failUpload={failUpload} reset={reset} />
 		</ScrollView>
 	);
 }
