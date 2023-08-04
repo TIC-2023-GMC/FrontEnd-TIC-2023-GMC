@@ -8,17 +8,7 @@ import { OrganizationScreen } from '../Screens/Organization';
 import { IconButton, useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
 import { FavoriteScreen } from '../Screens/Favorite';
-import { QuizzisGameScreen } from '../Screens/Game/QuizzisGameScreen';
-
 const Tab = createBottomTabNavigator();
-
-export function gameModuleScreen() {
-	return(
-		<Stack.Navigator>
-			<Stack.Screen name="Menu Game" component={QuizzisGameScreen}/>
-		</Stack.Navigator>
-	);
-}
 
 export function TabsNavigation() {
 	const theme = useTheme();

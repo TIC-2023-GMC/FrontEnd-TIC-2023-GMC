@@ -52,3 +52,42 @@ export interface AdoptionPublication {
 	sterilized: boolean;
 	vaccination_card: boolean;
 }
+export interface Answer{
+	answer_text: string;
+	is_correct: boolean;
+}
+
+export interface Question {
+	question_text: string;
+	answers: Answer[];
+}
+
+export interface GameQuiz{
+	_id: string;
+	user_id: string;
+	game_name: string;
+	game_description: string;
+	game_image: Photo;
+	game_category: string;
+	game_score: number;
+	game_questions: Question[];
+	game_time: number;
+}
+
+export interface UserScore{
+	user_first_name: string;
+	user_last_name: string;
+	user_photo: Photo;
+	game_score: number;
+	game_time: number;
+}
+
+export interface UserPosition{
+	position: number;
+	user: UserScore;
+}
+
+export interface LeaderBoard{ 
+	0: UserPosition[],
+	1: number
+}
