@@ -9,20 +9,19 @@ import AdoptionCard from '../../components/AdoptionCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/AdoptionsFilterModal';
-import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../../models/InterfacesModels';
+import {
+	AdoptionPublication,
+	AdoptionFilter,
+	SaveOrRemoveFavoriteProps
+} from '../../models/InterfacesModels';
 import { useFocusEffect } from '@react-navigation/native';
 import MoreOptionsModal from '../../components/MoreOptionsModal';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import { getListAdoptionsEndpoint } from '../../services/endpoints';
 
 interface AdoptionPublicationScreen {
 	0: AdoptionPublication[];
 	1: number;
-}
-
-export interface Filter {
-	species: string | undefined;
-	date: Date | undefined;
-	location: string | undefined;
 }
 
 const MemoizedAdoptionCard = memo(AdoptionCard);
@@ -42,7 +41,7 @@ export function AdoptionScreen({
 
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
-	const [filter, setFilter] = useState<Filter>({} as Filter);
+	const [filter, setFilter] = useState<AdoptionFilter>({} as AdoptionFilter);
 	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
 	const [publicationSelected, setPublicationSelected] = useState<AdoptionPublication>({
 		_id: '',
@@ -81,11 +80,7 @@ export function AdoptionScreen({
 				}
 
 				const response = await get<AdoptionPublicationScreen>(
-					`adoptions/list?page_number=${pageParam}&page_size=${pageSize}${
-						filter?.species ? '&species=' + filter.species : ''
-					}${filter?.date ? '&date=' + new_date?.toISOString() : ''}${
-						filter?.location ? '&location=' + filter?.location : ''
-					}`
+					getListAdoptionsEndpoint({ pageParam, filter, pageSize, new_date })
 				);
 
 				return response.data;
@@ -179,7 +174,7 @@ export function AdoptionScreen({
 				navBarHeight={tabBarHeight}
 				handlerVisible={() => setVisibleFilter(false)}
 				onApplyFilter={setFilter}
-				handlerCancel={() => setFilter({} as Filter)}
+				handlerCancel={() => setFilter({} as AdoptionFilter)}
 			/>
 			<FlatList
 				style={{
@@ -224,3 +219,4 @@ export function AdoptionScreen({
 		</>
 	);
 }
+export { AdoptionFilter };

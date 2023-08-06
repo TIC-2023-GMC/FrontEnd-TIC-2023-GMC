@@ -6,6 +6,11 @@ import { GameQuiz, UserScore } from '../../models/InterfacesModels';
 import { get, put } from '../../services/api';
 import { useStopwatch } from 'react-timer-hook';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import {
+	getLeaderBoardEndpoint,
+	getQuizGameByUserEndpoint,
+	getQuizGameEndpoint
+} from '../../services/endpoints';
 
 //get from API
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
@@ -38,7 +43,7 @@ export function QuizGameScreen({
 	useQuery({
 		queryKey: ['question'],
 		queryFn: async () => {
-			const response = await get<GameQuiz>(`game/quiz_game?user_id=${user._id}`);
+			const response = await get<GameQuiz>(getQuizGameByUserEndpoint(user));
 			return response.data;
 		},
 		onSuccess: (data: GameQuiz) => {
@@ -49,13 +54,14 @@ export function QuizGameScreen({
 		}
 	});
 	const sendScoreQuizzGame = useMutation({
-		mutationFn: (data: GameQuiz) => put('/game/quiz_game', data).then((response) => response.data)
+		mutationFn: (data: GameQuiz) =>
+			put(getQuizGameEndpoint(), data).then((response) => response.data)
 	});
 
 	const { data, isSuccess, isLoading, isFetching } = useQuery({
 		queryKey: ['leaderboard'],
 		queryFn: async () => {
-			const response = await get(`/game/leaderboard?user_id=${user._id}`);
+			const response = await get(getLeaderBoardEndpoint(user));
 			return response.data;
 		},
 		enabled: sendScoreQuizzGame.isSuccess

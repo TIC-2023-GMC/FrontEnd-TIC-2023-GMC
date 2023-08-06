@@ -16,6 +16,7 @@ import { SnackBarError } from '../../components/SnackBarError';
 import { uploadImg } from '../../utils/utils';
 import { post } from '../../services/api';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import { getAddExperienceEndpoint } from '../../services/endpoints';
 
 export function ExperienceScreenForm() {
 	const theme = useTheme();
@@ -49,7 +50,7 @@ export function ExperienceScreenForm() {
 
 	const createPublicationMutation = useMutation({
 		mutationFn: (data: ExperiencePublication) =>
-			post('/experiences/add', data).then((response) => response.data),
+			post(getAddExperienceEndpoint(), data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
 			navigation.navigate('Experiencias');

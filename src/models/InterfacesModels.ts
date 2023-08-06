@@ -20,6 +20,17 @@ export interface User {
 		img_path: string;
 	};
 }
+export interface AdoptionFilter {
+	species: string | undefined;
+	date: Date | undefined;
+	location: string | undefined;
+}
+
+export interface ExperienceFilter {
+	species: string | undefined;
+	date: Date | undefined;
+}
+
 export interface Interaction {
 	user: User;
 }

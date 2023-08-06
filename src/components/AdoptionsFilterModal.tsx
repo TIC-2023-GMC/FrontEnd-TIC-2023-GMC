@@ -5,9 +5,11 @@ import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
 import { registerTranslation, DatePickerInput } from 'react-native-paper-dates';
 import DropDownPicker, { ItemType, ValueType } from 'react-native-dropdown-picker';
-import { Filter } from '../Screens/Adoption/AdoptionScreen';
+
 import { useQuery } from '@tanstack/react-query';
 import { get } from '../services/api';
+import { AdoptionFilter } from '../models/InterfacesModels';
+import { getParishEndpoint } from '../services/endpoints';
 registerTranslation('es', {
 	save: 'Guardar',
 	selectSingle: 'Seleccionar fecha',
@@ -31,9 +33,9 @@ interface FilterModalProps {
 	visible: boolean;
 	navBarHeight: number;
 	handlerVisible: () => void;
-	onApplyFilter: React.Dispatch<React.SetStateAction<Filter>>;
+	onApplyFilter: React.Dispatch<React.SetStateAction<AdoptionFilter>>;
 	handlerCancel: () => void;
-	filter: Filter;
+	filter: AdoptionFilter;
 }
 
 const FilterModal = ({
@@ -55,7 +57,7 @@ const FilterModal = ({
 	const { isLoading } = useQuery({
 		queryKey: ['location'],
 		queryFn: async () => {
-			const response = await get<Location[]>('/parish/get_all');
+			const response = await get<Location[]>(getParishEndpoint());
 			return response.data;
 		},
 		onSuccess: (data) => {

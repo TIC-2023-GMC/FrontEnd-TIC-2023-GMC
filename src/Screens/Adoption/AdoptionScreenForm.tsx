@@ -24,6 +24,7 @@ import { parseNumber, uploadImg } from '../../utils/utils';
 import { AdoptionPublicationSchema } from '../../models/Schemas';
 import { SnackBarError } from '../../components/SnackBarError';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import { getAddAdoptionEndpoint, getParishEndpoint } from '../../services/endpoints';
 
 export function AdoptionScreenForm() {
 	const theme = useTheme();
@@ -75,7 +76,7 @@ export function AdoptionScreenForm() {
 	const { isLoading } = useQuery({
 		queryKey: ['location'],
 		queryFn: async () => {
-			const response = await get<Location[]>('/parish/get_all');
+			const response = await get<Location[]>(getParishEndpoint());
 			return response.data;
 		},
 		onSuccess: (data) => {
@@ -87,7 +88,7 @@ export function AdoptionScreenForm() {
 
 	const createPublicationMutation = useMutation({
 		mutationFn: (data: AdoptionPublication) =>
-			post('/adoptions/add', data).then((response) => response.data),
+			post(getAddAdoptionEndpoint(), data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
 			navigation.goBack();
