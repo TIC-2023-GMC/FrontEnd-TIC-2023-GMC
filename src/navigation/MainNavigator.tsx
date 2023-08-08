@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AdoptionScreen, AdoptionScreenForm } from '../Screens/Adoption';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { MaterialIcons, Feather, Octicons } from '@expo/vector-icons';
 import { ExperienceScreen, ExperienceScreenForm } from '../Screens/Experience';
 import { OrganizationScreen } from '../Screens/Organization';
-import { IconButton, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
 import { FavoritesScreen } from '../Screens/Favorites';
 import { createStackNavigator } from '@react-navigation/stack';
