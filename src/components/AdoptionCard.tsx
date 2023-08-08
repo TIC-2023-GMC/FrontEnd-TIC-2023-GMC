@@ -1,12 +1,24 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
 import { useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AdoptionPublication } from '../models/InterfacesModels';
+import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../models/InterfacesModels';
+import { MutateOptions } from '@tanstack/react-query';
 
-interface OnOpenModalProp {
+interface ModalProps {
 	onOpenModal: (_p: AdoptionPublication) => void;
+	userId: string;
+	onSaveAsFavorite: (
+		variables: SaveOrRemoveFavoriteProps,
+		options?: MutateOptions<any, unknown, SaveOrRemoveFavoriteProps, unknown> | undefined
+	) => void;
+	onRemoveFromFavorites: (
+		variables: SaveOrRemoveFavoriteProps,
+		options?: MutateOptions<any, unknown, SaveOrRemoveFavoriteProps, unknown> | undefined
+	) => void;
+	checkedFavorite: boolean;
 }
 
 const LeftContent = (props: { size: number; photo: string }) => (
@@ -18,7 +30,7 @@ const LeftContent = (props: { size: number; photo: string }) => (
 	/>
 );
 
-const PublicationCard = (props: AdoptionPublication & OnOpenModalProp) => {
+const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 	const theme = useTheme();
 	const [like, setLike] = useState<boolean>();
 	const [expanded, setExpanded] = useState<boolean>();
@@ -38,7 +50,14 @@ const PublicationCard = (props: AdoptionPublication & OnOpenModalProp) => {
 		setExpanded(!expanded);
 	};
 
-	const { onOpenModal, ...adoption } = props;
+	const {
+		userId,
+		onOpenModal,
+		onSaveAsFavorite,
+		onRemoveFromFavorites,
+		checkedFavorite,
+		...adoption
+	} = props;
 
 	return (
 		<Card style={styles.card}>
@@ -142,6 +161,20 @@ const PublicationCard = (props: AdoptionPublication & OnOpenModalProp) => {
 					</Button>
 				</View>
 				<View style={styles.actionsContainer}>
+					<View style={styles.actions}>
+						<IconButton
+							onPress={() => {
+								!checkedFavorite
+									? onSaveAsFavorite
+										? onSaveAsFavorite({ user_id: userId, pub_id: adoption._id })
+										: null
+									: onRemoveFromFavorites({ user_id: userId, pub_id: adoption._id });
+							}}
+							icon={`bookmark`}
+							iconColor={!checkedFavorite ? theme.colors.tertiary : theme.colors.primary}
+							size={28}
+						/>
+					</View>
 					<View style={styles.actions}>
 						<IconButton
 							animated={true}

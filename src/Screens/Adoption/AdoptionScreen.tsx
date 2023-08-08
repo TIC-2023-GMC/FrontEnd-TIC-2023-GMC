@@ -158,20 +158,7 @@ export function AdoptionScreen({
 				publication={publicationSelected}
 				visible={isMoreModalVisible}
 				handlerVisible={() => setIsMoreModalVisible(false)}
-				onSaveAsFavorite={() => {
-					savePublicationAsFavoriteMutation.mutate({
-						user_id: publicationSelected.user._id ? publicationSelected.user._id : '',
-						pub_id: publicationSelected._id
-					});
-				}}
-				onRemoveFromFavorites={() => {
-					removePublicationFromFavoritesMutation.mutate({
-						user_id: publicationSelected.user._id ? publicationSelected.user._id : '',
-						pub_id: publicationSelected._id
-					});
-				}}
 				navBarHeight={tabBarHeight}
-				checkedFavorite={checkedFavorite}
 			/>
 			<MemoizedFilterModal
 				filter={filter}
@@ -191,7 +178,16 @@ export function AdoptionScreen({
 				onEndReached={handleLoadMore}
 				ref={ref}
 				data={data?.pages.flatMap((page) => page[0])}
-				renderItem={({ item }) => <MemoizedAdoptionCard {...item} onOpenModal={handleOpenModal} />}
+				renderItem={({ item }) => (
+					<MemoizedAdoptionCard
+						{...item}
+						userId={user._id}
+						onOpenModal={handleOpenModal}
+						onSaveAsFavorite={savePublicationAsFavoriteMutation.mutate}
+						onRemoveFromFavorites={removePublicationFromFavoritesMutation.mutate}
+						checkedFavorite={checkedFavorite}
+					/>
+				)}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={
