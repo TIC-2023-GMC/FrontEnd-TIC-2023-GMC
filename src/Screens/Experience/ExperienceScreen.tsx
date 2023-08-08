@@ -99,9 +99,11 @@ export function ExperienceScreen({
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={
-					<View style={styles.activityIndicator}>
-						<Text>No hay más publicaciones</Text>
-					</View>
+					hasNextPage ? (
+						<View style={styles.activityIndicator}>
+							<Text>No hay más publicaciones</Text>
+						</View>
+					) : null
 				}
 				refreshControl={
 					<RefreshControl
@@ -112,7 +114,7 @@ export function ExperienceScreen({
 					/>
 				}
 				ListFooterComponent={
-					!hasNextPage ? (
+					hasNextPage ? (
 						<>
 							{isFetchingNextPage ? (
 								<ActivityIndicator size="large" style={styles.activityIndicator} />

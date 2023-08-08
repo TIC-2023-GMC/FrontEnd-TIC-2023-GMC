@@ -195,9 +195,11 @@ export function AdoptionScreen({
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={
-					<View style={styles.activityIndicator}>
-						<Text>No hay más publicaciones</Text>
-					</View>
+					hasNextPage ? (
+						<View style={styles.activityIndicator}>
+							<Text>No hay más publicaciones</Text>
+						</View>
+					) : null
 				}
 				refreshControl={
 					<RefreshControl
@@ -208,7 +210,7 @@ export function AdoptionScreen({
 					/>
 				}
 				ListFooterComponent={
-					!hasNextPage ? (
+					hasNextPage ? (
 						<>
 							{isFetchingNextPage ? (
 								<ActivityIndicator size="large" style={styles.activityIndicator} />

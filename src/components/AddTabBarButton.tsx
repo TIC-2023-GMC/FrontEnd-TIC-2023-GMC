@@ -17,7 +17,7 @@ export default function AddTabBarButton() {
 				size={40}
 				icon="plus"
 				style={styles.addButton}
-				iconColor={theme.colors.secondary}
+				iconColor={theme.colors.primary}
 				animated={true}
 				mode="outlined"
 			/>
@@ -27,11 +27,11 @@ export default function AddTabBarButton() {
 const createStyles = (theme: MD3Theme) =>
 	StyleSheet.create({
 		addButton: {
-			borderColor: theme.colors.secondary,
-			height: 65,
+			height: 60,
 			width: 60,
-			borderWidth: 3.5,
-			backgroundColor: theme.colors.primary,
-			margin: 0
+			borderRadius: 30,
+			borderWidth: 0,
+			backgroundColor: theme.colors.secondary,
+			marginVertical: 5
 		}
 	});
