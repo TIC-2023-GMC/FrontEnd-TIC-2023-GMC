@@ -1,24 +1,24 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../models/InterfacesModels';
+import { AdoptionPublication, SaveOrRemoveFavoriteProps, User } from '../models/InterfacesModels';
 import { MutateOptions } from '@tanstack/react-query';
 
 interface ModalProps {
 	onOpenModal: (_p: AdoptionPublication) => void;
-	userId: string;
+	userAccount: User;
+	setUserAccount: React.Dispatch<React.SetStateAction<User>>;
 	onSaveAsFavorite: (
 		variables: SaveOrRemoveFavoriteProps,
-		options?: MutateOptions<any, unknown, SaveOrRemoveFavoriteProps, unknown> | undefined
+		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
 	) => void;
 	onRemoveFromFavorites: (
 		variables: SaveOrRemoveFavoriteProps,
-		options?: MutateOptions<any, unknown, SaveOrRemoveFavoriteProps, unknown> | undefined
+		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
 	) => void;
-	checkedFavorite: boolean;
 }
 
 const LeftContent = (props: { size: number; photo: string }) => (
@@ -51,13 +51,19 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 	};
 
 	const {
-		userId,
+		setUserAccount,
+		userAccount,
 		onOpenModal,
 		onSaveAsFavorite,
 		onRemoveFromFavorites,
-		checkedFavorite,
 		...adoption
 	} = props;
+	const [checkedFavorite, setCheckedFavorite] = useState<boolean>(
+		userAccount.favorite_adoption_publications.includes(adoption._id)
+	);
+	useEffect(() => {
+		setCheckedFavorite(userAccount.favorite_adoption_publications.includes(adoption._id));
+	}, [userAccount.favorite_adoption_publications, adoption._id]);
 
 	return (
 		<Card style={styles.card}>
@@ -165,10 +171,40 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 						<IconButton
 							onPress={() => {
 								!checkedFavorite
-									? onSaveAsFavorite
-										? onSaveAsFavorite({ user_id: userId, pub_id: adoption._id })
-										: null
-									: onRemoveFromFavorites({ user_id: userId, pub_id: adoption._id });
+									? onSaveAsFavorite(
+										{
+											user_id: userAccount._id ? userAccount._id : '',
+											pub_id: adoption._id
+										},
+										{
+											onSuccess: () => {
+												setUserAccount({
+													...userAccount,
+													favorite_adoption_publications: [
+														...userAccount.favorite_adoption_publications,
+														adoption._id
+													]
+												});
+											}
+										}
+									)
+									: onRemoveFromFavorites(
+										{
+											user_id: userAccount._id ? userAccount._id : '',
+											pub_id: adoption._id
+										},
+										{
+											onSuccess: () => {
+												setUserAccount({
+													...userAccount,
+													favorite_adoption_publications:
+														userAccount.favorite_adoption_publications.filter(
+															(id) => id !== adoption._id
+														)
+												});
+											}
+										}
+									);
 							}}
 							icon={`bookmark`}
 							iconColor={!checkedFavorite ? theme.colors.tertiary : theme.colors.primary}

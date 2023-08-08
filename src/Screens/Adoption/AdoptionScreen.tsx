@@ -64,9 +64,6 @@ export function AdoptionScreen({
 		sterilized: false,
 		vaccination_card: false
 	});
-	const [checkedFavorite, setCheckedFavorite] = useState<boolean | undefined>(
-		publicationSelected.user.favorite_adoption_publications.includes(publicationSelected._id)
-	);
 	const pageSize = 2;
 	useScrollToTop(ref);
 
@@ -113,16 +110,6 @@ export function AdoptionScreen({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) => {
 			return post('/user/add_favorite_adoption', data).then((response) => response.data);
 		},
-		onSuccess: () => {
-			setCheckedFavorite(true);
-			setUser({
-				...user,
-				favorite_adoption_publications: [
-					...user.favorite_adoption_publications,
-					publicationSelected._id
-				]
-			});
-		},
 		onError: (error) => {
 			console.log(error);
 		}
@@ -131,22 +118,12 @@ export function AdoptionScreen({
 	const removePublicationFromFavoritesMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
 			del('/user/remove_favorite_adoption', { data: data }).then((response) => response.data),
-		onSuccess: () => {
-			setCheckedFavorite(false);
-			setUser({
-				...user,
-				favorite_adoption_publications: user.favorite_adoption_publications.filter(
-					(id) => id !== publicationSelected._id
-				)
-			});
-		},
 		onError: (error) => {
 			console.log(error);
 		}
 	});
 
 	const handleOpenModal = (publication: AdoptionPublication) => {
-		setCheckedFavorite(user.favorite_adoption_publications.includes(publication._id));
 		setPublicationSelected(publication);
 		setIsMoreModalVisible(true);
 	};
@@ -181,11 +158,11 @@ export function AdoptionScreen({
 				renderItem={({ item }) => (
 					<MemoizedAdoptionCard
 						{...item}
-						userId={user._id}
+						setUserAccount={setUser}
+						userAccount={user}
 						onOpenModal={handleOpenModal}
 						onSaveAsFavorite={savePublicationAsFavoriteMutation.mutate}
 						onRemoveFromFavorites={removePublicationFromFavoritesMutation.mutate}
-						checkedFavorite={checkedFavorite}
 					/>
 				)}
 				initialNumToRender={pageSize}
