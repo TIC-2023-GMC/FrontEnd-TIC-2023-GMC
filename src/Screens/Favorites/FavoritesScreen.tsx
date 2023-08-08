@@ -4,7 +4,7 @@ import { styles } from './FavoritesScreen.styles';
 import { StatusBar } from 'expo-status-bar';
 import { del, post } from '../../services/api';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
 import AdoptionCard from '../../components/AdoptionCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
@@ -26,6 +26,7 @@ export function FavoritesScreen() {
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
+	const [visibleSnackBar, setvisibleSnackBar] = useState(false);
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
 	const [publicationSelected, setPublicationSelected] = useState<AdoptionPublication>({
 		_id: '',
@@ -83,6 +84,9 @@ export function FavoritesScreen() {
 	const removePublicationFromFavoritesMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
 			del('/user/remove_favorite_adoption', { data: data }).then((response) => response.data),
+		onSuccess: () => {
+			setvisibleSnackBar(true);
+		},
 		onError: (error) => {
 			console.log(error);
 		}
@@ -150,6 +154,15 @@ export function FavoritesScreen() {
 					)
 				}
 			/>
+			<Snackbar
+				theme={theme}
+				visible={visibleSnackBar}
+				onDismiss={() => setvisibleSnackBar(false)}
+				duration={2000}
+				style={{ marginBottom: tabBarHeight + 10 }}
+			>
+				Publicación eliminada de favoritos
+			</Snackbar>
 		</>
 	);
 }
