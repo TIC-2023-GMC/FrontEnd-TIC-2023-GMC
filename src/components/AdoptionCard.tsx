@@ -61,6 +61,8 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 	const [checkedFavorite, setCheckedFavorite] = useState<boolean>(
 		userAccount.favorite_adoption_publications.includes(adoption._id)
 	);
+
+	const removeRequest = { user_id: userAccount._id ? userAccount._id : '', pub_id: adoption._id };
 	useEffect(() => {
 		setCheckedFavorite(userAccount.favorite_adoption_publications.includes(adoption._id));
 	}, [userAccount.favorite_adoption_publications, adoption._id]);
@@ -170,41 +172,31 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 					<View style={styles.actions}>
 						<IconButton
 							onPress={() => {
-								!checkedFavorite
-									? onSaveAsFavorite(
-										{
-											user_id: userAccount._id ? userAccount._id : '',
-											pub_id: adoption._id
-										},
-										{
-											onSuccess: () => {
-												setUserAccount({
-													...userAccount,
-													favorite_adoption_publications: [
-														...userAccount.favorite_adoption_publications,
-														adoption._id
-													]
-												});
-											}
+								if (!checkedFavorite) {
+									onSaveAsFavorite(removeRequest, {
+										onSuccess: () => {
+											setUserAccount({
+												...userAccount,
+												favorite_adoption_publications: [
+													...userAccount.favorite_adoption_publications,
+													adoption._id
+												]
+											});
 										}
-									)
-									: onRemoveFromFavorites(
-										{
-											user_id: userAccount._id ? userAccount._id : '',
-											pub_id: adoption._id
-										},
-										{
-											onSuccess: () => {
-												setUserAccount({
-													...userAccount,
-													favorite_adoption_publications:
-														userAccount.favorite_adoption_publications.filter(
-															(id) => id !== adoption._id
-														)
-												});
-											}
+									});
+								} else {
+									onRemoveFromFavorites(removeRequest, {
+										onSuccess: () => {
+											setUserAccount({
+												...userAccount,
+												favorite_adoption_publications:
+													userAccount.favorite_adoption_publications.filter(
+														(id) => id !== adoption._id
+													)
+											});
 										}
-									);
+									});
+								}
 							}}
 							icon={`bookmark`}
 							iconColor={!checkedFavorite ? theme.colors.tertiary : theme.colors.primary}
