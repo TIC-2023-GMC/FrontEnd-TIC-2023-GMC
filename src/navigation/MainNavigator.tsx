@@ -5,10 +5,11 @@ import { StyleSheet } from 'react-native';
 import { MaterialIcons, Feather, Octicons } from '@expo/vector-icons';
 import { ExperienceScreen, ExperienceScreenForm } from '../Screens/Experience';
 import { OrganizationScreen } from '../Screens/Organization';
-import { IconButton, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
 import { FavoritesScreen } from '../Screens/Favorites';
 import { createStackNavigator } from '@react-navigation/stack';
+import LeftHeaderActions from '../components/LeftHeaderActions';
 
 interface TabsNavigationProps {
 	visible: boolean;
@@ -61,15 +62,6 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 				tabBarInactiveTintColor: theme.colors.secondary,
 				tabBarActiveBackgroundColor: 'rgba(0,0,0,0.5)',
 				tabBarHideOnKeyboard: true,
-				headerLeft: (props) => (
-					<IconButton
-						icon="controller-classic"
-						iconColor={theme.colors.secondary}
-						size={40}
-						{...props}
-						onPress={() => setVisible(!visible)}
-					/>
-				),
 				headerStyle: {
 					backgroundColor: theme.colors.primary
 				},
@@ -78,7 +70,7 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 					fontWeight: 'bold',
 					fontSize: 24
 				},
-				headerTitleAlign: 'center'
+				headerTitleAlign: 'left'
 			})}
 		>
 			<Tab.Screen
@@ -89,14 +81,11 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 					},
 
 					headerRight: (props) => (
-						<IconButton
-							icon="filter"
-							iconColor={theme.colors.secondary}
-							size={30}
+						<LeftHeaderActions
+							visible={visible}
+							setVisible={setVisible}
+							setPublicationsVisibleFilter={setAdoptionsVisibleFilter}
 							{...props}
-							onPress={() => {
-								setAdoptionsVisibleFilter(true);
-							}}
 						/>
 					)
 				}}
@@ -116,14 +105,11 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 						return <Feather {...props} name="message-square" size={30} />;
 					},
 					headerRight: (props) => (
-						<IconButton
-							icon="filter"
-							iconColor={theme.colors.secondary}
-							size={30}
+						<LeftHeaderActions
+							visible={visible}
+							setVisible={setVisible}
+							setPublicationsVisibleFilter={setExperienceVisibleFilter}
 							{...props}
-							onPress={() => {
-								setExperienceVisibleFilter(true);
-							}}
 						/>
 					)
 				}}

@@ -4,7 +4,7 @@ import { styles } from './FavoritesScreen.styles';
 import { StatusBar } from 'expo-status-bar';
 import { del, post } from '../../services/api';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
 import AdoptionCard from '../../components/AdoptionCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
@@ -27,9 +27,8 @@ export function FavoritesScreen() {
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
-
+	const [visibleSnackBar, setvisibleSnackBar] = useState(false);
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
-
 	const [publicationSelected, setPublicationSelected] = useState<AdoptionPublication>({
 		_id: '',
 		user: user,
@@ -50,9 +49,6 @@ export function FavoritesScreen() {
 		sterilized: false,
 		vaccination_card: false
 	});
-	const [checkedFavorite, setCheckedFavorite] = useState<boolean | undefined>(
-		publicationSelected.user.favorite_adoption_publications.includes(publicationSelected._id)
-	);
 	const pageSize = 2;
 	useScrollToTop(ref);
 
@@ -83,22 +79,14 @@ export function FavoritesScreen() {
 	useFocusEffect(
 		useCallback(() => {
 			refetch();
-		}, [])
+		}, [user.favorite_adoption_publications])
 	);
 
 	const removePublicationFromFavoritesMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
 			del('/user/remove_favorite_adoption', { data: data }).then((response) => response.data),
 		onSuccess: () => {
-			setIsMoreModalVisible(false);
-			setCheckedFavorite(false);
-			setUser({
-				...user,
-				favorite_adoption_publications: user.favorite_adoption_publications.filter(
-					(id) => id !== publicationSelected._id
-				)
-			});
-			refetch();
+			setvisibleSnackBar(true);
 		},
 		onError: (error) => {
 			console.log(error);
@@ -106,7 +94,6 @@ export function FavoritesScreen() {
 	});
 
 	const handleOpenModal = (publication: AdoptionPublication) => {
-		setCheckedFavorite(user.favorite_adoption_publications.includes(publication._id));
 		setPublicationSelected(publication);
 		setIsMoreModalVisible(true);
 	};
@@ -118,14 +105,7 @@ export function FavoritesScreen() {
 				publication={publicationSelected}
 				visible={isMoreModalVisible}
 				handlerVisible={() => setIsMoreModalVisible(false)}
-				onRemoveFromFavorites={() => {
-					removePublicationFromFavoritesMutation.mutate({
-						user_id: publicationSelected.user._id ? publicationSelected.user._id : '',
-						pub_id: publicationSelected._id
-					});
-				}}
 				navBarHeight={tabBarHeight}
-				checkedFavorite={checkedFavorite}
 			/>
 			<FlatList
 				style={{
@@ -137,7 +117,15 @@ export function FavoritesScreen() {
 				onEndReached={handleLoadMore}
 				ref={ref}
 				data={data?.pages.flatMap((page) => page[0])}
-				renderItem={({ item }) => <MemoizedAdoptionCard {...item} onOpenModal={handleOpenModal} />}
+				renderItem={({ item }) => (
+					<MemoizedAdoptionCard
+						{...item}
+						setUserAccount={setUser}
+						userAccount={user}
+						onOpenModal={handleOpenModal}
+						onRemoveFromFavorites={removePublicationFromFavoritesMutation.mutate}
+					/>
+				)}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={
@@ -167,6 +155,15 @@ export function FavoritesScreen() {
 					)
 				}
 			/>
+			<Snackbar
+				theme={theme}
+				visible={visibleSnackBar}
+				onDismiss={() => setvisibleSnackBar(false)}
+				duration={2000}
+				style={{ marginBottom: tabBarHeight + 10 }}
+			>
+				Publicación eliminada de favoritos
+			</Snackbar>
 		</>
 	);
 }

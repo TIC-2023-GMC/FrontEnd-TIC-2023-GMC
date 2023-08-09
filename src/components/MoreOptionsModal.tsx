@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme, Portal, Modal, List, IconButton, Divider } from 'react-native-paper';
@@ -11,19 +10,13 @@ interface MoreOptionsModalProps {
 	visible: boolean;
 	navBarHeight: number;
 	handlerVisible: () => void;
-	onSaveAsFavorite?: () => void;
-	onRemoveFromFavorites: () => void;
-	checkedFavorite?: boolean;
 }
 
 const MoreOptionsModal = ({
 	publication,
 	visible,
 	navBarHeight,
-	handlerVisible,
-	onSaveAsFavorite,
-	onRemoveFromFavorites,
-	checkedFavorite
+	handlerVisible
 }: MoreOptionsModalProps) => {
 	const theme = useTheme();
 
@@ -37,10 +30,10 @@ const MoreOptionsModal = ({
 					backgroundColor: theme.colors.secondary,
 					justifyContent: 'flex-start',
 					alignContent: 'center',
-					height: 270,
+					height: 150,
 					borderTopEndRadius: 20,
 					borderTopStartRadius: 20,
-					transform: [{ translateY: deviceHeight / 2 - navBarHeight - 135 }]
+					transform: [{ translateY: deviceHeight / 2 - navBarHeight - 75 }]
 				}}
 			>
 				<TouchableOpacity>
@@ -50,31 +43,6 @@ const MoreOptionsModal = ({
 						iconColor={theme.colors.tertiary}
 						size={30}
 						onTouchEnd={handlerVisible}
-					/>
-				</TouchableOpacity>
-
-				<Divider />
-				<TouchableOpacity style={styles.viewList}>
-					<List.Item
-						style={styles.list}
-						titleStyle={{ fontWeight: 'bold' }}
-						title={!checkedFavorite ? 'Guardar en favoritos' : 'Eliminar de favoritos'}
-						onPress={() => {
-							!checkedFavorite
-								? onSaveAsFavorite
-									? onSaveAsFavorite()
-									: null
-								: onRemoveFromFavorites();
-						}}
-						left={(props) => (
-							<IconButton
-								{...props}
-								style={{ margin: 0, padding: 0 }}
-								icon={`bookmark${!checkedFavorite ? '-outline' : ''}`}
-								iconColor={theme.colors.primary}
-								size={50}
-							/>
-						)}
 					/>
 				</TouchableOpacity>
 
@@ -113,7 +81,6 @@ const MoreOptionsModal = ({
 						)}
 					/>
 				</TouchableOpacity>
-				<Divider />
 			</Modal>
 		</Portal>
 	);
@@ -121,28 +88,21 @@ const MoreOptionsModal = ({
 const styles = StyleSheet.create({
 	viewList: {
 		justifyContent: 'center',
+		alignItems: 'center',
+		alignContent: 'center'
+	},
+	downButton: {
+		justifyContent: 'center',
 		flexDirection: 'row',
 		alignItems: 'center',
-		height: '25%'
+		height: '20%'
 	},
 	list: {
 		justifyContent: 'center',
-		height: '100%',
-		width: '100%',
-		fontWeight: 'bold'
-	},
-	listItems: {
-		width: '100%',
-		justifyContent: 'center',
-		alignContent: 'center'
-	},
-	buttonView: {
-		flexDirection: 'row',
-		justifyContent: 'space-around',
-		margin: 10
-	},
-	button: {
-		width: '45%'
+		height: 60,
+		width: '90%',
+		fontWeight: 'bold',
+		paddingRight: 0
 	},
 	iconButton: {
 		width: '100%',

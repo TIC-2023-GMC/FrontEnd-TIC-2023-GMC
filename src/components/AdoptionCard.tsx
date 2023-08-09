@@ -1,12 +1,24 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AdoptionPublication } from '../models/InterfacesModels';
+import { AdoptionPublication, SaveOrRemoveFavoriteProps, User } from '../models/InterfacesModels';
+import { MutateOptions } from '@tanstack/react-query';
 
-interface OnOpenModalProp {
+interface ModalProps {
 	onOpenModal: (_p: AdoptionPublication) => void;
+	userAccount: User;
+	setUserAccount: React.Dispatch<React.SetStateAction<User>>;
+	onSaveAsFavorite: (
+		variables: SaveOrRemoveFavoriteProps,
+		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
+	) => void;
+	onRemoveFromFavorites: (
+		variables: SaveOrRemoveFavoriteProps,
+		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
+	) => void;
 }
 
 const LeftContent = (props: { size: number; photo: string }) => (
@@ -18,7 +30,7 @@ const LeftContent = (props: { size: number; photo: string }) => (
 	/>
 );
 
-const PublicationCard = (props: AdoptionPublication & OnOpenModalProp) => {
+const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 	const theme = useTheme();
 	const [like, setLike] = useState<boolean>();
 	const [expanded, setExpanded] = useState<boolean>();
@@ -38,7 +50,22 @@ const PublicationCard = (props: AdoptionPublication & OnOpenModalProp) => {
 		setExpanded(!expanded);
 	};
 
-	const { onOpenModal, ...adoption } = props;
+	const {
+		setUserAccount,
+		userAccount,
+		onOpenModal,
+		onSaveAsFavorite,
+		onRemoveFromFavorites,
+		...adoption
+	} = props;
+	const [checkedFavorite, setCheckedFavorite] = useState<boolean>(
+		userAccount.favorite_adoption_publications.includes(adoption._id)
+	);
+
+	const removeRequest = { user_id: userAccount._id ? userAccount._id : '', pub_id: adoption._id };
+	useEffect(() => {
+		setCheckedFavorite(userAccount.favorite_adoption_publications.includes(adoption._id));
+	}, [userAccount.favorite_adoption_publications, adoption._id]);
 
 	return (
 		<Card style={styles.card}>
@@ -142,6 +169,40 @@ const PublicationCard = (props: AdoptionPublication & OnOpenModalProp) => {
 					</Button>
 				</View>
 				<View style={styles.actionsContainer}>
+					<View style={styles.actions}>
+						<IconButton
+							onPress={() => {
+								if (!checkedFavorite) {
+									onSaveAsFavorite(removeRequest, {
+										onSuccess: () => {
+											setUserAccount({
+												...userAccount,
+												favorite_adoption_publications: [
+													...userAccount.favorite_adoption_publications,
+													adoption._id
+												]
+											});
+										}
+									});
+								} else {
+									onRemoveFromFavorites(removeRequest, {
+										onSuccess: () => {
+											setUserAccount({
+												...userAccount,
+												favorite_adoption_publications:
+													userAccount.favorite_adoption_publications.filter(
+														(id) => id !== adoption._id
+													)
+											});
+										}
+									});
+								}
+							}}
+							icon={`bookmark`}
+							iconColor={!checkedFavorite ? theme.colors.tertiary : theme.colors.primary}
+							size={28}
+						/>
+					</View>
 					<View style={styles.actions}>
 						<IconButton
 							animated={true}
