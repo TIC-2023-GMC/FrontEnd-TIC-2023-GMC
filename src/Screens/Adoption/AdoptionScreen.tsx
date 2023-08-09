@@ -4,7 +4,7 @@ import { styles } from './AdoptionScreen.styles';
 import { StatusBar } from 'expo-status-bar';
 import { get, post, del } from '../../services/api';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
 import AdoptionCard from '../../components/AdoptionCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
@@ -39,7 +39,7 @@ export function AdoptionScreen({
 }) {
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
 	const theme = useTheme();
-
+	const [visibleSnackBar, setvisibleSnackBar] = useState([false, false]);
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [filter, setFilter] = useState<Filter>({} as Filter);
@@ -64,9 +64,6 @@ export function AdoptionScreen({
 		sterilized: false,
 		vaccination_card: false
 	});
-	const [checkedFavorite, setCheckedFavorite] = useState<boolean | undefined>(
-		publicationSelected.user.favorite_adoption_publications.includes(publicationSelected._id)
-	);
 	const pageSize = 2;
 	useScrollToTop(ref);
 
@@ -114,14 +111,7 @@ export function AdoptionScreen({
 			return post('/user/add_favorite_adoption', data).then((response) => response.data);
 		},
 		onSuccess: () => {
-			setCheckedFavorite(true);
-			setUser({
-				...user,
-				favorite_adoption_publications: [
-					...user.favorite_adoption_publications,
-					publicationSelected._id
-				]
-			});
+			setvisibleSnackBar([true, false]);
 		},
 		onError: (error) => {
 			console.log(error);
@@ -132,13 +122,7 @@ export function AdoptionScreen({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
 			del('/user/remove_favorite_adoption', { data: data }).then((response) => response.data),
 		onSuccess: () => {
-			setCheckedFavorite(false);
-			setUser({
-				...user,
-				favorite_adoption_publications: user.favorite_adoption_publications.filter(
-					(id) => id !== publicationSelected._id
-				)
-			});
+			setvisibleSnackBar([false, true]);
 		},
 		onError: (error) => {
 			console.log(error);
@@ -146,7 +130,6 @@ export function AdoptionScreen({
 	});
 
 	const handleOpenModal = (publication: AdoptionPublication) => {
-		setCheckedFavorite(user.favorite_adoption_publications.includes(publication._id));
 		setPublicationSelected(publication);
 		setIsMoreModalVisible(true);
 	};
@@ -158,20 +141,7 @@ export function AdoptionScreen({
 				publication={publicationSelected}
 				visible={isMoreModalVisible}
 				handlerVisible={() => setIsMoreModalVisible(false)}
-				onSaveAsFavorite={() => {
-					savePublicationAsFavoriteMutation.mutate({
-						user_id: publicationSelected.user._id ? publicationSelected.user._id : '',
-						pub_id: publicationSelected._id
-					});
-				}}
-				onRemoveFromFavorites={() => {
-					removePublicationFromFavoritesMutation.mutate({
-						user_id: publicationSelected.user._id ? publicationSelected.user._id : '',
-						pub_id: publicationSelected._id
-					});
-				}}
 				navBarHeight={tabBarHeight}
-				checkedFavorite={checkedFavorite}
 			/>
 			<MemoizedFilterModal
 				filter={filter}
@@ -191,7 +161,16 @@ export function AdoptionScreen({
 				onEndReached={handleLoadMore}
 				ref={ref}
 				data={data?.pages.flatMap((page) => page[0])}
-				renderItem={({ item }) => <MemoizedAdoptionCard {...item} onOpenModal={handleOpenModal} />}
+				renderItem={({ item }) => (
+					<MemoizedAdoptionCard
+						{...item}
+						setUserAccount={setUser}
+						userAccount={user}
+						onOpenModal={handleOpenModal}
+						onSaveAsFavorite={savePublicationAsFavoriteMutation.mutate}
+						onRemoveFromFavorites={removePublicationFromFavoritesMutation.mutate}
+					/>
+				)}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={
@@ -221,6 +200,24 @@ export function AdoptionScreen({
 					)
 				}
 			/>
+			<Snackbar
+				theme={theme}
+				visible={visibleSnackBar[0]}
+				onDismiss={() => setvisibleSnackBar([false, false])}
+				duration={2000}
+				style={{ marginBottom: tabBarHeight + 10 }}
+			>
+				Publicación guardada en favoritos
+			</Snackbar>
+			<Snackbar
+				theme={theme}
+				visible={visibleSnackBar[1]}
+				onDismiss={() => setvisibleSnackBar([false, false])}
+				duration={2000}
+				style={{ marginBottom: tabBarHeight + 10 }}
+			>
+				Publicación eliminada de favoritos
+			</Snackbar>
 		</>
 	);
 }

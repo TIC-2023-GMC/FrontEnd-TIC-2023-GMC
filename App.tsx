@@ -36,7 +36,7 @@ const theme: MD3Theme = {
 		primary: '#7A8A50',
 		secondary: '#ECEBEB',
 		tertiary: '#A3A3A3',
-		inverseSurface: 'rgba(163, 163, 163, 1)',
+		inverseSurface: '#7A8A50',
 		inversePrimary: '#ECEBEB'
 	}
 
