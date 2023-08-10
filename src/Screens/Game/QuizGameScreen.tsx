@@ -221,7 +221,7 @@ const createStyles = () =>
 			flex: 1,
 			backgroundColor: '#fff',
 			alignItems: 'center',
-			flexDirection: 'column',
+			flexDirection: 'column'
 		},
 		cardContainer: {
 			width: 325,
