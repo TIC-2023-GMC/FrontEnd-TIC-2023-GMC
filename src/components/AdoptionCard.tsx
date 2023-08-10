@@ -38,6 +38,7 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 		user,
 		pet_age: petAge,
 		pet_size: petSize,
+		pet_breed: petBreed,
 		description,
 		pet_location: petLocation,
 		publication_date: publicationDate,
@@ -158,6 +159,7 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 			</Card.Content>
 			{expanded && (
 				<Card.Content>
+					<List.Item style={styles.list} title="Raza" description={petBreed} />
 					<List.Item style={styles.list} title="Descripción" description={description} />
 				</Card.Content>
 			)}

@@ -16,6 +16,7 @@ import { SnackBarError } from '../../components/SnackBarError';
 import { uploadImg } from '../../utils/utils';
 import { post } from '../../services/api';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import { getAddExperienceEndpoint } from '../../services/endpoints';
 
 export function ExperienceScreenForm() {
 	const theme = useTheme();
@@ -38,7 +39,6 @@ export function ExperienceScreenForm() {
 			description: '',
 			publication_date: new Date(),
 			photo: {
-				_id: '',
 				img_path: ''
 			},
 			likes: [],
@@ -49,7 +49,7 @@ export function ExperienceScreenForm() {
 
 	const createPublicationMutation = useMutation({
 		mutationFn: (data: ExperiencePublication) =>
-			post('/experiences/add', data).then((response) => response.data),
+			post(getAddExperienceEndpoint(), data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
 			navigation.navigate('Experiencias');
@@ -57,6 +57,7 @@ export function ExperienceScreenForm() {
 			setImage(undefined);
 		}
 	});
+
 	const onSubmit: SubmitHandler<ExperiencePublication> = async (data) => {
 		if (image) {
 			setLoading(true);
@@ -76,7 +77,6 @@ export function ExperienceScreenForm() {
 			createPublicationMutation.mutate(new_publication);
 		}
 	};
-
 	return (
 		<View style={{ ...styles.container, marginBottom: tabBarHeight }}>
 			<PhotoSelection image={image} setImage={setImage} />
@@ -143,7 +143,6 @@ export function ExperienceScreenForm() {
 				)}
 				name="description"
 			/>
-
 			<View style={styles.buttonView}>
 				<Button
 					style={styles.button}
@@ -170,7 +169,6 @@ export function ExperienceScreenForm() {
 					Publicar
 				</Button>
 			</View>
-
 			<SnackBarError setFailUpload={setFailUpload} failUpload={failUpload} reset={reset} />
 		</View>
 	);

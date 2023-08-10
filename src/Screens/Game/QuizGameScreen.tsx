@@ -6,10 +6,16 @@ import { GameQuiz, UserScore } from '../../models/InterfacesModels';
 import { get, put } from '../../services/api';
 import { useStopwatch } from 'react-timer-hook';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import {
+	getLeaderBoardEndpoint,
+	getQuizGameByUserEndpoint,
+	getQuizGameEndpoint
+} from '../../services/endpoints';
 
 //get from API
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
 const levelImages = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
+
 export function QuizGameScreen({
 	visible,
 	setVisible
@@ -19,27 +25,27 @@ export function QuizGameScreen({
 }) {
 	const styles = createStyles();
 	const { user } = useContext<UserContextParams>(UserContext);
-	const [quizzGame, setQuizzGame] = useState<GameQuiz>({
-		_id: '',
-		user_id: user._id ? user._id : '',
-		game_name: '',
-		game_description: '',
-		game_image: { _id: '', img_path: '' },
-		game_category: '',
-		game_score: 0,
-		game_questions: [],
-		game_time: 0
-	});
 	const [question, setQuestion] = useState(-1);
 	const [modalVisible, setModalVisible] = useState(false);
 	const { totalSeconds, seconds, minutes, pause, reset } = useStopwatch({
 		autoStart: true
 	});
+	const [quizzGame, setQuizzGame] = useState<GameQuiz>({
+		_id: '',
+		user_id: user._id ? user._id : '',
+		game_name: '',
+		game_description: '',
+		game_image: { img_path: '' },
+		game_category: '',
+		game_score: 0,
+		game_questions: [],
+		game_time: 0
+	});
 
 	useQuery({
 		queryKey: ['question'],
 		queryFn: async () => {
-			const response = await get<GameQuiz>(`game/quiz_game?user_id=${user._id}`);
+			const response = await get<GameQuiz>(getQuizGameByUserEndpoint(user));
 			return response.data;
 		},
 		onSuccess: (data: GameQuiz) => {
@@ -51,13 +57,14 @@ export function QuizGameScreen({
 	});
 
 	const sendScoreQuizzGame = useMutation({
-		mutationFn: (data: GameQuiz) => put('/game/quiz_game', data).then((response) => response.data)
+		mutationFn: (data: GameQuiz) =>
+			put(getQuizGameEndpoint(), data).then((response) => response.data)
 	});
 
 	const { data, isSuccess, isLoading, isFetching } = useQuery({
 		queryKey: ['leaderboard'],
 		queryFn: async () => {
-			const response = await get(`/game/leaderboard?user_id=${user._id}`);
+			const response = await get(getLeaderBoardEndpoint(user));
 			return response.data;
 		},
 		enabled: sendScoreQuizzGame.isSuccess

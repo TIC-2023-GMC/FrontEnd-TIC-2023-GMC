@@ -12,6 +12,7 @@ import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../../models/Int
 import { useFocusEffect } from '@react-navigation/native';
 import MoreOptionsModal from '../../components/MoreOptionsModal';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import { getListFavoritesAdoptionsEndpoint } from '../../services/endpoints';
 
 interface FavoritesScreenValues {
 	0: AdoptionPublication[];
@@ -34,7 +35,6 @@ export function FavoritesScreen() {
 		description: '',
 		publication_date: new Date(),
 		photo: {
-			_id: '',
 			img_path: ''
 		},
 		likes: [],
@@ -56,7 +56,7 @@ export function FavoritesScreen() {
 			queryKey: ['Favorites'],
 			queryFn: async ({ pageParam = 1 }) => {
 				const response = await post<FavoritesScreenValues>(
-					`/user/list_favorite_adoptions?page_number=${pageParam}&page_size=${pageSize}`,
+					getListFavoritesAdoptionsEndpoint({ pageParam, pageSize }),
 					user.favorite_adoption_publications
 				);
 
@@ -75,6 +75,7 @@ export function FavoritesScreen() {
 			fetchNextPage();
 		}
 	};
+
 	useFocusEffect(
 		useCallback(() => {
 			refetch();
