@@ -4,12 +4,14 @@ import { AdoptionScreen, AdoptionScreenForm } from '../Screens/Adoption';
 import { StyleSheet } from 'react-native';
 import { MaterialIcons, Feather, Octicons } from '@expo/vector-icons';
 import { ExperienceScreen, ExperienceScreenForm } from '../Screens/Experience';
-import { OrganizationScreen } from '../Screens/Organization';
+// import { OrganizationScreen } from '../Screens/Organization';
 import { useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
-import { FavoritesScreen } from '../Screens/Favorites';
+import { FavoritesScreen } from '../Screens/Profile/Favorites';
+import { MyPublicationsScreen } from '../Screens/Profile/MyPublications';
 import { createStackNavigator } from '@react-navigation/stack';
-import LeftHeaderActions from '../components/LeftHeaderActions';
+import RightHeaderActions from '../components/LeftHeaderActions';
+import { OrganizationScreen } from '../Screens/Organization';
 
 interface TabsNavigationProps {
 	visible: boolean;
@@ -19,14 +21,47 @@ interface TabsNavigationProps {
 const Stack = createStackNavigator();
 
 export function AddNavigationStack() {
+	const theme = useTheme();
 	return (
 		<Stack.Navigator
 			screenOptions={{
-				headerShown: false
+				headerStyle: {
+					backgroundColor: theme.colors.primary
+				},
+				headerTitleStyle: {
+					color: theme.colors.secondary,
+					fontWeight: 'bold',
+					fontSize: 24
+				},
+				headerTitleAlign: 'left',
+				headerLeft: () => null
 			}}
 		>
 			<Stack.Screen name="Agregar Adopción" component={AdoptionScreenForm} />
 			<Stack.Screen name="Agregar Experiencia" component={ExperienceScreenForm} />
+		</Stack.Navigator>
+	);
+}
+export function ProfileNavigationStack() {
+	const theme = useTheme();
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerStyle: {
+					backgroundColor: theme.colors.primary
+				},
+				headerTitleStyle: {
+					color: theme.colors.secondary,
+					fontWeight: 'bold',
+					fontSize: 24
+				},
+				headerTitleAlign: 'left',
+				headerLeft: () => null
+			}}
+		>
+			{/* <Stack.Screen name="Perfil" component={MyPublicationsScreen} /> */}
+			<Stack.Screen name="Mis Publicaciones" component={MyPublicationsScreen} />
+			<Stack.Screen name="Favoritos" component={FavoritesScreen} />
 		</Stack.Navigator>
 	);
 }
@@ -81,7 +116,7 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 					},
 
 					headerRight: (props) => (
-						<LeftHeaderActions
+						<RightHeaderActions
 							visible={visible}
 							setVisible={setVisible}
 							setPublicationsVisibleFilter={setAdoptionsVisibleFilter}
@@ -105,7 +140,7 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 						return <Feather {...props} name="message-square" size={30} />;
 					},
 					headerRight: (props) => (
-						<LeftHeaderActions
+						<RightHeaderActions
 							visible={visible}
 							setVisible={setVisible}
 							setPublicationsVisibleFilter={setExperienceVisibleFilter}
@@ -129,7 +164,8 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 				options={{
 					tabBarButton: (props) => {
 						return <AddTabBarButton {...props} />;
-					}
+					},
+					headerShown: false
 				}}
 			/>
 			<Tab.Screen
@@ -143,7 +179,7 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 			/>
 			<Tab.Screen
 				name="Perfil"
-				component={FavoritesScreen}
+				component={ProfileNavigationStack}
 				options={{
 					tabBarIcon: (props) => {
 						return <Octicons {...props} name="person-fill" size={30} />;

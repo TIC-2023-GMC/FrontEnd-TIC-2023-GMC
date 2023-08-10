@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DefaultTheme, MD3Theme, Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
-import { TabsNavigation } from './src/navigation/MainNavigator';
+import { TabsNavigation } from './src/navigation/SocialNavigator';
 import { AuthProvider } from './src/auth/userContext';
 import { GameNavigationStack } from './src/navigation/GameNavigator';
 import { SafeAreaProvider } from 'react-native-safe-area-context';

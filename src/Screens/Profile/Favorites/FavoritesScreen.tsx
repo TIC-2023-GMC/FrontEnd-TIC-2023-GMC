@@ -2,17 +2,20 @@ import React, { useRef, useState, memo, useCallback, useContext } from 'react';
 import { Text, View, FlatList, RefreshControl } from 'react-native';
 import { styles } from './FavoritesScreen.styles';
 import { StatusBar } from 'expo-status-bar';
-import { del, post } from '../../services/api';
+import { del, post } from '../../../services/api';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
-import AdoptionCard from '../../components/AdoptionCard';
+import AdoptionCard from '../../../components/AdoptionCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../../models/InterfacesModels';
+import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../../../models/InterfacesModels';
 import { useFocusEffect } from '@react-navigation/native';
-import MoreOptionsModal from '../../components/MoreOptionsModal';
-import { UserContext, UserContextParams } from '../../auth/userContext';
-import { getListFavoritesAdoptionsEndpoint } from '../../services/endpoints';
+import MoreOptionsModal from '../../../components/MoreOptionsModal';
+import { UserContext, UserContextParams } from '../../../auth/userContext';
+import {
+	getListFavoritesAdoptionsEndpoint,
+	getRemoveFavoriteAdoptionEndpoint
+} from '../../../services/endpoints';
 
 interface FavoritesScreenValues {
 	0: AdoptionPublication[];
@@ -84,7 +87,7 @@ export function FavoritesScreen() {
 
 	const removePublicationFromFavoritesMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
-			del('/user/remove_favorite_adoption', { data: data }).then((response) => response.data),
+			del(getRemoveFavoriteAdoptionEndpoint(), { data: data }).then((response) => response.data),
 		onSuccess: () => {
 			setvisibleSnackBar(true);
 		},
@@ -129,9 +132,11 @@ export function FavoritesScreen() {
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={
-					<View style={styles.activityIndicator}>
-						<Text>No hay más publicaciones</Text>
-					</View>
+					hasNextPage ? (
+						<View style={styles.activityIndicator}>
+							<Text>No hay más publicaciones</Text>
+						</View>
+					) : null
 				}
 				refreshControl={
 					<RefreshControl
@@ -142,7 +147,7 @@ export function FavoritesScreen() {
 					/>
 				}
 				ListFooterComponent={
-					!hasNextPage ? (
+					hasNextPage ? (
 						<>
 							{isFetchingNextPage ? (
 								<ActivityIndicator size="large" style={styles.activityIndicator} />

@@ -43,6 +43,24 @@ export function getListFavoritesAdoptionsEndpoint({
 }) {
 	return `/user/list_favorite_adoptions?page_number=${pageParam}&page_size=${pageSize}`;
 }
+export function getRemoveFavoriteAdoptionEndpoint() {
+	return '/user/remove_favorite_adoption';
+}
+export function getAddFavoriteAdoptionEndpoint() {
+	return '/user/add_favorite_adoption';
+}
+
+export function getMyPublicationsEndpoint({
+	pageParam,
+	pageSize,
+	user_id
+}: {
+	pageParam: number;
+	pageSize: number;
+	user_id: string;
+}) {
+	return `/user/list_my_publications?page_number=${pageParam}&page_size=${pageSize}&user_id=${user_id}`;
+}
 
 export function getLeaderBoardEndpoint(user: User) {
 	return `/game/leaderboard?user_id=${user._id}`;
