@@ -12,8 +12,7 @@ import {
 	getQuizGameEndpoint
 } from '../../services/endpoints';
 
-//get from API
-const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
+const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' };
 const level_images = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
 export function QuizGameScreen({
 	visible,
@@ -22,22 +21,23 @@ export function QuizGameScreen({
 	visible: boolean;
 	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+	const styles = createStyles();
 	const { user } = useContext<UserContextParams>(UserContext);
+	const [question, setQuestion] = useState(-1);
+	const [modalVisible, setModalVisible] = useState(false);
+	const { totalSeconds, seconds, minutes, pause, reset } = useStopwatch({
+		autoStart: true
+	});
 	const [quizzGame, setQuizzGame] = useState<GameQuiz>({
 		_id: '',
 		user_id: user._id ? user._id : '',
 		game_name: '',
 		game_description: '',
-		game_image: { _id: '', img_path: '' },
+		game_image: { img_path: '' },
 		game_category: '',
 		game_score: 0,
 		game_questions: [],
 		game_time: 0
-	});
-	const [question, setQuestion] = useState(-1);
-	const [modalVisible, setModalVisible] = useState(false);
-	const { totalSeconds, seconds, minutes, pause, reset } = useStopwatch({
-		autoStart: true
 	});
 
 	useQuery({
@@ -53,6 +53,7 @@ export function QuizGameScreen({
 			setQuestion(data?.game_questions?.length ? data?.game_questions?.length - 1 : 0);
 		}
 	});
+
 	const sendScoreQuizzGame = useMutation({
 		mutationFn: (data: GameQuiz) =>
 			put(getQuizGameEndpoint(), data).then((response) => response.data)
@@ -67,7 +68,6 @@ export function QuizGameScreen({
 		enabled: sendScoreQuizzGame.isSuccess
 	});
 
-	const styles = createStyles();
 	useEffect(() => {
 		if (question === 0) {
 			sendScoreQuizzGame.mutate(quizzGame);
@@ -140,13 +140,7 @@ export function QuizGameScreen({
 					))}
 				<Portal>
 					<Modal
-						contentContainerStyle={{
-							width: '90%',
-							borderRadius: 20,
-							justifyContent: 'center',
-							alignSelf: 'center',
-							backgroundColor: '#ffffff'
-						}}
+						contentContainerStyle={styles.modalContainer}
 						dismissable={false}
 						visible={modalVisible}
 						onDismiss={() => {
@@ -261,11 +255,17 @@ const createStyles = () =>
 			marginBottom: 20,
 			alignSelf: 'center'
 		},
-
 		textStyle: {
 			color: 'white',
 			fontWeight: 'bold',
 			textAlign: 'center'
+		},
+		modalContainer: {
+			width: '90%',
+			borderRadius: 20,
+			justifyContent: 'center',
+			alignSelf: 'center',
+			backgroundColor: '#ffffff'
 		},
 		modalText: {
 			marginBottom: 15,

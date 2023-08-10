@@ -15,10 +15,7 @@ export interface User {
 	pet_expenses: number;
 	motivation: string;
 	favorite_adoption_publications: string[];
-	photo: {
-		_id: string;
-		img_path: string;
-	};
+	photo: Photo;
 }
 export interface AdoptionFilter {
 	species: string | undefined;
@@ -35,7 +32,6 @@ export interface Interaction {
 	user: User;
 }
 export interface Photo {
-	_id: string;
 	img_path: string;
 }
 export interface Comment extends Interaction {

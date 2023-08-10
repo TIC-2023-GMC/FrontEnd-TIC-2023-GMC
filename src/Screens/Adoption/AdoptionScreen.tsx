@@ -9,15 +9,15 @@ import AdoptionCard from '../../components/AdoptionCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/AdoptionsFilterModal';
+import { useFocusEffect } from '@react-navigation/native';
+import MoreOptionsModal from '../../components/MoreOptionsModal';
+import { UserContext, UserContextParams } from '../../auth/userContext';
+import { getListAdoptionsEndpoint } from '../../services/endpoints';
 import {
 	AdoptionPublication,
 	AdoptionFilter,
 	SaveOrRemoveFavoriteProps
 } from '../../models/InterfacesModels';
-import { useFocusEffect } from '@react-navigation/native';
-import MoreOptionsModal from '../../components/MoreOptionsModal';
-import { UserContext, UserContextParams } from '../../auth/userContext';
-import { getListAdoptionsEndpoint } from '../../services/endpoints';
 
 interface AdoptionPublicationScreen {
 	0: AdoptionPublication[];
@@ -49,7 +49,6 @@ export function AdoptionScreen({
 		description: '',
 		publication_date: new Date(),
 		photo: {
-			_id: '',
 			img_path: ''
 		},
 		likes: [],
@@ -71,15 +70,12 @@ export function AdoptionScreen({
 			queryKey: ['Adoption', filter],
 			queryFn: async ({ pageParam = 1 }) => {
 				const new_date = filter?.date ? new Date(filter?.date) : undefined;
-
 				if (new_date) {
 					new_date.setUTCHours(0, 0, 0, 0);
 				}
-
 				const response = await get<AdoptionPublicationScreen>(
 					getListAdoptionsEndpoint({ pageParam, filter, pageSize, new_date })
 				);
-
 				return response.data;
 			},
 			getNextPageParam: (lastPage) => {

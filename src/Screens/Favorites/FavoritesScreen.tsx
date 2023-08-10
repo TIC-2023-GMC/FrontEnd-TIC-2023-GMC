@@ -35,7 +35,6 @@ export function FavoritesScreen() {
 		description: '',
 		publication_date: new Date(),
 		photo: {
-			_id: '',
 			img_path: ''
 		},
 		likes: [],
@@ -76,6 +75,7 @@ export function FavoritesScreen() {
 			fetchNextPage();
 		}
 	};
+	
 	useFocusEffect(
 		useCallback(() => {
 			refetch();
