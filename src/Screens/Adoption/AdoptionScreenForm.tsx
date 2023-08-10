@@ -48,7 +48,6 @@ export function AdoptionScreenForm() {
 			description: '',
 			publication_date: new Date(),
 			photo: {
-				_id: '',
 				img_path: ''
 			},
 			likes: [],
@@ -66,7 +65,7 @@ export function AdoptionScreenForm() {
 
 	const [openSize, setOpenSize] = useState(false);
 	const [itemsSize, setItemsSize] = useState([
-		{ label: 'Pequeño', value: 'Pequeño' }, //valores que van a tener los va
+		{ label: 'Pequeño', value: 'Pequeño' },
 		{ label: 'Mediano', value: 'Mediano' },
 		{ label: 'Grande', value: 'Grande' }
 	]);
