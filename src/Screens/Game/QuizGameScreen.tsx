@@ -90,7 +90,7 @@ export function QuizGameScreen({
 					</Card>
 				</Card>
 			</Card>
-			<View style={{ marginTop: 25 }}>
+			<View style={styles.answerContainer}>
 				{quizzGame.game_questions.length > 0 &&
 					quizzGame.game_questions[question].answers.map((data, index) => (
 						<TouchableHighlight
@@ -218,13 +218,15 @@ export function QuizGameScreen({
 const createStyles = () =>
 	StyleSheet.create({
 		container: {
-			height: '100%',
+			flex: 1,
+			backgroundColor: '#fff',
 			alignItems: 'center',
-			paddingTop: 50
+			flexDirection: 'column',
 		},
 		cardContainer: {
 			width: 325,
 			height: 150,
+			backgroundColor: '#EDE4AB',
 			justifyContent: 'center',
 			alignItems: 'center'
 		},
@@ -232,6 +234,15 @@ const createStyles = () =>
 			fontSize: 20,
 			fontWeight: 'bold',
 			textAlign: 'center'
+		},
+		answerContainer: {
+			marginTop: 25,
+			backgroundColor: '#B2AAED',
+			width: '88%',
+			padding: 25,
+			borderRadius: 10,
+			alignSelf: 'center',
+			justifyContent: 'center'
 		},
 		buttonAnswer: {
 			width: 'auto',
