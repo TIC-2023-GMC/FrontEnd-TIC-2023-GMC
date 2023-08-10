@@ -68,6 +68,7 @@ export function QuizGameScreen({
 		}
 	}, [quizzGame.game_score]);
 
+	const [buttonPressed, setButtonPressed] = useState(false);
 	return (
 		<ImageBackground source={image} resizeMode="cover" style={styles.container}>
 			<Text>
@@ -95,7 +96,7 @@ export function QuizGameScreen({
 					quizzGame.game_questions[question].answers.map((data, index) => (
 						<TouchableHighlight
 							key={index}
-							style={styles.buttonAnswer}
+							style={[styles.buttonAnswer, buttonPressed ? styles.buttonPressed : null]}
 							onPress={() => {
 								setQuestion((prevQuestion) => (prevQuestion === 0 ? 0 : prevQuestion - 1));
 								setQuizzGame((prevQuizzGame) => {
@@ -127,7 +128,15 @@ export function QuizGameScreen({
 									setModalVisible(true);
 								}
 							}}
-							underlayColor={data.is_correct ? '#40FF49' : '#FF4040'}
+							onLongPress={() => {
+								setButtonPressed(true);
+							}}
+							onPressOut={() => {
+								setButtonPressed(false);
+							}}
+							underlayColor={
+								buttonPressed ? 'transparent' : data.is_correct ? '#40FF49' : '#FF4040'
+							}
 						>
 							<Text style={styles.buttonText}>{data.answer_text}</Text>
 						</TouchableHighlight>
@@ -320,5 +329,8 @@ const createStyles = () =>
 		acceptButton: {
 			width: '88%',
 			alignSelf: 'center'
+		},
+		buttonPressed: {
+			backgroundColor: 'white'
 		}
 	});
