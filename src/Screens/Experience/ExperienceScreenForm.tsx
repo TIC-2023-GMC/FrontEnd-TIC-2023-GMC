@@ -57,7 +57,7 @@ export function ExperienceScreenForm() {
 			setImage(undefined);
 		}
 	});
-	
+
 	const onSubmit: SubmitHandler<ExperiencePublication> = async (data) => {
 		if (image) {
 			setLoading(true);

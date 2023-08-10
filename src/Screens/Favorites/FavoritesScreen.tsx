@@ -75,7 +75,7 @@ export function FavoritesScreen() {
 			fetchNextPage();
 		}
 	};
-	
+
 	useFocusEffect(
 		useCallback(() => {
 			refetch();
