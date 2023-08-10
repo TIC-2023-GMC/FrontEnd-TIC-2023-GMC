@@ -9,7 +9,7 @@ import { UserContext, UserContextParams } from '../../auth/userContext';
 
 //get from API
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
-const level_images = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
+const levelImages = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
 export function QuizGameScreen({
 	visible,
 	setVisible
@@ -17,6 +17,7 @@ export function QuizGameScreen({
 	visible: boolean;
 	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+	const styles = createStyles();
 	const { user } = useContext<UserContextParams>(UserContext);
 	const [quizzGame, setQuizzGame] = useState<GameQuiz>({
 		_id: '',
@@ -48,6 +49,7 @@ export function QuizGameScreen({
 			setQuestion(data?.game_questions?.length ? data?.game_questions?.length - 1 : 0);
 		}
 	});
+
 	const sendScoreQuizzGame = useMutation({
 		mutationFn: (data: GameQuiz) => put('/game/quiz_game', data).then((response) => response.data)
 	});
@@ -61,7 +63,6 @@ export function QuizGameScreen({
 		enabled: sendScoreQuizzGame.isSuccess
 	});
 
-	const styles = createStyles();
 	useEffect(() => {
 		if (question === 0) {
 			sendScoreQuizzGame.mutate(quizzGame);
@@ -82,7 +83,7 @@ export function QuizGameScreen({
 							{ transform: [{ rotateZ: '4deg' }], paddingHorizontal: 20 }
 						]}
 					>
-						<Text style={styles.questionStyle}>
+						<Text style={styles.questionText}>
 							{quizzGame.game_questions.length > 0
 								? quizzGame.game_questions[question].question_text
 								: ''}
@@ -134,65 +135,67 @@ export function QuizGameScreen({
 					))}
 				<Portal>
 					<Modal
-						contentContainerStyle={{
-							width: '90%',
-							borderRadius: 20,
-							justifyContent: 'center',
-							alignSelf: 'center',
-							backgroundColor: '#ffffff'
-						}}
+						contentContainerStyle={styles.leaderboardModal}
 						dismissable={false}
 						visible={modalVisible}
 						onDismiss={() => {
 							setModalVisible(!modalVisible);
 						}}
 					>
-						<Image source={level_images} style={styles.backgroundImage} />
+						<Image source={levelImages} style={styles.leaderboardBackgroundImage} />
 						{isFetching || isLoading ? (
 							<ActivityIndicator animating={true} size="large"></ActivityIndicator>
 						) : (
 							sendScoreQuizzGame.isSuccess &&
 							isSuccess && (
 								<>
-									<View style={styles.match}>
-										<Text style={styles.modalText}>¡Felcidades! {'\n'}Has Completado el Quiz</Text>
-										<Text style={styles.modalText}>
+									<View style={styles.gameStatisticsContainer}>
+										<Text style={styles.statisticsText}>
+											¡Felicidades!{'\n'}Has completado el Quiz.
+										</Text>
+										<Text style={styles.statisticsText}>
 											Tiempo: {minutes < 10 ? '0' + minutes : minutes}:
 											{seconds < 10 ? '0' + seconds : seconds}
 										</Text>
-										<Text style={styles.modalText}>Puntuación: {quizzGame.game_score}</Text>
+										<Text style={styles.statisticsText}>Puntuación: {quizzGame.game_score}</Text>
 									</View>
-									<View style={styles.leaderboard}>
-										<Text style={styles.leaderboardTextitle}>Tabla de Posiciones</Text>
-										<View
-											style={{
-												flexDirection: 'row',
-												justifyContent: 'space-between'
-											}}
-										>
-											<Text style={{ ...styles.leaderboardHeader, width: '15%', marginLeft: 15 }}>
-												Pos
-											</Text>
-											<Text style={{ ...styles.leaderboardHeader, width: '22%' }}>Puntos</Text>
-											<Text style={{ ...styles.leaderboardHeader, width: '40%', marginRight: 20 }}>
+									<View style={styles.leaderboardContainer}>
+										<Text style={styles.leaderboardTextTitle}>Tabla de Posiciones</Text>
+										<View style={styles.leaderboardHeaderGroup}>
+											<Text style={[styles.leaderboardHeader, styles.positionWidth]}>Pos</Text>
+											<Text style={[styles.leaderboardHeader, styles.pointsWidth]}>Puntos</Text>
+											<Text style={[styles.leaderboardHeader, styles.playerNameWidth]}>
 												Jugador
 											</Text>
 										</View>
+
 										{isSuccess &&
 											data[0]?.map((entry: UserScore, index: number) => (
-												<Card.Title
-													key={index}
-													title={`${index + 1}°       ${entry.game_score}           ${
-														entry.user_first_name
-													} ${entry.user_last_name}`}
-													titleStyle={styles.leaderboardText}
-												/>
+												<View key={index} style={styles.leaderboardHeaderGroup}>
+													<Text style={[styles.leaderboardScoreText, styles.positionWidth]}>
+														{index + 1}°
+													</Text>
+													<Text style={[styles.leaderboardScoreText, styles.pointsWidth]}>
+														{entry.game_score}
+													</Text>
+													<Text style={[styles.leaderboardScoreText, styles.playerNameWidth]}>
+														{entry.user_first_name + '\n' + entry.user_last_name}
+													</Text>
+												</View>
 											))}
-										<Text style={styles.leaderboardTextitle}>Tu posición:</Text>
-										<Card.Title
-											title={`${data[1]}°       ${quizzGame.game_score}             ${user.first_name} ${user.last_name}`}
-											titleStyle={styles.leaderboardText}
-										/>
+
+										<Text style={styles.leaderboardTextTitle}>Tu posición:</Text>
+										<View style={styles.leaderboardHeaderGroup}>
+											<Text style={[styles.leaderboardScoreText, styles.positionWidth]}>
+												{data[1]}°
+											</Text>
+											<Text style={[styles.leaderboardScoreText, styles.pointsWidth]}>
+												{quizzGame.game_score}
+											</Text>
+											<Text style={[styles.leaderboardScoreText, styles.playerNameWidth]}>
+												{user.first_name + '\n' + user.last_name}
+											</Text>
+										</View>
 									</View>
 									<Button
 										style={styles.acceptButton}
@@ -228,7 +231,7 @@ const createStyles = () =>
 			justifyContent: 'center',
 			alignItems: 'center'
 		},
-		questionStyle: {
+		questionText: {
 			fontSize: 20,
 			fontWeight: 'bold',
 			textAlign: 'center'
@@ -247,67 +250,89 @@ const createStyles = () =>
 			paddingVertical: 2,
 			paddingHorizontal: 2
 		},
-		match: {
+		leaderboardModal: {
+			height: '80%',
+			width: '90%',
+			borderRadius: 20,
+			justifyContent: 'space-between',
+			alignSelf: 'center',
+			backgroundColor: '#fff',
+			paddingVertical: 20
+		},
+		leaderboardBackgroundImage: {
+			position: 'absolute',
+			width: '100%',
+			height: '100%'
+		},
+		gameStatisticsContainer: {
 			backgroundColor: '#EDE4AB',
-			width: '88%',
-			height: '23%',
+			width: '90%',
+			height: '25%',
 			borderRadius: 10,
-			marginBottom: 20,
-			alignSelf: 'center'
+			alignSelf: 'center',
+			justifyContent: 'space-between',
+			paddingVertical: 10
 		},
-
-		textStyle: {
-			color: 'white',
-			fontWeight: 'bold',
-			textAlign: 'center'
-		},
-		modalText: {
-			marginBottom: 15,
+		statisticsText: {
 			textAlign: 'center',
 			fontWeight: 'bold',
 			fontSize: 20,
 			color: '#534F6E'
 		},
-		backgroundImage: {
-			position: 'absolute',
-			width: '100%',
-			height: '100%'
-		},
-		leaderboard: {
+		leaderboardContainer: {
 			backgroundColor: '#B2AAED',
-			width: '88%',
-			height: '50%',
+			width: '90%',
+			height: '62%',
 			borderRadius: 10,
-			marginBottom: 20,
-			alignSelf: 'center'
+			alignSelf: 'center',
+			paddingVertical: 10,
+			alignItems: 'center'
 		},
-		leaderboardTextitle: {
+		leaderboardTextTitle: {
 			color: '#ffffff',
 			fontWeight: 'bold',
 			fontSize: 20,
 			textAlign: 'center',
 			fontFamily: 'sans-serif'
 		},
+		leaderboardHeaderGroup: {
+			width: '90%',
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			marginVertical: 5
+		},
 		leaderboardHeader: {
+			justifyContent: 'center',
 			backgroundColor: '#EDE4AB',
-			paddingHorizontal: 5,
+			textAlign: 'center',
+			fontFamily: 'sans-serif',
+			fontSize: 15,
+			color: '#000000',
+			borderRadius: 5
+		},
+		positionWidth: {
+			width: '15%'
+		},
+		pointsWidth: {
+			width: '25%'
+		},
+		playerNameWidth: {
+			width: '50%'
+		},
+		leaderboardScoreText: {
+			width: 'auto',
+			paddingHorizontal: 10,
+			justifyContent: 'center',
+			backgroundColor: 'rgba(255,255,255,0.5)',
 			textAlign: 'center',
 			fontFamily: 'sans-serif',
 			fontSize: 17,
-			color: '#000000',
-			width: '35%'
-		},
-		leaderboardText: {
-			paddingHorizontal: 20,
-			fontFamily: 'sans-serif',
-			fontSize: 17,
 			color: '#534F6E',
-			backgroundColor: 'rgba(255,255,255,0.5)',
-			marginRight: 15,
-			borderRadius: 5
+			borderRadius: 5,
+			textAlignVertical: 'center'
 		},
 		acceptButton: {
-			width: '88%',
+			width: '90%',
 			alignSelf: 'center'
 		}
 	});
