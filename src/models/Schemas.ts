@@ -1,6 +1,5 @@
 import { z } from 'zod';
 export const PhotoSchema = z.object({
-	_id: z.string(),
 	img_path: z.string()
 });
 

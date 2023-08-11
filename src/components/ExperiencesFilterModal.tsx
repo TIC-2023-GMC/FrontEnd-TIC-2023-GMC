@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
 import { registerTranslation, DatePickerInput } from 'react-native-paper-dates';
-import { Filter } from '../Screens/Experience/ExperienceScreen';
+import { ExperienceFilter } from '../Screens/Experience/ExperienceScreen';
 registerTranslation('es', {
 	save: 'Guardar',
 	selectSingle: 'Seleccionar fecha',
@@ -28,9 +28,9 @@ interface FilterModalProps {
 	visible: boolean;
 	navBarHeight: number;
 	handlerVisible: () => void;
-	onApplyFilter: React.Dispatch<React.SetStateAction<Filter>>;
+	onApplyFilter: React.Dispatch<React.SetStateAction<ExperienceFilter>>;
 	handlerCancel: () => void;
-	filter: Filter;
+	filter: ExperienceFilter;
 }
 
 const FilterModal = ({

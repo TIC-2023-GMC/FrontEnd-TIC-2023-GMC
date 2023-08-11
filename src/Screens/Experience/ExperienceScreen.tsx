@@ -8,16 +8,13 @@ import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/ExperiencesFilterModal';
-import { ExperiencePublication } from '../../models/InterfacesModels';
+import { ExperienceFilter, ExperiencePublication } from '../../models/InterfacesModels';
 import ExperienceCard from '../../components/ExperienceCard';
+import { getListExperiencesEnpoint } from '../../services/endpoints';
 
 interface ExperiencePublicationScreen {
 	0: ExperiencePublication[];
 	1: number;
-}
-export interface Filter {
-	species: string | undefined;
-	date: Date | undefined;
 }
 
 const MemoizedExperienceCard = memo(ExperienceCard);
@@ -34,7 +31,7 @@ export function ExperienceScreen({
 	const theme = useTheme();
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
-	const [filter, setFilter] = useState<Filter>({} as Filter);
+	const [filter, setFilter] = useState<ExperienceFilter>({} as ExperienceFilter);
 	const pageSize = 2;
 	useScrollToTop(ref);
 
@@ -49,9 +46,7 @@ export function ExperienceScreen({
 				}
 
 				const response = await get<ExperiencePublicationScreen>(
-					`experiences/list?page_number=${pageParam}&page_size=${pageSize}${
-						filter?.species ? '&species=' + filter.species : ''
-					}${filter?.date ? '&date=' + new_date?.toISOString() : ''}`
+					getListExperiencesEnpoint({ pageParam, pageSize, filter, new_date })
 				);
 				return response.data;
 			},
@@ -83,7 +78,7 @@ export function ExperienceScreen({
 				navBarHeight={tabBarHeight}
 				handlerVisible={() => setVisibleFilter(false)}
 				onApplyFilter={setFilter}
-				handlerCancel={() => setFilter({} as Filter)}
+				handlerCancel={() => setFilter({} as ExperienceFilter)}
 			/>
 			<FlatList
 				style={{
@@ -130,3 +125,4 @@ export function ExperienceScreen({
 		</>
 	);
 }
+export { ExperienceFilter };

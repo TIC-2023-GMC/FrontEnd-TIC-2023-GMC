@@ -361,7 +361,6 @@ export function UserAptitudeScreenForm() {
 					buttonColor={theme.colors.tertiary}
 					textColor={theme.colors.secondary}
 					onPress={() => {
-						setImage(undefined);
 						reset();
 						navigation.goBack();
 					}}
