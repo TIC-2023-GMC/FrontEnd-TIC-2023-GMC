@@ -12,14 +12,27 @@ export const UserSchema = z.object({
 	neighborhood: z.string(),
 	email: z.string().email(),
 	password: z.string(),
-	num_previous_pets: z.number(),
-	num_current_pets: z.number(),
-	outdoor_hours: z.number(),
-	house_space: z.number(),
-	has_yard: z.boolean(),
-	main_pet_food: z.string(),
-	pet_expenses: z.number(),
-	motivation: z.string(),
+	num_previous_pets: z
+		.number({ invalid_type_error: 'Por favor, ingrese un número entero mayor o igual a 0' })
+		.gte(0, 'El número de mascotas previas debe ser mayor o igual a 0'),
+	num_current_pets: z
+		.number({ invalid_type_error: 'Por favor, ingrese un número entero mayor o igual a 0' })
+		.gte(0, 'El número de mascotas actuales debe ser mayor o igual a 0'),
+	outdoor_hours: z
+		.number({ invalid_type_error: 'Por favor, ingrese un número entero mayor o igual a 0' })
+		.min(0, 'El número de horas fuera de casa deber estar entre 0 y 24')
+		.max(24, 'El número de horas fuera de casa deber estar entre 0 y 24'),
+	house_space: z
+		.number({ invalid_type_error: 'Por favor, ingrese un número entero mayor a 0' })
+		.gt(0, 'La extensión del domicilio debe ser mayor a 0'),
+	has_yard: z.boolean({
+		required_error: 'Por favor, seleccione si su casa tiene patio o no'
+	}),
+	main_pet_food: z.string().nonempty('El principal tipo de alimento de sus mascotas es requerido'),
+	pet_expenses: z
+		.number({ invalid_type_error: 'Por favor, ingrese un número entero mayor o igual a 0' })
+		.gte(0, 'El gasto promedio por mascota debe ser mayor o igual a 0'),
+	motivation: z.string().nonempty('Su motivación para adoptar es requerida').max(150, 'Por favor, ingrese una motivación de 150 caracteres o menos'),
 	favorite_adoption_publications: z.array(z.string()),
 	photo: PhotoSchema
 });
@@ -45,7 +58,9 @@ export const AdoptionPublicationSchema = z.object({
 	species: z.string().nonempty('La especie del animal es requerida'),
 	pet_size: z.string().nonempty('El tamaño del animal es requerido'),
 	pet_breed: z.string().nonempty('La raza del animal es requerida'),
-	pet_age: z.number().positive('La edad del animal debe ser un número positivo'),
+	pet_age: z
+		.number({ invalid_type_error: 'Por favor, ingrese un número entero en la edad' })
+		.positive('La edad del animal debe ser un número positivo'),
 	pet_sex: z.boolean({
 		required_error: 'El sexo del animal es requerido'
 	}),
@@ -63,4 +78,15 @@ export const ExperiencePublicationSchema = z.object({
 	likes: z.optional(z.array(Like)),
 	comments: z.optional(z.array(Comment)),
 	species: z.string().nonempty('La especie del animal es requerida')
+});
+
+export const UserAptitudeSchema = UserSchema.pick({
+	num_previous_pets: true,
+	num_current_pets: true,
+	outdoor_hours: true,
+	house_space: true,
+	has_yard: true,
+	main_pet_food: true,
+	pet_expenses: true,
+	motivation: true
 });
