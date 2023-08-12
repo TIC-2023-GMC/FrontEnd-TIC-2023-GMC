@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, StyleSheet, ImageBackground, Image, TouchableHighlight } from 'react-native';
-import { ActivityIndicator, Button, Card, Text, Modal, Portal } from 'react-native-paper';
+import { View, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Button, Card, Text, Modal, Portal, Snackbar } from 'react-native-paper';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { GameQuiz, UserScore } from '../../models/InterfacesModels';
 import { get, put } from '../../services/api';
 import { useStopwatch } from 'react-timer-hook';
 import { UserContext, UserContextParams } from '../../auth/userContext';
 
-//get from API
+const timeOutAnswer = 3000;
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
 const level_images = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
 export function QuizGameScreen({
@@ -30,6 +30,8 @@ export function QuizGameScreen({
 		game_time: 0
 	});
 	const [question, setQuestion] = useState(-1);
+	const [isClicked, setIsClicked] = useState(-1);
+	const [snackbarVisible, setSnackbarVisible] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
 	const { totalSeconds, seconds, minutes, pause, reset } = useStopwatch({
 		autoStart: true
@@ -68,13 +70,17 @@ export function QuizGameScreen({
 		}
 	}, [quizzGame.game_score]);
 
-	const [buttonPressed, setButtonPressed] = useState(false);
+	const handlePress = (answerIndex: number) => {
+		setIsClicked(answerIndex);
+		setSnackbarVisible(true);
+		setTimeout(() => setIsClicked(-1), timeOutAnswer - 100); // Cambia el color de vuelta después de 2 segundos
+	};
 	return (
 		<ImageBackground source={image} resizeMode="cover" style={styles.container}>
-			<Text>
+			<Text style={{ margin: 10 }}>{quizzGame?.game_description}</Text>
+			<Text style={styles.timer}>
 				{minutes < 10 ? '0' + minutes : minutes}:{seconds < 10 ? '0' + seconds : seconds}
 			</Text>
-			<Text style={{ margin: 25 }}>{quizzGame?.game_description}</Text>
 			<Card style={[styles.cardContainer, { transform: [{ rotateZ: '4deg' }] }]}>
 				<Card style={[styles.cardContainer, { transform: [{ rotateZ: '-8deg' }] }]}>
 					<Card
@@ -94,11 +100,18 @@ export function QuizGameScreen({
 			<View style={styles.answerContainer}>
 				{quizzGame.game_questions.length > 0 &&
 					quizzGame.game_questions[question].answers.map((data, index) => (
-						<TouchableHighlight
+						<TouchableOpacity
 							key={index}
-							style={[styles.buttonAnswer, buttonPressed ? styles.buttonPressed : null]}
+							disabled={isClicked !== -1}
+							style={[
+								styles.buttonAnswer,
+								isClicked !== -1 ? (data.is_correct ? styles.clicked : styles.notClicked) : null
+							]}
 							onPress={() => {
-								setQuestion((prevQuestion) => (prevQuestion === 0 ? 0 : prevQuestion - 1));
+								handlePress(index);
+								setTimeout(() => {
+									setQuestion((prevQuestion) => (prevQuestion === 0 ? 0 : prevQuestion - 1));
+								}, timeOutAnswer);
 								setQuizzGame((prevQuizzGame) => {
 									if (data.is_correct) {
 										const object: GameQuiz = {
@@ -128,98 +141,105 @@ export function QuizGameScreen({
 									setModalVisible(true);
 								}
 							}}
-							onLongPress={() => {
-								setButtonPressed(true);
-							}}
-							onPressOut={() => {
-								setButtonPressed(false);
-							}}
-							underlayColor={
-								buttonPressed ? 'transparent' : data.is_correct ? '#40FF49' : '#FF4040'
-							}
 						>
 							<Text style={styles.buttonText}>{data.answer_text}</Text>
-						</TouchableHighlight>
+						</TouchableOpacity>
 					))}
-				<Portal>
-					<Modal
-						contentContainerStyle={{
-							width: '90%',
-							borderRadius: 20,
-							justifyContent: 'center',
-							alignSelf: 'center',
-							backgroundColor: '#ffffff'
-						}}
-						dismissable={false}
-						visible={modalVisible}
-						onDismiss={() => {
-							setModalVisible(!modalVisible);
-						}}
-					>
-						<Image source={level_images} style={styles.backgroundImage} />
-						{isFetching || isLoading ? (
-							<ActivityIndicator animating={true} size="large"></ActivityIndicator>
-						) : (
-							sendScoreQuizzGame.isSuccess &&
-							isSuccess && (
-								<>
-									<View style={styles.match}>
-										<Text style={styles.modalText}>¡Felcidades! {'\n'}Has Completado el Quiz</Text>
-										<Text style={styles.modalText}>
-											Tiempo: {minutes < 10 ? '0' + minutes : minutes}:
-											{seconds < 10 ? '0' + seconds : seconds}
-										</Text>
-										<Text style={styles.modalText}>Puntuación: {quizzGame.game_score}</Text>
-									</View>
-									<View style={styles.leaderboard}>
-										<Text style={styles.leaderboardTextitle}>Tabla de Posiciones</Text>
-										<View
-											style={{
-												flexDirection: 'row',
-												justifyContent: 'space-between'
-											}}
-										>
-											<Text style={{ ...styles.leaderboardHeader, width: '15%', marginLeft: 15 }}>
-												Pos
-											</Text>
-											<Text style={{ ...styles.leaderboardHeader, width: '22%' }}>Puntos</Text>
-											<Text style={{ ...styles.leaderboardHeader, width: '40%', marginRight: 20 }}>
-												Jugador
-											</Text>
-										</View>
-										{isSuccess &&
-											data[0]?.map((entry: UserScore, index: number) => (
-												<Card.Title
-													key={index}
-													title={`${index + 1}°       ${entry.game_score}           ${
-														entry.user_first_name
-													} ${entry.user_last_name}`}
-													titleStyle={styles.leaderboardText}
-												/>
-											))}
-										<Text style={styles.leaderboardTextitle}>Tu posición:</Text>
-										<Card.Title
-											title={`${data[1]}°       ${quizzGame.game_score}             ${user.first_name} ${user.last_name}`}
-											titleStyle={styles.leaderboardText}
-										/>
-									</View>
-									<Button
-										style={styles.acceptButton}
-										mode="contained"
-										onPress={() => {
-											setModalVisible(!modalVisible);
-											reset();
-											setVisible(!visible);
+			</View>
+			{quizzGame.game_questions.length > 0 && (
+				<Snackbar
+					onIconPress={() => setSnackbarVisible(false)}
+					icon={
+						quizzGame.game_questions[question].answers[isClicked]
+							? quizzGame.game_questions[question].answers[isClicked].is_correct
+								? 'check-all'
+								: 'close'
+							: ''
+					}
+					style={styles.snackbarStyle}
+					duration={timeOutAnswer - 1000}
+					visible={snackbarVisible}
+					onDismiss={() => setSnackbarVisible(false)}
+				>
+					{quizzGame.game_questions[question].answers[isClicked]
+						? !quizzGame.game_questions[question].answers[isClicked].is_correct
+							? 'Oh no! es incorrecto'
+							: 'Muy bien! es correcto'
+						: ''}
+				</Snackbar>
+			)}
+			<Portal>
+				<Modal
+					contentContainerStyle={styles.modalContainer}
+					dismissable={false}
+					visible={modalVisible}
+					onDismiss={() => {
+						setModalVisible(!modalVisible);
+					}}
+				>
+					<Image source={level_images} style={styles.backgroundImage} />
+					{isFetching || isLoading ? (
+						<ActivityIndicator animating={true} size="large"></ActivityIndicator>
+					) : (
+						sendScoreQuizzGame.isSuccess &&
+						isSuccess && (
+							<>
+								<View style={styles.match}>
+									<Text style={styles.modalText}>¡Felcidades! {'\n'}Has Completado el Quiz</Text>
+									<Text style={styles.modalText}>
+										Tiempo: {minutes < 10 ? '0' + minutes : minutes}:
+										{seconds < 10 ? '0' + seconds : seconds}
+									</Text>
+									<Text style={styles.modalText}>Puntuación: {quizzGame.game_score}</Text>
+								</View>
+								<View style={styles.leaderboard}>
+									<Text style={styles.leaderboardTextitle}>Tabla de Posiciones</Text>
+									<View
+										style={{
+											flexDirection: 'row',
+											justifyContent: 'space-between'
 										}}
 									>
-										ACEPTAR
-									</Button>
-								</>
-							)
-						)}
-					</Modal>
-				</Portal>
-			</View>
+										<Text style={{ ...styles.leaderboardHeader, width: '15%', marginLeft: 15 }}>
+											Pos
+										</Text>
+										<Text style={{ ...styles.leaderboardHeader, width: '22%' }}>Puntos</Text>
+										<Text style={{ ...styles.leaderboardHeader, width: '40%', marginRight: 20 }}>
+											Jugador
+										</Text>
+									</View>
+									{isSuccess &&
+										data[0]?.map((entry: UserScore, index: number) => (
+											<Card.Title
+												key={index}
+												title={`${index + 1}°       ${entry.game_score}           ${
+													entry.user_first_name
+												} ${entry.user_last_name}`}
+												titleStyle={styles.leaderboardText}
+											/>
+										))}
+									<Text style={styles.leaderboardTextitle}>Tu posición:</Text>
+									<Card.Title
+										title={`${data[1]}°       ${quizzGame.game_score}             ${user.first_name} ${user.last_name}`}
+										titleStyle={styles.leaderboardText}
+									/>
+								</View>
+								<Button
+									style={styles.acceptButton}
+									mode="contained"
+									onPress={() => {
+										setModalVisible(!modalVisible);
+										reset();
+										setVisible(!visible);
+									}}
+								>
+									ACEPTAR
+								</Button>
+							</>
+						)
+					)}
+				</Modal>
+			</Portal>
 		</ImageBackground>
 	);
 }
@@ -239,6 +259,12 @@ const createStyles = () =>
 			justifyContent: 'center',
 			alignItems: 'center'
 		},
+		timer: {
+			fontSize: 35,
+			fontWeight: 'bold',
+			color: '#333',
+			textAlign: 'center'
+		},
 		questionStyle: {
 			fontSize: 20,
 			fontWeight: 'bold',
@@ -247,14 +273,15 @@ const createStyles = () =>
 		answerContainer: {
 			marginTop: 25,
 			backgroundColor: '#B2AAED',
-			width: '88%',
+			width: '90%',
 			padding: 25,
 			borderRadius: 10,
 			alignSelf: 'center',
+			alignItems: 'center',
 			justifyContent: 'center'
 		},
 		buttonAnswer: {
-			width: 'auto',
+			width: '100%',
 			marginTop: 20,
 			borderRadius: 10,
 			backgroundColor: '#ffffff',
@@ -280,6 +307,13 @@ const createStyles = () =>
 			color: 'white',
 			fontWeight: 'bold',
 			textAlign: 'center'
+		},
+		modalContainer: {
+			width: '90%',
+			borderRadius: 20,
+			justifyContent: 'center',
+			alignSelf: 'center',
+			backgroundColor: '#ffffff'
 		},
 		modalText: {
 			marginBottom: 15,
@@ -330,7 +364,11 @@ const createStyles = () =>
 			width: '88%',
 			alignSelf: 'center'
 		},
-		buttonPressed: {
-			backgroundColor: 'white'
+		clicked: { backgroundColor: '#40FF49' },
+		notClicked: { backgroundColor: '#FF4040' },
+		snackbarStyle: {
+			width: '90%',
+			alignSelf: 'center',
+			marginBottom: 20
 		}
 	});
