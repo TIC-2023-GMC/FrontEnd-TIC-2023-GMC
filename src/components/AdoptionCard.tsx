@@ -8,14 +8,14 @@ import { AdoptionPublication, SaveOrRemoveFavoriteProps, User } from '../models/
 import { MutateOptions } from '@tanstack/react-query';
 
 interface ModalProps {
-	onOpenModal: (_p: AdoptionPublication) => void;
+	onOpenModal?: (_p: AdoptionPublication) => void;
 	userAccount: User;
 	setUserAccount: React.Dispatch<React.SetStateAction<User>>;
-	onSaveAsFavorite: (
+	onSaveAsFavorite?: (
 		variables: SaveOrRemoveFavoriteProps,
 		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
 	) => void;
-	onRemoveFromFavorites: (
+	onRemoveFromFavorites?: (
 		variables: SaveOrRemoveFavoriteProps,
 		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
 	) => void;
@@ -38,6 +38,7 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 		user,
 		pet_age: petAge,
 		pet_size: petSize,
+		pet_breed: petBreed,
 		description,
 		pet_location: petLocation,
 		publication_date: publicationDate,
@@ -87,7 +88,11 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 					</Text>
 				}
 				left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
-				right={() => <IconButton icon="dots-vertical" onPress={() => onOpenModal(adoption)} />}
+				right={
+					onOpenModal !== undefined
+						? () => <IconButton icon="dots-vertical" onPress={() => onOpenModal(adoption)} />
+						: undefined
+				}
 			/>
 			<Card.Cover
 				theme={{ ...theme, roundness: 0.5 }}
@@ -158,6 +163,7 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 			</Card.Content>
 			{expanded && (
 				<Card.Content>
+					<List.Item style={styles.list} title="Raza" description={petBreed} />
 					<List.Item style={styles.list} title="Descripción" description={description} />
 				</Card.Content>
 			)}
@@ -169,40 +175,42 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 					</Button>
 				</View>
 				<View style={styles.actionsContainer}>
-					<View style={styles.actions}>
-						<IconButton
-							onPress={() => {
-								if (!checkedFavorite) {
-									onSaveAsFavorite(removeRequest, {
-										onSuccess: () => {
-											setUserAccount({
-												...userAccount,
-												favorite_adoption_publications: [
-													...userAccount.favorite_adoption_publications,
-													adoption._id
-												]
-											});
-										}
-									});
-								} else {
-									onRemoveFromFavorites(removeRequest, {
-										onSuccess: () => {
-											setUserAccount({
-												...userAccount,
-												favorite_adoption_publications:
-													userAccount.favorite_adoption_publications.filter(
-														(id) => id !== adoption._id
-													)
-											});
-										}
-									});
-								}
-							}}
-							icon={`bookmark`}
-							iconColor={!checkedFavorite ? theme.colors.tertiary : theme.colors.primary}
-							size={28}
-						/>
-					</View>
+					{(onSaveAsFavorite !== undefined || onRemoveFromFavorites !== undefined) && (
+						<View style={styles.actions}>
+							<IconButton
+								onPress={() => {
+									if (!checkedFavorite && onSaveAsFavorite !== undefined) {
+										onSaveAsFavorite(removeRequest, {
+											onSuccess: () => {
+												setUserAccount({
+													...userAccount,
+													favorite_adoption_publications: [
+														...userAccount.favorite_adoption_publications,
+														adoption._id
+													]
+												});
+											}
+										});
+									} else if (checkedFavorite && onRemoveFromFavorites !== undefined) {
+										onRemoveFromFavorites(removeRequest, {
+											onSuccess: () => {
+												setUserAccount({
+													...userAccount,
+													favorite_adoption_publications:
+														userAccount.favorite_adoption_publications.filter(
+															(id) => id !== adoption._id
+														)
+												});
+											}
+										});
+									}
+								}}
+								icon={`bookmark`}
+								iconColor={!checkedFavorite ? theme.colors.tertiary : theme.colors.primary}
+								size={28}
+							/>
+						</View>
+					)}
 					<View style={styles.actions}>
 						<IconButton
 							animated={true}

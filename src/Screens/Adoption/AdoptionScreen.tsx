@@ -9,20 +9,23 @@ import AdoptionCard from '../../components/AdoptionCard';
 import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/AdoptionsFilterModal';
-import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../../models/InterfacesModels';
 import { useFocusEffect } from '@react-navigation/native';
 import MoreOptionsModal from '../../components/MoreOptionsModal';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import {
+	getAddFavoriteAdoptionEndpoint,
+	getListAdoptionsEndpoint,
+	getRemoveFavoriteAdoptionEndpoint
+} from '../../services/endpoints';
+import {
+	AdoptionPublication,
+	AdoptionFilter,
+	SaveOrRemoveFavoriteProps
+} from '../../models/InterfacesModels';
 
 interface AdoptionPublicationScreen {
 	0: AdoptionPublication[];
 	1: number;
-}
-
-export interface Filter {
-	species: string | undefined;
-	date: Date | undefined;
-	location: string | undefined;
 }
 
 const MemoizedAdoptionCard = memo(AdoptionCard);
@@ -42,7 +45,7 @@ export function AdoptionScreen({
 	const [visibleSnackBar, setvisibleSnackBar] = useState([false, false]);
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
-	const [filter, setFilter] = useState<Filter>({} as Filter);
+	const [filter, setFilter] = useState<AdoptionFilter>({} as AdoptionFilter);
 	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
 	const [publicationSelected, setPublicationSelected] = useState<AdoptionPublication>({
 		_id: '',
@@ -50,7 +53,6 @@ export function AdoptionScreen({
 		description: '',
 		publication_date: new Date(),
 		photo: {
-			_id: '',
 			img_path: ''
 		},
 		likes: [],
@@ -72,19 +74,12 @@ export function AdoptionScreen({
 			queryKey: ['Adoption', filter],
 			queryFn: async ({ pageParam = 1 }) => {
 				const new_date = filter?.date ? new Date(filter?.date) : undefined;
-
 				if (new_date) {
 					new_date.setUTCHours(0, 0, 0, 0);
 				}
-
 				const response = await get<AdoptionPublicationScreen>(
-					`adoptions/list?page_number=${pageParam}&page_size=${pageSize}${
-						filter?.species ? '&species=' + filter.species : ''
-					}${filter?.date ? '&date=' + new_date?.toISOString() : ''}${
-						filter?.location ? '&location=' + filter?.location : ''
-					}`
+					getListAdoptionsEndpoint({ pageParam, filter, pageSize, new_date })
 				);
-
 				return response.data;
 			},
 			getNextPageParam: (lastPage) => {
@@ -108,7 +103,7 @@ export function AdoptionScreen({
 
 	const savePublicationAsFavoriteMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) => {
-			return post('/user/add_favorite_adoption', data).then((response) => response.data);
+			return post(getAddFavoriteAdoptionEndpoint(), data).then((response) => response.data);
 		},
 		onSuccess: () => {
 			setvisibleSnackBar([true, false]);
@@ -120,7 +115,7 @@ export function AdoptionScreen({
 
 	const removePublicationFromFavoritesMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
-			del('/user/remove_favorite_adoption', { data: data }).then((response) => response.data),
+			del(getRemoveFavoriteAdoptionEndpoint(), { data: data }).then((response) => response.data),
 		onSuccess: () => {
 			setvisibleSnackBar([false, true]);
 		},
@@ -149,7 +144,7 @@ export function AdoptionScreen({
 				navBarHeight={tabBarHeight}
 				handlerVisible={() => setVisibleFilter(false)}
 				onApplyFilter={setFilter}
-				handlerCancel={() => setFilter({} as Filter)}
+				handlerCancel={() => setFilter({} as AdoptionFilter)}
 			/>
 			<FlatList
 				style={{
@@ -223,3 +218,4 @@ export function AdoptionScreen({
 		</>
 	);
 }
+export { AdoptionFilter };

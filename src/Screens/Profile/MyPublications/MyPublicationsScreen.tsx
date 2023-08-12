@@ -1,53 +1,42 @@
-import React, { useRef, useState, memo, useCallback } from 'react';
+import React, { useRef, memo, useCallback, useContext } from 'react';
 import { Text, View, FlatList, RefreshControl } from 'react-native';
-import { styles } from './ExperienceScreen.styles';
+import { styles } from './MyPublicationsScreen.styles';
 import { StatusBar } from 'expo-status-bar';
-import { get } from '../../services/api';
+import { get } from '../../../services/api';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
-import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
+import AdoptionCard from '../../../components/AdoptionCard';
+import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import FilterModal from '../../components/ExperiencesFilterModal';
-import { ExperienceFilter, ExperiencePublication } from '../../models/InterfacesModels';
-import ExperienceCard from '../../components/ExperienceCard';
-import { getListExperiencesEnpoint } from '../../services/endpoints';
+import { AdoptionPublication } from '../../../models/InterfacesModels';
+import { useFocusEffect } from '@react-navigation/native';
+import { UserContext, UserContextParams } from '../../../auth/userContext';
+import { getMyPublicationsEndpoint } from '../../../services/endpoints';
 
-interface ExperiencePublicationScreen {
-	0: ExperiencePublication[];
+interface MyPublicationsScreenValues {
+	0: AdoptionPublication[];
 	1: number;
 }
 
-const MemoizedExperienceCard = memo(ExperienceCard);
-const MemoizedFilterModal = memo(FilterModal);
+const MemoizedAdoptionCard = memo(AdoptionCard);
 
-export function ExperienceScreen({
-	visibleFilter,
-	setVisibleFilter
-}: {
-	visibleFilter: boolean;
-	// eslint-disable-next-line no-unused-vars
-	setVisibleFilter: (visible: boolean) => void;
-}) {
+export function MyPublicationsScreen() {
 	const theme = useTheme();
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
-	const [filter, setFilter] = useState<ExperienceFilter>({} as ExperienceFilter);
+	const { user, setUser } = useContext<UserContextParams>(UserContext);
+
 	const pageSize = 2;
 	useScrollToTop(ref);
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
 		useInfiniteQuery({
-			queryKey: ['Experience', filter],
+			queryKey: ['MyPublicationsScreen'],
 			queryFn: async ({ pageParam = 1 }) => {
-				const new_date = filter?.date ? new Date(filter?.date) : undefined;
-
-				if (new_date) {
-					new_date.setUTCHours(0, 0, 0, 0);
-				}
-
-				const response = await get<ExperiencePublicationScreen>(
-					getListExperiencesEnpoint({ pageParam, pageSize, filter, new_date })
+				const response = await get<MyPublicationsScreenValues>(
+					getMyPublicationsEndpoint({ pageParam, pageSize, user_id: user._id ? user._id : '' })
 				);
+
 				return response.data;
 			},
 			getNextPageParam: (lastPage) => {
@@ -63,6 +52,7 @@ export function ExperienceScreen({
 			fetchNextPage();
 		}
 	};
+
 	useFocusEffect(
 		useCallback(() => {
 			refetch();
@@ -72,14 +62,6 @@ export function ExperienceScreen({
 	return (
 		<>
 			<StatusBar style="light" />
-			<MemoizedFilterModal
-				filter={filter}
-				visible={visibleFilter}
-				navBarHeight={tabBarHeight}
-				handlerVisible={() => setVisibleFilter(false)}
-				onApplyFilter={setFilter}
-				handlerCancel={() => setFilter({} as ExperienceFilter)}
-			/>
 			<FlatList
 				style={{
 					...styles.section,
@@ -90,7 +72,9 @@ export function ExperienceScreen({
 				onEndReached={handleLoadMore}
 				ref={ref}
 				data={data?.pages.flatMap((page) => page[0])}
-				renderItem={({ item }) => <MemoizedExperienceCard {...item} />}
+				renderItem={({ item }) => (
+					<MemoizedAdoptionCard {...item} setUserAccount={setUser} userAccount={user} />
+				)}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={
@@ -125,4 +109,3 @@ export function ExperienceScreen({
 		</>
 	);
 }
-export { ExperienceFilter };
