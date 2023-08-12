@@ -12,7 +12,11 @@ import FilterModal from '../../components/AdoptionsFilterModal';
 import { useFocusEffect } from '@react-navigation/native';
 import MoreOptionsModal from '../../components/MoreOptionsModal';
 import { UserContext, UserContextParams } from '../../auth/userContext';
-import { getListAdoptionsEndpoint } from '../../services/endpoints';
+import {
+	getAddFavoriteAdoptionEndpoint,
+	getListAdoptionsEndpoint,
+	getRemoveFavoriteAdoptionEndpoint
+} from '../../services/endpoints';
 import {
 	AdoptionPublication,
 	AdoptionFilter,
@@ -99,7 +103,7 @@ export function AdoptionScreen({
 
 	const savePublicationAsFavoriteMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) => {
-			return post('/user/add_favorite_adoption', data).then((response) => response.data);
+			return post(getAddFavoriteAdoptionEndpoint(), data).then((response) => response.data);
 		},
 		onSuccess: () => {
 			setvisibleSnackBar([true, false]);
@@ -111,7 +115,7 @@ export function AdoptionScreen({
 
 	const removePublicationFromFavoritesMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
-			del('/user/remove_favorite_adoption', { data: data }).then((response) => response.data),
+			del(getRemoveFavoriteAdoptionEndpoint(), { data: data }).then((response) => response.data),
 		onSuccess: () => {
 			setvisibleSnackBar([false, true]);
 		},
