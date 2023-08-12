@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { IconButton, useTheme } from 'react-native-paper';
 
-export default function LeftHeaderActions({
+export default function RightHeaderActions({
 	visible,
 	setVisible,
 	setPublicationsVisibleFilter,
