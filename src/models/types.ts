@@ -6,4 +6,7 @@ export type TabNavigation = {
 	Perfil: undefined;
 	AdoptionScreenForm: undefined;
 	ExperienceScreenForm: undefined;
+	'Mis Publicaciones': undefined;
+	Favoritos: undefined;
+	'Editar Perfil': undefined;
 };

@@ -12,11 +12,16 @@ import { MyPublicationsScreen } from '../Screens/Profile/MyPublications';
 import { createStackNavigator } from '@react-navigation/stack';
 import RightHeaderActions from '../components/LeftHeaderActions';
 import { OrganizationScreen } from '../Screens/Organization';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { ProfileScreen } from '../Screens/Profile/ProfileScreen';
+import { UserAptitudeScreenForm } from '../Screens/User/UserAptitudeScreenForm';
 
 interface TabsNavigationProps {
 	visible: boolean;
 	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+const noTabBarRoutes = ['Agregar Adopción', 'Agregar Experiencia', 'Editar Perfil'];
 
 const Stack = createStackNavigator();
 
@@ -59,9 +64,10 @@ export function ProfileNavigationStack() {
 				headerLeft: () => null
 			}}
 		>
-			{/* <Stack.Screen name="Perfil" component={MyPublicationsScreen} /> */}
+			<Stack.Screen name="Profile" component={ProfileScreen} />
 			<Stack.Screen name="Mis Publicaciones" component={MyPublicationsScreen} />
 			<Stack.Screen name="Favoritos" component={FavoritesScreen} />
+			<Stack.Screen name="Editar Perfil" component={UserAptitudeScreenForm} />
 		</Stack.Navigator>
 	);
 }
@@ -90,23 +96,31 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 		<Tab.Navigator
 			backBehavior="initialRoute"
 			initialRouteName="Adopciones"
-			screenOptions={() => ({
-				tabBarStyle: styles.tabBar,
-				tabBarItemStyle: styles.tab,
-				tabBarActiveTintColor: theme.colors.tertiary,
-				tabBarInactiveTintColor: theme.colors.secondary,
-				tabBarActiveBackgroundColor: 'rgba(0,0,0,0.5)',
-				tabBarHideOnKeyboard: true,
-				headerStyle: {
-					backgroundColor: theme.colors.primary
-				},
-				headerTitleStyle: {
-					color: theme.colors.secondary,
-					fontWeight: 'bold',
-					fontSize: 24
-				},
-				headerTitleAlign: 'left'
-			})}
+			screenOptions={({ route }) => {
+				const routeName = getFocusedRouteNameFromRoute(route);
+				let tabBarVisible = true;
+
+				if (noTabBarRoutes.includes(routeName!)) {
+					tabBarVisible = false;
+				}
+				return {
+					tabBarStyle: tabBarVisible ? styles.tabBar : { display: 'none' },
+					tabBarItemStyle: styles.tab,
+					tabBarActiveTintColor: theme.colors.tertiary,
+					tabBarInactiveTintColor: theme.colors.secondary,
+					tabBarActiveBackgroundColor: 'rgba(0,0,0,0.5)',
+					tabBarHideOnKeyboard: true,
+					headerStyle: {
+						backgroundColor: theme.colors.primary
+					},
+					headerTitleStyle: {
+						color: theme.colors.secondary,
+						fontWeight: 'bold',
+						fontSize: 24
+					},
+					headerTitleAlign: 'left'
+				};
+			}}
 		>
 			<Tab.Screen
 				name="Adopciones"

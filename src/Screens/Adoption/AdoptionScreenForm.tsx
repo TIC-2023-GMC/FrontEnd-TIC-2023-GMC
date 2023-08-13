@@ -1,7 +1,7 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useContext, useState } from 'react';
-import { Text, View, ScrollView } from 'react-native';
+import React, { useCallback, useContext, useState } from 'react';
+import { Text, View, ScrollView, BackHandler } from 'react-native';
 import {
 	TextInput,
 	Checkbox,
@@ -19,8 +19,8 @@ import { post, get } from '../../services/api';
 import { AdoptionPublication, Photo } from '../../models/InterfacesModels';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigation } from '@react-navigation/native';
-import { parseNumber, uploadImg } from '../../utils/utils';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { parseNumber, resetNavigationStack, uploadImg } from '../../utils/utils';
 import { AdoptionPublicationSchema } from '../../models/Schemas';
 import { SnackBarError } from '../../components/SnackBarError';
 import { UserContext, UserContextParams } from '../../auth/userContext';
@@ -34,6 +34,20 @@ export function AdoptionScreenForm() {
 	const [image, setImage] = useState<string>();
 	const [loading, setLoading] = useState<boolean>(false);
 	const [failUpload, setFailUpload] = useState<string>('');
+
+	useFocusEffect(
+		useCallback(() => {
+			const handleBackPress = () => {
+				if (navigation.isFocused()) {
+					resetNavigationStack(navigation);
+					return true;
+				}
+				return false;
+			};
+			BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+		}, [])
+	);
 
 	const {
 		control,
@@ -90,8 +104,8 @@ export function AdoptionScreenForm() {
 			post(getAddAdoptionEndpoint(), data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
-			navigation.goBack();
 			reset();
+			resetNavigationStack(navigation);
 			setSize('');
 			setLocation('');
 			setImage(undefined);
@@ -397,7 +411,12 @@ export function AdoptionScreenForm() {
 				)}
 				name="description"
 			/>
-
+			{errors.user && (
+				<HelperText type="error">
+					NOTA: Debe completar los campos de &quot;Aptitud&quot; en su perfil para realizar
+					publicaciones
+				</HelperText>
+			)}
 			<View style={styles.buttonView}>
 				<Button
 					style={styles.button}
@@ -406,8 +425,9 @@ export function AdoptionScreenForm() {
 					textColor={theme.colors.secondary}
 					onPress={() => {
 						setImage(undefined);
+						setLoading(false);
 						reset();
-						navigation.goBack();
+						resetNavigationStack(navigation);
 					}}
 				>
 					Cancelar

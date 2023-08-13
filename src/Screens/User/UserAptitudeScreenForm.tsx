@@ -1,13 +1,13 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useContext, useState } from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import { TextInput, Divider, RadioButton, useTheme, Button, HelperText } from 'react-native-paper';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { styles } from './UserAptitudeScreenForm.styles';
-import { post, get } from '../../services/api';
-import { AdoptionPublication, Photo, UserAptitude } from '../../models/InterfacesModels';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { put } from '../../services/api';
+import { User, UserAptitude } from '../../models/InterfacesModels';
+import { useMutation } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import { parseNumber } from '../../utils/utils';
@@ -40,20 +40,8 @@ export function UserAptitudeScreenForm() {
 		}
 	});
 
-	const { isLoading } = useQuery({
-		queryKey: ['location'],
-		queryFn: async () => {
-			const response = await get<Location[]>('/parish/get_all');
-			return response.data;
-		},
-		onSuccess: (data) => {
-			console.log(data);
-		}
-	});
-
-	const createPublicationMutation = useMutation({
-		mutationFn: (data: AdoptionPublication) =>
-			post('/adoptions/add', data).then((response) => response.data),
+	const updateUserMutation = useMutation({
+		mutationFn: (data: User) => put('/user/update_user', data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
 			navigation.goBack();
@@ -62,7 +50,12 @@ export function UserAptitudeScreenForm() {
 	});
 
 	const onSubmit: SubmitHandler<UserAptitude> = async (data) => {
-		console.log(data);
+		setLoading(true);
+		const updatedUser: User = {
+			...user,
+			...data
+		};
+		updateUserMutation.mutate(updatedUser);
 	};
 
 	return (
@@ -375,7 +368,7 @@ export function UserAptitudeScreenForm() {
 					onPress={handleSubmit(onSubmit)}
 					loading={loading}
 				>
-					Publicar
+					Guardar
 				</Button>
 			</View>
 		</ScrollView>

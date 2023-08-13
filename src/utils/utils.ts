@@ -1,6 +1,7 @@
 import { uploadAsync, FileSystemUploadType } from 'expo-file-system';
 import { baseUrl } from '../services/api';
 import React from 'react';
+import { CommonActions, NavigationProp } from '@react-navigation/native';
 
 export function parseNumber(value: string) {
 	const valueNumber = parseInt(value);
@@ -29,4 +30,13 @@ export const uploadImg = async (
 
 		setError('Error al subir la imagen');
 	}
+};
+
+export const resetNavigationStack = (navigation: NavigationProp<ReactNavigation.RootParamList>) => {
+	navigation.dispatch(
+		CommonActions.reset({
+			index: 0,
+			routes: [{ name: 'Adopciones' }]
+		})
+	);
 };

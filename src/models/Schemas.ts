@@ -31,7 +31,10 @@ export const UserSchema = z.object({
 	pet_expenses: z
 		.number({ invalid_type_error: 'Por favor, ingrese un número entero mayor o igual a 0' })
 		.gte(0, 'El gasto promedio por mascota debe ser mayor o igual a 0'),
-	motivation: z.string().nonempty('Su motivación para adoptar es requerida').max(150, 'Por favor, ingrese una motivación de 150 caracteres o menos'),
+	motivation: z
+		.string()
+		.nonempty('Su motivación para adoptar es requerida')
+		.max(150, 'Por favor, ingrese una motivación de 150 caracteres o menos'),
 	favorite_adoption_publications: z.array(z.string()),
 	photo: PhotoSchema
 });
