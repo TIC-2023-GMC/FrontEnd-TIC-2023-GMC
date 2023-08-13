@@ -146,7 +146,9 @@ export function QuizGameScreen({
 										return object;
 									});
 
-									setModalVisible(true);
+									setTimeout(() => {
+										setModalVisible(true);
+									}, 2000);
 								}
 							}}
 						>
@@ -171,8 +173,8 @@ export function QuizGameScreen({
 				>
 					{quizzGame.game_questions[question].answers[isClicked]
 						? !quizzGame.game_questions[question].answers[isClicked].is_correct
-							? 'Oh no! es incorrecto'
-							: 'Muy bien! es correcto'
+							? 'Oh no! Respuesta incorrecta'
+							: 'Muy bien! Respuesta correcta'
 						: ''}
 				</Snackbar>
 			)}
