@@ -1,7 +1,7 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useContext, useState } from 'react';
-import { Text, View } from 'react-native';
+import React, { useCallback, useContext, useState } from 'react';
+import { BackHandler, Text, View } from 'react-native';
 import { TextInput, Divider, RadioButton, useTheme, Button, HelperText } from 'react-native-paper';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { styles } from './ExperienceScreenForm.styles';
@@ -9,23 +9,37 @@ import PhotoSelection from '../../components/PhotoSelection';
 import { ExperiencePublication, Photo } from '../../models/InterfacesModels';
 import { useMutation } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { TabNavigation } from '../../models/types';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ExperiencePublicationSchema } from '../../models/Schemas';
 import { SnackBarError } from '../../components/SnackBarError';
-import { uploadImg } from '../../utils/utils';
+import { resetNavigationStack, uploadImg } from '../../utils/utils';
 import { post } from '../../services/api';
 import { UserContext, UserContextParams } from '../../auth/userContext';
 import { getAddExperienceEndpoint } from '../../services/endpoints';
 
 export function ExperienceScreenForm() {
 	const theme = useTheme();
-	const navigation = useNavigation<NavigationProp<TabNavigation>>();
+	const navigation = useNavigation();
 	const { user } = useContext<UserContextParams>(UserContext);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [image, setImage] = useState<string>();
 	const [loading, setLoading] = useState<boolean>(false);
 	const [failUpload, setFailUpload] = useState<string>('');
+
+	useFocusEffect(
+		useCallback(() => {
+			const handleBackPress = () => {
+				if (navigation.isFocused()) {
+					resetNavigationStack(navigation, 'Experiencias');
+					return true;
+				}
+				return false;
+			};
+			BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+		}, [])
+	);
+
 	const {
 		control,
 		formState: { errors },
@@ -52,8 +66,8 @@ export function ExperienceScreenForm() {
 			post(getAddExperienceEndpoint(), data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
-			navigation.navigate('Experiencias');
 			reset();
+			resetNavigationStack(navigation, 'Experiencias');
 			setImage(undefined);
 		}
 	});
@@ -143,6 +157,12 @@ export function ExperienceScreenForm() {
 				)}
 				name="description"
 			/>
+			{errors.user && (
+				<HelperText type="error">
+					NOTA: Debe completar los campos de &quot;Aptitud&quot; en su perfil para realizar
+					publicaciones
+				</HelperText>
+			)}
 			<View style={styles.buttonView}>
 				<Button
 					style={styles.button}
@@ -153,7 +173,7 @@ export function ExperienceScreenForm() {
 						setImage(undefined);
 						setLoading(false);
 						reset();
-						navigation.navigate('Experiencias');
+						resetNavigationStack(navigation, 'Experiencias');
 					}}
 				>
 					Cancelar

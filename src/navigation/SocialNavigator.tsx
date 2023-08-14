@@ -5,18 +5,24 @@ import { StyleSheet } from 'react-native';
 import { MaterialIcons, Feather, Octicons } from '@expo/vector-icons';
 import { ExperienceScreen, ExperienceScreenForm } from '../Screens/Experience';
 // import { OrganizationScreen } from '../Screens/Organization';
-import { useTheme } from 'react-native-paper';
+import { IconButton, useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
 import { FavoritesScreen } from '../Screens/Profile/Favorites';
 import { MyPublicationsScreen } from '../Screens/Profile/MyPublications';
 import { createStackNavigator } from '@react-navigation/stack';
 import RightHeaderActions from '../components/LeftHeaderActions';
 import { OrganizationScreen } from '../Screens/Organization';
+import { getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/native';
+import { ProfileScreen } from '../Screens/Profile/ProfileScreen';
+import { UserAptitudeScreenForm } from '../Screens/User/UserAptitudeScreenForm';
+import { resetNavigationStack } from '../utils/utils';
 
 interface TabsNavigationProps {
 	visible: boolean;
 	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+const noTabBarProfileRoutes = ['Editar Perfil', 'Favoritos', 'Mis Publicaciones'];
 
 const Stack = createStackNavigator();
 
@@ -43,6 +49,7 @@ export function AddNavigationStack() {
 	);
 }
 export function ProfileNavigationStack() {
+	const navigation = useNavigation();
 	const theme = useTheme();
 	return (
 		<Stack.Navigator
@@ -56,12 +63,31 @@ export function ProfileNavigationStack() {
 					fontSize: 24
 				},
 				headerTitleAlign: 'left',
-				headerLeft: () => null
+				headerLeft: (props) => (
+					<IconButton
+						icon="arrow-left-thick"
+						iconColor={theme.colors.secondary}
+						size={35}
+						{...props}
+						onPress={() => {
+							resetNavigationStack(navigation, 'Mi Perfil');
+						}}
+					/>
+				)
 			}}
 		>
-			{/* <Stack.Screen name="Perfil" component={MyPublicationsScreen} /> */}
+			<Stack.Screen
+				name="Mi Perfil"
+				component={ProfileScreen}
+				options={{ headerLeft: () => null }}
+			/>
 			<Stack.Screen name="Mis Publicaciones" component={MyPublicationsScreen} />
 			<Stack.Screen name="Favoritos" component={FavoritesScreen} />
+			<Stack.Screen
+				name="Editar Perfil"
+				component={UserAptitudeScreenForm}
+				options={{ headerLeft: () => null }}
+			/>
 		</Stack.Navigator>
 	);
 }
@@ -90,23 +116,31 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 		<Tab.Navigator
 			backBehavior="initialRoute"
 			initialRouteName="Adopciones"
-			screenOptions={() => ({
-				tabBarStyle: styles.tabBar,
-				tabBarItemStyle: styles.tab,
-				tabBarActiveTintColor: theme.colors.tertiary,
-				tabBarInactiveTintColor: theme.colors.secondary,
-				tabBarActiveBackgroundColor: 'rgba(0,0,0,0.5)',
-				tabBarHideOnKeyboard: true,
-				headerStyle: {
-					backgroundColor: theme.colors.primary
-				},
-				headerTitleStyle: {
-					color: theme.colors.secondary,
-					fontWeight: 'bold',
-					fontSize: 24
-				},
-				headerTitleAlign: 'left'
-			})}
+			screenOptions={({ route }) => {
+				const routeName = getFocusedRouteNameFromRoute(route);
+				let tabBarVisible = true;
+
+				if (noTabBarProfileRoutes.includes(routeName!)) {
+					tabBarVisible = false;
+				}
+				return {
+					tabBarStyle: tabBarVisible ? styles.tabBar : { display: 'none' },
+					tabBarItemStyle: styles.tab,
+					tabBarActiveTintColor: theme.colors.tertiary,
+					tabBarInactiveTintColor: theme.colors.secondary,
+					tabBarActiveBackgroundColor: 'rgba(0,0,0,0.5)',
+					tabBarHideOnKeyboard: true,
+					headerStyle: {
+						backgroundColor: theme.colors.primary
+					},
+					headerTitleStyle: {
+						color: theme.colors.secondary,
+						fontWeight: 'bold',
+						fontSize: 24
+					},
+					headerTitleAlign: 'left'
+				};
+			}}
 		>
 			<Tab.Screen
 				name="Adopciones"
@@ -165,7 +199,8 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 					tabBarButton: (props) => {
 						return <AddTabBarButton {...props} />;
 					},
-					headerShown: false
+					headerShown: false,
+					tabBarStyle: { display: 'none' }
 				}}
 			/>
 			<Tab.Screen
@@ -183,7 +218,8 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 				options={{
 					tabBarIcon: (props) => {
 						return <Octicons {...props} name="person-fill" size={30} />;
-					}
+					},
+					headerShown: false
 				}}
 			/>
 		</Tab.Navigator>

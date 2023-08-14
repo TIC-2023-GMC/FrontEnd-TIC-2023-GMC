@@ -10,7 +10,7 @@ export interface User {
 	num_current_pets: number;
 	outdoor_hours: number;
 	house_space: number;
-	has_yard: boolean;
+	has_yard: boolean | undefined;
 	main_pet_food: string;
 	pet_expenses: number;
 	motivation: string;
@@ -27,6 +27,18 @@ export interface ExperienceFilter {
 	species: string | undefined;
 	date: Date | undefined;
 }
+
+export type UserAptitude = Pick<
+	User,
+	| 'num_previous_pets'
+	| 'num_current_pets'
+	| 'outdoor_hours'
+	| 'house_space'
+	| 'has_yard'
+	| 'main_pet_food'
+	| 'pet_expenses'
+	| 'motivation'
+>;
 
 export interface Interaction {
 	user: User;
