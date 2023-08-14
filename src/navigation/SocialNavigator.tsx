@@ -5,23 +5,24 @@ import { StyleSheet } from 'react-native';
 import { MaterialIcons, Feather, Octicons } from '@expo/vector-icons';
 import { ExperienceScreen, ExperienceScreenForm } from '../Screens/Experience';
 // import { OrganizationScreen } from '../Screens/Organization';
-import { useTheme } from 'react-native-paper';
+import { IconButton, useTheme } from 'react-native-paper';
 import AddTabBarButton from '../components/AddTabBarButton';
 import { FavoritesScreen } from '../Screens/Profile/Favorites';
 import { MyPublicationsScreen } from '../Screens/Profile/MyPublications';
 import { createStackNavigator } from '@react-navigation/stack';
 import RightHeaderActions from '../components/LeftHeaderActions';
 import { OrganizationScreen } from '../Screens/Organization';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/native';
 import { ProfileScreen } from '../Screens/Profile/ProfileScreen';
 import { UserAptitudeScreenForm } from '../Screens/User/UserAptitudeScreenForm';
+import { resetNavigationStack } from '../utils/utils';
 
 interface TabsNavigationProps {
 	visible: boolean;
 	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const noTabBarRoutes = ['Agregar Adopción', 'Agregar Experiencia', 'Editar Perfil'];
+const noTabBarProfileRoutes = ['Editar Perfil', 'Favoritos', 'Mis Publicaciones'];
 
 const Stack = createStackNavigator();
 
@@ -48,6 +49,7 @@ export function AddNavigationStack() {
 	);
 }
 export function ProfileNavigationStack() {
+	const navigation = useNavigation();
 	const theme = useTheme();
 	return (
 		<Stack.Navigator
@@ -61,13 +63,31 @@ export function ProfileNavigationStack() {
 					fontSize: 24
 				},
 				headerTitleAlign: 'left',
-				headerLeft: () => null
+				headerLeft: (props) => (
+					<IconButton
+						icon="arrow-left-thick"
+						iconColor={theme.colors.secondary}
+						size={35}
+						{...props}
+						onPress={() => {
+							resetNavigationStack(navigation, 'Mi Perfil');
+						}}
+					/>
+				)
 			}}
 		>
-			<Stack.Screen name="Profile" component={ProfileScreen} />
+			<Stack.Screen
+				name="Mi Perfil"
+				component={ProfileScreen}
+				options={{ headerLeft: () => null }}
+			/>
 			<Stack.Screen name="Mis Publicaciones" component={MyPublicationsScreen} />
 			<Stack.Screen name="Favoritos" component={FavoritesScreen} />
-			<Stack.Screen name="Editar Perfil" component={UserAptitudeScreenForm} />
+			<Stack.Screen
+				name="Editar Perfil"
+				component={UserAptitudeScreenForm}
+				options={{ headerLeft: () => null }}
+			/>
 		</Stack.Navigator>
 	);
 }
@@ -100,7 +120,7 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 				const routeName = getFocusedRouteNameFromRoute(route);
 				let tabBarVisible = true;
 
-				if (noTabBarRoutes.includes(routeName!)) {
+				if (noTabBarProfileRoutes.includes(routeName!)) {
 					tabBarVisible = false;
 				}
 				return {
@@ -179,7 +199,8 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 					tabBarButton: (props) => {
 						return <AddTabBarButton {...props} />;
 					},
-					headerShown: false
+					headerShown: false,
+					tabBarStyle: { display: 'none' }
 				}}
 			/>
 			<Tab.Screen
@@ -197,7 +218,8 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 				options={{
 					tabBarIcon: (props) => {
 						return <Octicons {...props} name="person-fill" size={30} />;
-					}
+					},
+					headerShown: false
 				}}
 			/>
 		</Tab.Navigator>

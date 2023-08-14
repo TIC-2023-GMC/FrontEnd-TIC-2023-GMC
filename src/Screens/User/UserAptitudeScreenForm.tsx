@@ -16,7 +16,7 @@ import { UserContext, UserContextParams } from '../../auth/userContext';
 
 export function UserAptitudeScreenForm() {
 	const theme = useTheme();
-	const { user } = useContext<UserContextParams>(UserContext);
+	const { user, setUser } = useContext<UserContextParams>(UserContext);
 	const navigation = useNavigation();
 	const tabBarHeight = useBottomTabBarHeight();
 	const [loading, setLoading] = useState<boolean>(false);
@@ -51,10 +51,13 @@ export function UserAptitudeScreenForm() {
 
 	const onSubmit: SubmitHandler<UserAptitude> = async (data) => {
 		setLoading(true);
+
 		const updatedUser: User = {
 			...user,
 			...data
 		};
+
+		setUser(updatedUser);
 		updateUserMutation.mutate(updatedUser);
 	};
 

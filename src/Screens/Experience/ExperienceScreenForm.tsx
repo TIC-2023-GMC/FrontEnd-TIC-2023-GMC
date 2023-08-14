@@ -30,7 +30,7 @@ export function ExperienceScreenForm() {
 		useCallback(() => {
 			const handleBackPress = () => {
 				if (navigation.isFocused()) {
-					resetNavigationStack(navigation);
+					resetNavigationStack(navigation, 'Experiencias');
 					return true;
 				}
 				return false;
@@ -67,7 +67,7 @@ export function ExperienceScreenForm() {
 		onSuccess: () => {
 			setLoading(false);
 			reset();
-			resetNavigationStack(navigation);
+			resetNavigationStack(navigation, 'Experiencias');
 			setImage(undefined);
 		}
 	});
@@ -173,7 +173,7 @@ export function ExperienceScreenForm() {
 						setImage(undefined);
 						setLoading(false);
 						reset();
-						resetNavigationStack(navigation);
+						resetNavigationStack(navigation, 'Experiencias');
 					}}
 				>
 					Cancelar

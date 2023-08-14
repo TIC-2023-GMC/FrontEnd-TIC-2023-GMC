@@ -39,7 +39,7 @@ export function AdoptionScreenForm() {
 		useCallback(() => {
 			const handleBackPress = () => {
 				if (navigation.isFocused()) {
-					resetNavigationStack(navigation);
+					resetNavigationStack(navigation, 'Adopciones');
 					return true;
 				}
 				return false;
@@ -105,7 +105,7 @@ export function AdoptionScreenForm() {
 		onSuccess: () => {
 			setLoading(false);
 			reset();
-			resetNavigationStack(navigation);
+			resetNavigationStack(navigation, 'Adopciones');
 			setSize('');
 			setLocation('');
 			setImage(undefined);
@@ -427,7 +427,7 @@ export function AdoptionScreenForm() {
 						setImage(undefined);
 						setLoading(false);
 						reset();
-						resetNavigationStack(navigation);
+						resetNavigationStack(navigation, 'Adopciones');
 					}}
 				>
 					Cancelar

@@ -32,11 +32,14 @@ export const uploadImg = async (
 	}
 };
 
-export const resetNavigationStack = (navigation: NavigationProp<ReactNavigation.RootParamList>) => {
+export const resetNavigationStack = (
+	navigation: NavigationProp<ReactNavigation.RootParamList>,
+	route: string
+) => {
 	navigation.dispatch(
 		CommonActions.reset({
 			index: 0,
-			routes: [{ name: 'Adopciones' }]
+			routes: [{ name: route }]
 		})
 	);
 };
