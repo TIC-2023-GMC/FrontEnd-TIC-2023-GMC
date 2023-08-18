@@ -73,7 +73,7 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 
 	return (
 		<>
-			<CommentSection visible={comment} onDismiss={() => setComment(!comment)} />
+			<CommentSection visible={comment} onDismiss={() => setComment(!comment)}  />
 			<Card style={styles.card}>
 				<Card.Title
 					title={user.first_name + ' ' + user.last_name}
