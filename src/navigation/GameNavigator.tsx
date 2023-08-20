@@ -1,7 +1,7 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import { QuizGameScreen } from '../Screens/Game/QuizGameScreen';
 import { IconButton, useTheme } from 'react-native-paper';
 import React from 'react';
+import { MenuGameScreen } from '../Screens/Game/MenuGameScreen';
 
 interface GameNavigationProps {
 	visible: boolean;
@@ -35,8 +35,8 @@ export function GameNavigationStack({ visible, setVisible }: GameNavigationProps
 				)
 			})}
 		>
-			<Stack.Screen name="Quiz Game" options={{ title: 'Quiz Game' }}>
-				{(props) => <QuizGameScreen {...props} visible={visible} setVisible={setVisible} />}
+			<Stack.Screen name="Menu Game" options={{ title: 'Aprende Jugando' }}>
+				{(props) => <MenuGameScreen {...props} visible={visible} setVisible={setVisible} />}
 			</Stack.Screen>
 		</Stack.Navigator>
 	);

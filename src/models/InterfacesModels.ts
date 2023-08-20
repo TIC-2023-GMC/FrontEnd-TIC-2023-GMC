@@ -91,6 +91,15 @@ export interface SaveOrRemoveFavoriteProps {
 	user_id: string;
 	pub_id: string;
 }
+
+//Game Section
+export interface Game {
+	game_name: string;
+	game_image: Photo;
+	game_description: string;
+}
+
+
 export interface Answer {
 	answer_text: string;
 	is_correct: boolean;
