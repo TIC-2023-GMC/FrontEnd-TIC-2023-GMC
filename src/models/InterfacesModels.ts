@@ -99,7 +99,6 @@ export interface Game {
 	game_description: string;
 }
 
-
 export interface Answer {
 	answer_text: string;
 	is_correct: boolean;
