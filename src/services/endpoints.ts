@@ -84,6 +84,6 @@ export function getParishEndpoint() {
 	return `parish/get_all`;
 }
 
- export function getGamesEnpoint() {
-	 return `games/get_all_games`;
- }
+export function getGamesEnpoint() {
+	return `games/get_all_games`;
+}
