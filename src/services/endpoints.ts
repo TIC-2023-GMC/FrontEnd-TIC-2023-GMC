@@ -83,3 +83,7 @@ export function getAddExperienceEndpoint() {
 export function getParishEndpoint() {
 	return `parish/get_all`;
 }
+
+export function getUserByIdEndpoint(id: string) {
+	return `user/get_by_id?_id=${id}`;
+}

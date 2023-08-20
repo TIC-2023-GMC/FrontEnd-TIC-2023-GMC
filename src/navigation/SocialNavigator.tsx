@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AdoptionScreen, AdoptionScreenForm } from '../Screens/Adoption';
 import { StyleSheet } from 'react-native';
@@ -12,10 +12,13 @@ import { MyPublicationsScreen } from '../Screens/Profile/MyPublications';
 import { createStackNavigator } from '@react-navigation/stack';
 import RightHeaderActions from '../components/LeftHeaderActions';
 import { OrganizationScreen } from '../Screens/Organization';
-import { getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/native';
+import { RouteProp, getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/native';
 import { ProfileScreen } from '../Screens/Profile/ProfileScreen';
 import { UserAptitudeScreenForm } from '../Screens/User/UserAptitudeScreenForm';
 import { resetNavigationStack } from '../utils/utils';
+import { UserContext, UserContextParams } from '../auth/userContext';
+import { MyProfileScreen } from '../Screens/User/MyProfileScreen';
+import { ProfileParamsList } from '../models/types';
 
 interface TabsNavigationProps {
 	visible: boolean;
@@ -70,6 +73,45 @@ export function ProfileNavigationStack() {
 						size={35}
 						{...props}
 						onPress={() => {
+							navigation.goBack();
+						}}
+					/>
+				)
+			}}
+		>
+			<Stack.Screen
+				name="PerfilUsuario"
+				component={ProfileScreen}
+				options={{ headerShown: true }}
+			>
+			</Stack.Screen>
+		</Stack.Navigator>
+	);
+}
+
+export function MyProfileNavigationStack() {
+	const navigation = useNavigation();
+	const theme = useTheme();
+
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerStyle: {
+					backgroundColor: theme.colors.primary
+				},
+				headerTitleStyle: {
+					color: theme.colors.secondary,
+					fontWeight: 'bold',
+					fontSize: 24
+				},
+				headerTitleAlign: 'left',
+				headerLeft: (props) => (
+					<IconButton
+						icon="arrow-left-thick"
+						iconColor={theme.colors.secondary}
+						size={35}
+						{...props}
+						onPress={() => {
 							resetNavigationStack(navigation, 'Mi Perfil');
 						}}
 					/>
@@ -78,9 +120,10 @@ export function ProfileNavigationStack() {
 		>
 			<Stack.Screen
 				name="Mi Perfil"
-				component={ProfileScreen}
+				component={MyProfileScreen}
 				options={{ headerLeft: () => null }}
 			/>
+
 			<Stack.Screen name="Mis Publicaciones" component={MyPublicationsScreen} />
 			<Stack.Screen name="Favoritos" component={FavoritesScreen} />
 			<Stack.Screen
@@ -96,8 +139,10 @@ const Tab = createBottomTabNavigator();
 
 export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 	const theme = useTheme();
+	const navigation = useNavigation();
 	const [adoptionsVisibleFilter, setAdoptionsVisibleFilter] = useState<boolean>(false);
 	const [experiencesVisibleFilter, setExperienceVisibleFilter] = useState<boolean>(false);
+	const [userProfileId, setUserProfileId] = useState<string>('');
 
 	const styles = StyleSheet.create({
 		tabBar: {
@@ -168,6 +213,11 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 				)}
 			</Tab.Screen>
 			<Tab.Screen
+				name="Perfil de Usuario"
+				component={ProfileNavigationStack}
+				options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' }, headerShown: false }}
+			/>
+			<Tab.Screen
 				name="Experiencias"
 				options={{
 					tabBarIcon: (props) => {
@@ -214,7 +264,7 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 			/>
 			<Tab.Screen
 				name="Perfil"
-				component={ProfileNavigationStack}
+				component={MyProfileNavigationStack}
 				options={{
 					tabBarIcon: (props) => {
 						return <Octicons {...props} name="person-fill" size={30} />;

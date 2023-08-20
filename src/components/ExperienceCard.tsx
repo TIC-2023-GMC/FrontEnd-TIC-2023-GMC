@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { StyleSheet, View, Image, TextLayoutEventData, NativeSyntheticEvent } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
 import { ExperiencePublication } from '../models/InterfacesModels';
+import { useNavigation } from '@react-navigation/native';
+import { TabNavigationParamsList } from '../models/types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const LeftContent = (props: { size: number; photo: string }) => (
 	<Image
@@ -16,6 +19,7 @@ const LeftContent = (props: { size: number; photo: string }) => (
 
 const ExperienceCard = (props: ExperiencePublication) => {
 	const theme = useTheme();
+	const navigation = useNavigation<NativeStackNavigationProp<TabNavigationParamsList>>();
 	const [like, setLike] = useState<boolean>();
 	const { user, description, publication_date: publicationDate, photo } = props;
 	const [expanded, setExpanded] = useState<boolean>();
@@ -37,7 +41,18 @@ const ExperienceCard = (props: ExperiencePublication) => {
 	return (
 		<Card style={styles.card}>
 			<Card.Title
-				title={user.first_name + ' ' + user.last_name}
+				title={
+					<Button
+						onPress={() => {
+							navigation.navigate('Perfil de Usuario', {
+								screen: 'PerfilUsuario',
+								params: { userId: user._id! }
+							});
+						}}
+					>
+						{user.first_name + ' ' + user.last_name}
+					</Button>
+				}
 				subtitle={
 					<Text style={{ color: theme.colors.tertiary }}>
 						{'Publicado el ' +

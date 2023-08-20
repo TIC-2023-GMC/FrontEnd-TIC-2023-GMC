@@ -6,6 +6,9 @@ import { StyleSheet, View, Image } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
 import { AdoptionPublication, SaveOrRemoveFavoriteProps, User } from '../models/InterfacesModels';
 import { MutateOptions } from '@tanstack/react-query';
+import { useNavigation } from '@react-navigation/native';
+import { TabNavigationParamsList } from '../models/types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 interface ModalProps {
 	onOpenModal?: (_p: AdoptionPublication) => void;
@@ -32,6 +35,7 @@ const LeftContent = (props: { size: number; photo: string }) => (
 
 const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 	const theme = useTheme();
+	const navigation = useNavigation<NativeStackNavigationProp<TabNavigationParamsList>>();
 	const [like, setLike] = useState<boolean>();
 	const [expanded, setExpanded] = useState<boolean>();
 	const {
@@ -71,7 +75,18 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 	return (
 		<Card style={styles.card}>
 			<Card.Title
-				title={user.first_name + ' ' + user.last_name}
+				title={
+					<Button
+						onPress={() => {
+							navigation.navigate('Perfil de Usuario', {
+								screen: 'PerfilUsuario',
+								params: { userId: user._id! }
+							});
+						}}
+					>
+						{user.first_name + ' ' + user.last_name}
+					</Button>
+				}
 				subtitle={
 					<Text style={{ color: theme.colors.tertiary }}>
 						{'Publicado el ' +

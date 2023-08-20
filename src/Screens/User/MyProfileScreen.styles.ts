@@ -4,7 +4,8 @@ export const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: '#fff',
-		flexDirection: 'column'
+		flexDirection: 'column',
+		marginBottom: 70
 	},
 	cardTitles: {
 		borderTopEndRadius: 10,

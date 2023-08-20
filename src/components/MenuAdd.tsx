@@ -1,7 +1,7 @@
 import { Menu } from 'react-native-paper';
 import React from 'react';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { TabNavigation } from '../models/types';
+import { TabNavigationParamsList } from '../models/types';
 
 export default function MenuAdd({
 	children,
@@ -12,7 +12,7 @@ export default function MenuAdd({
 	visible: boolean;
 	closeMenu: () => void;
 }) {
-	const navigation = useNavigation<NavigationProp<TabNavigation>>();
+	const navigation = useNavigation<NavigationProp<TabNavigationParamsList>>();
 
 	return (
 		<Menu visible={visible} onDismiss={closeMenu} anchor={children}>
