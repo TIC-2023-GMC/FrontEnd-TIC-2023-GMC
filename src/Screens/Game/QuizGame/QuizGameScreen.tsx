@@ -2,15 +2,15 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import { ActivityIndicator, Button, Card, Text, Modal, Portal, Snackbar } from 'react-native-paper';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { GameQuiz, UserScore } from '../../models/InterfacesModels';
-import { get, put } from '../../services/api';
+import { GameQuiz, UserScore } from '../../../models/InterfacesModels';
+import { get, put } from '../../../services/api';
 import { useStopwatch } from 'react-timer-hook';
-import { UserContext, UserContextParams } from '../../auth/userContext';
+import { UserContext, UserContextParams } from '../../../auth/userContext';
 import {
 	getLeaderBoardEndpoint,
 	getQuizGameByUserEndpoint,
 	getQuizGameEndpoint
-} from '../../services/endpoints';
+} from '../../../services/endpoints';
 
 const timeOutAnswer = 3000;
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
