@@ -16,40 +16,40 @@ export const styles = StyleSheet.create({
 		height: 125,
 		margin: 10,
 		backgroundColor: '#F3FFE5',
-		alignItems: 'center', 
+		alignItems: 'center',
 		justifyContent: 'space-evenly',
 		borderRadius: 10,
 		elevation: 10,
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.2,
-		shadowRadius: 4,
+		shadowRadius: 4
 	},
-	gameIcon:{
+	gameIcon: {
 		width: 100,
 		height: 100,
 		margin: 10,
-		borderRadius: 10,
+		borderRadius: 10
 	},
-	sectionText:{
+	sectionText: {
 		width: '60%',
-		alignItems: 'center',
+		alignItems: 'center'
 	},
 	gameTitle: {
-		fontSize:20,
+		fontSize: 20,
 		paddingRight: 0,
 		marginRight: 0,
 		marginHorizontal: 0,
 		alignItems: 'center',
 		color: '#000',
-		fontWeight: 'bold',
+		fontWeight: 'bold'
 	},
 	button: {
-		width:100,
+		width: 100,
 		height: 40,
 		margin: 20,
 		backgroundColor: '#4caf5066',
-		buttonText:{
+		buttonText: {
 			fontSize: 20,
 			margin: 0,
 			padding: 0,
