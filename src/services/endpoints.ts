@@ -63,13 +63,13 @@ export function getMyPublicationsEndpoint({
 }
 
 export function getLeaderBoardEndpoint(user: User) {
-	return `/game/leaderboard?user_id=${user._id}`;
+	return `/match/leaderboard?user_id=${user._id}`;
 }
 export function getQuizGameByUserEndpoint(user: User) {
-	return `game/quiz_game?user_id=${user._id}`;
+	return `match/quiz_game?user_id=${user._id}`;
 }
 export function getQuizGameEndpoint() {
-	return `game/quiz_game`;
+	return `match/quiz_game`;
 }
 
 export function getAddAdoptionEndpoint() {
@@ -82,4 +82,8 @@ export function getAddExperienceEndpoint() {
 
 export function getParishEndpoint() {
 	return `parish/get_all`;
+}
+
+export function getGamesEnpoint() {
+	return `game/get_games`;
 }

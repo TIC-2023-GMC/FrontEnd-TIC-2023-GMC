@@ -10,3 +10,10 @@ export type TabNavigation = {
 	Favoritos: undefined;
 	'Editar Perfil': undefined;
 };
+
+export type GameTabNavigation = {
+	'Hangman Game': undefined;
+	'Search Words Game': undefined;
+	'Quiz Game': undefined;
+	'Menu Games': undefined;
+};
