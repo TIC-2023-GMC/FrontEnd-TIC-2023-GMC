@@ -95,8 +95,9 @@ export interface SaveOrRemoveFavoriteProps {
 //Game Section
 export interface Game {
 	game_name: string;
-	game_image: Photo;
+	game_category: string;
 	game_description: string;
+	game_image: Photo;
 }
 
 export interface Answer {
@@ -109,24 +110,22 @@ export interface Question {
 	answers: Answer[];
 }
 
-export interface GameQuiz {
+export interface QuizGameMatch {
 	_id: string;
 	user_id: string;
-	game_name: string;
-	game_description: string;
-	game_image: Photo;
-	game_category: string;
-	game_score: number;
-	game_questions: Question[];
-	game_time: number;
+	match_name: string;
+	match_game_score: number;
+	match_game_time: number;
+	match_game_onboarding: string;
+	match_game_questions: Question[];
 }
 
 export interface UserScore {
 	user_first_name: string;
 	user_last_name: string;
 	user_photo: Photo;
-	game_score: number;
-	game_time: number;
+	match_game_score: number;
+	match_game_time: number;
 }
 
 export interface UserPosition {
