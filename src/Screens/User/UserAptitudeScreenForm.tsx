@@ -80,7 +80,7 @@ export function UserAptitudeScreenForm() {
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
 							keyboardType="numeric"
-							value={value! < 0 ? '' : value.toString()}
+							value={value < 0 ? '' : value.toString()}
 							label="Número de mascotas previas:"
 							style={{ ...styles.input, backgroundColor: theme.colors.secondary }}
 							right={
@@ -114,7 +114,7 @@ export function UserAptitudeScreenForm() {
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
 							keyboardType="numeric"
-							value={value! < 0 ? '' : value?.toString()}
+							value={value < 0 ? '' : value?.toString()}
 							label="Número de mascotas actuales:"
 							style={{ ...styles.input, backgroundColor: theme.colors.secondary }}
 							right={
@@ -149,7 +149,7 @@ export function UserAptitudeScreenForm() {
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
 							keyboardType="numeric"
-							value={value! < 0 ? '' : value?.toString()}
+							value={value < 0 ? '' : value?.toString()}
 							label="Horas fuera del hogar al día (promedio):"
 							style={{ ...styles.input, backgroundColor: theme.colors.secondary }}
 							right={
@@ -183,7 +183,7 @@ export function UserAptitudeScreenForm() {
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
 							keyboardType="numeric"
-							value={value! < 0 ? '' : value?.toString()}
+							value={value < 0 ? '' : value?.toString()}
 							label="Área de su domicilio:"
 							style={{ ...styles.input, backgroundColor: theme.colors.secondary }}
 							right={
@@ -289,7 +289,7 @@ export function UserAptitudeScreenForm() {
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
 							keyboardType="numeric"
-							value={value! < 0 ? '' : value?.toString()}
+							value={value < 0 ? '' : value?.toString()}
 							label="Gastos mensuales por mascota (promedio $):"
 							style={{ ...styles.input, backgroundColor: theme.colors.secondary }}
 							right={

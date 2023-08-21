@@ -11,22 +11,19 @@ import {
 	getQuizGameByUserEndpoint,
 	getQuizGameEndpoint
 } from '../../../services/endpoints';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { GameTabNavigation } from '../../../models/types';
 
 const timeOutAnswer = 3000;
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
 const levelImages = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
 
-export function QuizGameScreen({
-	visible,
-	setVisible
-}: {
-	visible: boolean;
-	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+export function QuizGameScreen() {
 	const styles = createStyles();
 	const { user } = useContext<UserContextParams>(UserContext);
 	const [question, setQuestion] = useState(-1);
 	const [modalVisible, setModalVisible] = useState(false);
+	const navigation = useNavigation<NavigationProp<GameTabNavigation>>();
 	const [isClicked, setIsClicked] = useState(-1);
 	const [snackbarVisible, setSnackbarVisible] = useState(false);
 	const { totalSeconds, seconds, minutes, pause, reset } = useStopwatch({
@@ -245,7 +242,7 @@ export function QuizGameScreen({
 									onPress={() => {
 										setModalVisible(!modalVisible);
 										reset();
-										setVisible(!visible);
+										navigation.goBack();
 									}}
 								>
 									ACEPTAR

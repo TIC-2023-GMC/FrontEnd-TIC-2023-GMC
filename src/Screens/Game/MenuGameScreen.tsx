@@ -44,12 +44,16 @@ export function MenuGameScreen() {
 							style={styles.button}
 							mode="elevated"
 							onPress={() => {
-								if (opcion.game_name == 'Leyes y Sanciones') {
-									navigation.navigate('Hangman Game');
-								} else if (opcion.game_name == 'Cuidado Responsable') {
-									navigation.navigate('Search Words Game');
-								} else if (opcion.game_name == 'Quiz') {
-									navigation.navigate('Quiz Game');
+								switch (opcion.game_name) {
+									case 'Leyes y Sanciones':
+										navigation.navigate('Hangman Game');
+										break;
+									case 'Cuidado Responsable':
+										navigation.navigate('Search Words Game');
+										break;
+									case 'Quiz':
+										navigation.navigate('Quiz Game');
+										break;
 								}
 							}}
 						>

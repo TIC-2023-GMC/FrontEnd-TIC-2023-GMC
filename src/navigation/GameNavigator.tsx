@@ -31,16 +31,26 @@ export function GameNavigationStack({ visible, setVisible }: GameNavigationProps
 						iconColor={theme.colors.secondary}
 						size={35}
 						{...props}
-						onPress={() => {
-							setVisible(!visible);
-						}}
 					/>
 				)
 			})}
 		>
 			<Stack.Screen
 				name="Menu Game"
-				options={{ title: 'Aprende Jugando' }}
+				options={{
+					title: 'Aprende Jugando',
+					headerLeft: (props) => (
+						<IconButton
+							icon="arrow-left-thick"
+							iconColor={theme.colors.secondary}
+							size={35}
+							{...props}
+							onPress={() => {
+								setVisible(!visible);
+							}}
+						/>
+					)
+				}}
 				component={MenuGameScreen}
 			/>
 			<Stack.Screen
@@ -53,9 +63,11 @@ export function GameNavigationStack({ visible, setVisible }: GameNavigationProps
 				options={{ title: 'Cuidado Responsable' }}
 				component={SearchWordsScreen}
 			/>
-			<Stack.Screen name="Quiz Game" options={{ title: 'Leyes y Sanciones' }}>
-				{(props) => <QuizGameScreen {...props} visible={visible} setVisible={setVisible} />}
-			</Stack.Screen>
+			<Stack.Screen
+				component={QuizGameScreen}
+				name="Quiz Game"
+				options={{ title: 'Leyes y Sanciones' }}
+			/>
 		</Stack.Navigator>
 	);
 }
