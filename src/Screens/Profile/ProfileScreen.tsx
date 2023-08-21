@@ -24,7 +24,7 @@ export function ProfileScreen({ route }: any) {
 	const { user } = useContext<UserContextParams>(UserContext);
 	const [profileUser, setProfileUser] = React.useState<User>(user);
 
-	const { isLoading, refetch, isRefetching, isSuccess, data } = useQuery({
+	const { isLoading, isRefetching, isSuccess, data } = useQuery({
 		queryKey: ['userProfileData'],
 		queryFn: async () => {
 			const response = await get<User>(getUserByIdEndpoint(userId || ''));
@@ -60,8 +60,7 @@ export function ProfileScreen({ route }: any) {
 
 	useFocusEffect(
 		useCallback(() => {
-			userId && refetch();
-			setProfileUser(user);
+			!userId && setProfileUser(user);
 		}, [])
 	);
 

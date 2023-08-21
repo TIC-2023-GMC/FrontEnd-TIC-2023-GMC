@@ -145,7 +145,7 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 				const routeName = getFocusedRouteNameFromRoute(route);
 				let tabBarVisible = true;
 
-				if (noTabBarProfileRoutes.includes(routeName!)) {
+				if (noTabBarProfileRoutes.includes(routeName || '')) {
 					tabBarVisible = false;
 				}
 				return {

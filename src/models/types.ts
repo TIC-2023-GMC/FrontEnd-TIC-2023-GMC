@@ -16,3 +16,10 @@ export type ProfileStackParamsList = {
 	'Mis Publicaciones': undefined;
 	Favoritos: undefined;
 };
+
+export type GameTabNavigation = {
+	'Hangman Game': undefined;
+	'Search Words Game': undefined;
+	'Quiz Game': undefined;
+	'Menu Games': undefined;
+};

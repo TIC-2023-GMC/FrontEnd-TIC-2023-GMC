@@ -2,64 +2,59 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import { ActivityIndicator, Button, Card, Text, Modal, Portal, Snackbar } from 'react-native-paper';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { GameQuiz, UserScore } from '../../models/InterfacesModels';
-import { get, put } from '../../services/api';
+import { QuizGameMatch, UserScore } from '../../../models/InterfacesModels';
+import { get, put } from '../../../services/api';
 import { useStopwatch } from 'react-timer-hook';
-import { UserContext, UserContextParams } from '../../auth/userContext';
+import { UserContext, UserContextParams } from '../../../auth/userContext';
 import {
 	getLeaderBoardEndpoint,
 	getQuizGameByUserEndpoint,
 	getQuizGameEndpoint
-} from '../../services/endpoints';
+} from '../../../services/endpoints';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { GameTabNavigation } from '../../../models/types';
 
 const timeOutAnswer = 3000;
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
 const levelImages = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
 
-export function QuizGameScreen({
-	visible,
-	setVisible
-}: {
-	visible: boolean;
-	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+export function QuizGameScreen() {
 	const styles = createStyles();
 	const { user } = useContext<UserContextParams>(UserContext);
 	const [question, setQuestion] = useState(-1);
 	const [modalVisible, setModalVisible] = useState(false);
+	const navigation = useNavigation<NavigationProp<GameTabNavigation>>();
 	const [isClicked, setIsClicked] = useState(-1);
 	const [snackbarVisible, setSnackbarVisible] = useState(false);
 	const { totalSeconds, seconds, minutes, pause, reset } = useStopwatch({
 		autoStart: true
 	});
-	const [quizzGame, setQuizzGame] = useState<GameQuiz>({
+	const [quizzGame, setQuizzGame] = useState<QuizGameMatch>({
 		_id: '',
 		user_id: user._id ? user._id : '',
-		game_name: '',
-		game_description: '',
-		game_image: { img_path: '' },
-		game_category: '',
-		game_score: 0,
-		game_questions: [],
-		game_time: 0
+		match_name: '',
+		match_game_score: 0,
+		match_game_time: 0,
+		match_game_onboarding: '',
+		match_game_questions: []
 	});
 
 	useQuery({
 		queryKey: ['question'],
 		queryFn: async () => {
-			const response = await get<GameQuiz>(getQuizGameByUserEndpoint(user));
+			const response = await get<QuizGameMatch>(getQuizGameByUserEndpoint(user));
 			return response.data;
 		},
-		onSuccess: (data: GameQuiz) => {
-			data.game_score = 0;
-			data.game_time = 0;
+		onSuccess: (data: QuizGameMatch) => {
+			data.match_game_score = 0;
+			data.match_game_time = 0;
 			setQuizzGame(data);
-			setQuestion(data?.game_questions?.length ? data?.game_questions?.length - 1 : 0);
+			setQuestion(data?.match_game_questions?.length ? data?.match_game_questions?.length - 1 : 0);
 		}
 	});
 
 	const sendScoreQuizzGame = useMutation({
-		mutationFn: (data: GameQuiz) =>
+		mutationFn: (data: QuizGameMatch) =>
 			put(getQuizGameEndpoint(), data).then((response) => response.data)
 	});
 
@@ -76,7 +71,7 @@ export function QuizGameScreen({
 		if (question === 0) {
 			sendScoreQuizzGame.mutate(quizzGame);
 		}
-	}, [quizzGame.game_score]);
+	}, [quizzGame.match_game_score]);
 
 	const handlePress = (answerIndex: number) => {
 		setIsClicked(answerIndex);
@@ -85,7 +80,6 @@ export function QuizGameScreen({
 	};
 	return (
 		<ImageBackground source={image} resizeMode="cover" style={styles.container}>
-			<Text style={{ margin: 10 }}>{quizzGame?.game_description}</Text>
 			<Text style={styles.timer}>
 				{minutes < 10 ? '0' + minutes : minutes}:{seconds < 10 ? '0' + seconds : seconds}
 			</Text>
@@ -98,16 +92,16 @@ export function QuizGameScreen({
 						]}
 					>
 						<Text style={styles.questionText}>
-							{quizzGame.game_questions.length > 0
-								? quizzGame.game_questions[question].question_text
+							{quizzGame.match_game_questions.length > 0
+								? quizzGame.match_game_questions[question].question_text
 								: ''}
 						</Text>
 					</Card>
 				</Card>
 			</Card>
 			<View style={styles.answerContainer}>
-				{quizzGame.game_questions.length > 0 &&
-					quizzGame.game_questions[question].answers.map((data, index) => (
+				{quizzGame.match_game_questions.length > 0 &&
+					quizzGame.match_game_questions[question].answers.map((data, index) => (
 						<TouchableOpacity
 							key={index}
 							disabled={isClicked !== -1}
@@ -122,9 +116,9 @@ export function QuizGameScreen({
 								}, timeOutAnswer);
 								setQuizzGame((prevQuizzGame) => {
 									if (data.is_correct) {
-										const object: GameQuiz = {
+										const object: QuizGameMatch = {
 											...prevQuizzGame,
-											game_score: prevQuizzGame.game_score + 1
+											match_game_score: prevQuizzGame.match_game_score + 1
 										};
 										return object;
 									}
@@ -134,13 +128,13 @@ export function QuizGameScreen({
 								if (question === 0) {
 									pause();
 									setQuizzGame((prevQuizzGame) => {
-										const object: GameQuiz = {
+										const object: QuizGameMatch = {
 											...prevQuizzGame,
-											game_time: totalSeconds,
+											match_game_time: totalSeconds,
 
-											game_score: Math.round(
-												prevQuizzGame.game_score * 10 +
-													(10 * Math.pow(prevQuizzGame.game_score, 2)) / totalSeconds
+											match_game_score: Math.round(
+												prevQuizzGame.match_game_score * 10 +
+													(10 * Math.pow(prevQuizzGame.match_game_score, 2)) / totalSeconds
 											)
 										};
 										return object;
@@ -156,12 +150,12 @@ export function QuizGameScreen({
 						</TouchableOpacity>
 					))}
 			</View>
-			{quizzGame.game_questions.length > 0 && (
+			{quizzGame.match_game_questions.length > 0 && (
 				<Snackbar
 					onIconPress={() => setSnackbarVisible(false)}
 					icon={
-						quizzGame.game_questions[question].answers[isClicked]
-							? quizzGame.game_questions[question].answers[isClicked].is_correct
+						quizzGame.match_game_questions[question].answers[isClicked]
+							? quizzGame.match_game_questions[question].answers[isClicked].is_correct
 								? 'check-all'
 								: 'close'
 							: ''
@@ -171,8 +165,8 @@ export function QuizGameScreen({
 					visible={snackbarVisible}
 					onDismiss={() => setSnackbarVisible(false)}
 				>
-					{quizzGame.game_questions[question].answers[isClicked]
-						? !quizzGame.game_questions[question].answers[isClicked].is_correct
+					{quizzGame.match_game_questions[question].answers[isClicked]
+						? !quizzGame.match_game_questions[question].answers[isClicked].is_correct
 							? 'Oh no! Respuesta incorrecta'
 							: 'Muy bien! Respuesta correcta'
 						: ''}
@@ -202,7 +196,9 @@ export function QuizGameScreen({
 										Tiempo: {minutes < 10 ? '0' + minutes : minutes}:
 										{seconds < 10 ? '0' + seconds : seconds}
 									</Text>
-									<Text style={styles.statisticsText}>Puntuación: {quizzGame.game_score}</Text>
+									<Text style={styles.statisticsText}>
+										Puntuación: {quizzGame.match_game_score}
+									</Text>
 								</View>
 								<View style={styles.leaderboardContainer}>
 									<Text style={styles.leaderboardTextTitle}>Tabla de Posiciones</Text>
@@ -219,7 +215,7 @@ export function QuizGameScreen({
 													{index + 1}°
 												</Text>
 												<Text style={[styles.leaderboardScoreText, styles.pointsWidth]}>
-													{entry.game_score}
+													{entry.match_game_score}
 												</Text>
 												<Text style={[styles.leaderboardScoreText, styles.playerNameWidth]}>
 													{entry.user_first_name + '\n' + entry.user_last_name}
@@ -233,7 +229,7 @@ export function QuizGameScreen({
 											{data[1]}°
 										</Text>
 										<Text style={[styles.leaderboardScoreText, styles.pointsWidth]}>
-											{quizzGame.game_score}
+											{quizzGame.match_game_score}
 										</Text>
 										<Text style={[styles.leaderboardScoreText, styles.playerNameWidth]}>
 											{user.first_name + '\n' + user.last_name}
@@ -246,7 +242,7 @@ export function QuizGameScreen({
 									onPress={() => {
 										setModalVisible(!modalVisible);
 										reset();
-										setVisible(!visible);
+										navigation.goBack();
 									}}
 								>
 									ACEPTAR
