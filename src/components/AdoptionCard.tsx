@@ -81,18 +81,18 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 			<Card style={styles.card}>
 				<Card.Title
 					title={
-					<Button
-						onPress={() => {
-							navigation.navigate('Perfil de Usuario', {
-								screen: 'PerfilUsuario',
-								params: { userId: user._id! }
-							});
-						}}
-					>
-						{user.first_name + ' ' + user.last_name}
+						<Button
+							onPress={() => {
+								navigation.navigate('Perfil', {
+									screen: 'Perfil de Usuarios',
+									params: { userId: user._id || '' }
+								});
+							}}
+						>
+							{user.first_name + ' ' + user.last_name}
 						</Button>
-				}
-				subtitle={
+					}
+					subtitle={
 						<Text style={{ color: theme.colors.tertiary }}>
 							{'Publicado el ' +
 								new Date(publicationDate).toLocaleString('es-ES', {

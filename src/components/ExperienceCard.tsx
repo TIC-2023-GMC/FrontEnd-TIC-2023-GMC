@@ -44,9 +44,9 @@ const ExperienceCard = (props: ExperiencePublication) => {
 				title={
 					<Button
 						onPress={() => {
-							navigation.navigate('Perfil de Usuario', {
-								screen: 'PerfilUsuario',
-								params: { userId: user._id! }
+							navigation.navigate('Perfil', {
+								screen: 'Perfil de Usuarios',
+								params: { userId: user._id || '' }
 							});
 						}}
 					>

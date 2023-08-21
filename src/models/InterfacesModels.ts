@@ -4,6 +4,7 @@ export interface User {
 	last_name: string;
 	mobile_phone: string;
 	neighborhood: string;
+	birth_date: Date;
 	email: string;
 	password: string;
 	num_previous_pets: number;

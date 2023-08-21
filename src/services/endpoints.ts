@@ -71,6 +71,9 @@ export function getQuizGameByUserEndpoint(user: User) {
 export function getQuizGameEndpoint() {
 	return `game/quiz_game`;
 }
+export function getUpdateUserEndpoint() {
+	return '/user/update_user';
+}
 
 export function getAddAdoptionEndpoint() {
 	return `adoptions/add`;

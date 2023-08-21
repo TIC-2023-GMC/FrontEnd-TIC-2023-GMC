@@ -19,7 +19,8 @@ export const styles = StyleSheet.create({
 		backgroundColor: '#CAD9B5'
 	},
 	aptitudeContainer: {
-		height: 'auto'
+		height: 'auto',
+		marginBottom: 20
 	},
 	basicInfoContainer: {
 		marginTop: 20,

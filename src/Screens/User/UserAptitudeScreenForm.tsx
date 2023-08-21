@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { parseNumber } from '../../utils/utils';
 import { UserAptitudeSchema } from '../../models/Schemas';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import { getUpdateUserEndpoint } from '../../services/endpoints';
 
 export function UserAptitudeScreenForm() {
 	const theme = useTheme();
@@ -41,7 +42,8 @@ export function UserAptitudeScreenForm() {
 	});
 
 	const updateUserMutation = useMutation({
-		mutationFn: (data: User) => put('/user/update_user', data).then((response) => response.data),
+		mutationFn: (data: User) =>
+			put(getUpdateUserEndpoint(), data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
 			navigation.goBack();
@@ -56,7 +58,6 @@ export function UserAptitudeScreenForm() {
 			...user,
 			...data
 		};
-
 		setUser(updatedUser);
 		updateUserMutation.mutate(updatedUser);
 	};

@@ -6,6 +6,7 @@ const userDefault: User = {
 	last_name: 'Garcia',
 	mobile_phone: '0983473043',
 	neighborhood: 'Cumbayá',
+	birth_date: new Date('2000-10-18'),
 	email: 'gandhygarcia@outlook.es',
 	password: 'password123',
 	num_previous_pets: -1,
