@@ -15,7 +15,6 @@ import { OrganizationScreen } from '../Screens/Organization';
 import { getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/native';
 import { UserAptitudeScreenForm } from '../Screens/User/UserAptitudeScreenForm';
 import { resetNavigationStack } from '../utils/utils';
-import { MyProfileScreen } from '../Screens/User/MyProfileScreen';
 import { ProfileScreen } from '../Screens/Profile/ProfileScreen';
 
 interface TabsNavigationProps {
@@ -23,7 +22,12 @@ interface TabsNavigationProps {
 	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const noTabBarProfileRoutes = ['Editar Perfil', 'Favoritos', 'Mis Publicaciones'];
+const noTabBarProfileRoutes = [
+	'Editar Perfil',
+	'Favoritos',
+	'Mis Publicaciones',
+	'Perfil de Usuarios'
+];
 
 const Stack = createStackNavigator();
 
@@ -81,7 +85,7 @@ export function ProfileNavigationStack() {
 		>
 			<Stack.Screen
 				name="Perfil de Usuario"
-				component={MyProfileScreen}
+				component={ProfileScreen}
 				options={{ headerLeft: () => null }}
 			/>
 
@@ -240,7 +244,8 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 					tabBarIcon: (props) => {
 						return <Octicons {...props} name="person-fill" size={30} />;
 					},
-					headerShown: false
+					headerShown: false,
+					unmountOnBlur: true
 				}}
 			/>
 		</Tab.Navigator>

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import { Text, View, Image, ScrollView, BackHandler } from 'react-native';
 import { styles } from './ProfileScreen.styles';
 import { ActivityIndicator, Button, Card, Divider, List, useTheme } from 'react-native-paper';
@@ -14,18 +14,17 @@ import { getUserByIdEndpoint } from '../../services/endpoints';
 import { User } from '../../models/InterfacesModels';
 import { get } from '../../services/api';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { UserContext, UserContextParams } from '../../auth/userContext';
 
 export function ProfileScreen({ route }: any) {
 	const theme = useTheme();
 	const tabBarHeight = useBottomTabBarHeight();
 	const userId = route.params?.userId;
 	const navigation = useNavigation<NavigationProp<TabNavigationParamsList>>();
-	const {
-		isLoading,
-		refetch,
-		isRefetching,
-		data: profileUser
-	} = useQuery({
+	const { user } = useContext<UserContextParams>(UserContext);
+	const [profileUser, setProfileUser] = React.useState<User>(user);
+
+	const { isLoading, refetch, isRefetching, isSuccess, data } = useQuery({
 		queryKey: ['userProfileData'],
 		queryFn: async () => {
 			const response = await get<User>(getUserByIdEndpoint(userId || ''));
@@ -33,6 +32,12 @@ export function ProfileScreen({ route }: any) {
 		},
 		enabled: !!userId
 	});
+
+	useEffect(() => {
+		if (isSuccess) {
+			setProfileUser(data);
+		}
+	}, [isSuccess, data]);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -56,17 +61,21 @@ export function ProfileScreen({ route }: any) {
 	useFocusEffect(
 		useCallback(() => {
 			userId && refetch();
+			setProfileUser(user);
 		}, [])
 	);
+
 	return (
 		<ScrollView
 			style={{ ...styles.container, marginBottom: tabBarHeight }}
 			contentContainerStyle={{
-				alignItems: 'center'
+				minHeight: '100%',
+				alignItems: 'center',
+				justifyContent: 'space-between'
 			}}
 		>
 			{!!userId && (isLoading || isRefetching) ? (
-				<ActivityIndicator animating={true} size="large" style={{ flex: 1 }}></ActivityIndicator>
+				<ActivityIndicator animating={true} size={100} style={{ flex: 1 }}></ActivityIndicator>
 			) : (
 				profileUser && (
 					<>
@@ -117,7 +126,13 @@ export function ProfileScreen({ route }: any) {
 								</Button>
 							</View>
 						</Card>
-						<Card style={[styles.profileContainer, styles.aptitudeContainer]}>
+						<Card
+							style={[
+								styles.profileContainer,
+								styles.aptitudeContainer,
+								userId ? { marginBottom: 60 } : {}
+							]}
+						>
 							<Card.Title
 								style={[styles.cardTitles, { backgroundColor: theme.colors.primary }]}
 								title="Datos de Aptitud"
@@ -175,6 +190,45 @@ export function ProfileScreen({ route }: any) {
 								<Text style={styles.aptitudeText}>{profileUser.motivation}</Text>
 							</View>
 						</Card>
+
+						{!userId && (
+							<View style={styles.profileButtonsView}>
+								<Button
+									style={styles.button}
+									mode="elevated"
+									buttonColor={theme.colors.primary}
+									textColor={theme.colors.secondary}
+									onPress={() => {
+										navigation.navigate('Perfil', { screen: 'Mis Publicaciones' });
+									}}
+								>
+									Mis Publicaciones
+								</Button>
+								<Button
+									style={styles.button}
+									mode="elevated"
+									buttonColor={theme.colors.primary}
+									textColor={theme.colors.secondary}
+									onPress={() => {
+										navigation.navigate('Perfil', { screen: 'Favoritos' });
+									}}
+								>
+									Mis Favoritos
+								</Button>
+								<Button
+									style={styles.button}
+									mode="elevated"
+									buttonColor={theme.colors.tertiary}
+									textColor={theme.colors.secondary}
+									icon={'square-edit-outline'}
+									onPress={() => {
+										navigation.navigate('Perfil', { screen: 'Editar Perfil' });
+									}}
+								>
+									Editar Perfil
+								</Button>
+							</View>
+						)}
 					</>
 				)
 			)}

@@ -7,7 +7,7 @@ import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-pap
 import { AdoptionPublication, SaveOrRemoveFavoriteProps, User } from '../models/InterfacesModels';
 import { MutateOptions } from '@tanstack/react-query';
 import { CommentSection } from './CommentSection';
-import { useNavigation } from '@react-navigation/native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import { TabNavigationParamsList } from '../models/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -83,6 +83,12 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 					title={
 						<Button
 							onPress={() => {
+								navigation.dispatch(
+									CommonActions.reset({
+										index: 0,
+										routes: [{ name: 'Perfil' }]
+									})
+								);
 								navigation.navigate('Perfil', {
 									screen: 'Perfil de Usuarios',
 									params: { userId: user._id || '' }
