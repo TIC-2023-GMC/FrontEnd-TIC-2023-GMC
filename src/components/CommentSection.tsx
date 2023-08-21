@@ -1,8 +1,10 @@
 import { StyleSheet, Modal, View, FlatList, RefreshControl } from 'react-native';
 import { Text, MD3Theme, TextInput, useTheme } from 'react-native-paper';
 import { CommentComponent } from './CommentComponent';
-import React, { useContext, useState } from 'react';
-import { UserContext } from '../auth/userContext';
+import React, { useState } from 'react';
+
+import { Comment } from '../models/InterfacesModels';
+
 interface CommentSectionProps {
 	visible: boolean;
 	onDismiss: () => void;
@@ -18,45 +20,44 @@ export function CommentSection({
 	isLoading
 }: CommentSectionProps) {
 	const theme = useTheme();
-	const { user } = useContext(UserContext);
 	const styles = createStyles(theme);
 	const [comment, setComment] = useState('');
-	const comments = [
+	const comments: Comment[] = [
 		{
-			_id: '1',
+			user_id: '64c1b0ef0fd89c04b7114eb8',
+			_id: '1fff',
 			comment_text: 'Hola Mundo',
 			comment_date: new Date().toISOString(),
-			user: user
+			user_photo: {
+				img_path:
+					'https://imagenes.elpais.com/resizer/fdGn2HZ-QXQJW92FNbeWU7Z9Da4=/1960x1470/cloudfront-eu-central-1.images.arcpublishing.com/prisa/TW5CHJTUY5B3DOS35VMOLZUVF4.jpg'
+			},
+			user_first_name: 'Bil',
+			user_last_name: 'Gates'
 		},
 		{
-			_id: '2',
+			user_id: '2fff',
+			_id: '2fff',
 			comment_text: 'Hola Mundo',
 			comment_date: new Date().toISOString(),
-			user: user
+			user_photo: {
+				img_path:
+					'https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/364103707_975993543519709_3612431512803587105_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeEwJHZpCsZgpD_FUU2P5KSOQdEJOBSmWp1B0Qk4FKZandjUMKH74v2_LzVLOe4Vu-xlhYSxT72kLYsbBgnw5gqA&_nc_ohc=XY5pICYEY6UAX9v_-1o&_nc_ht=scontent.fuio35-1.fna&oh=00_AfAblqMWZ3sPaU7I5ovUGB4gRZuDsNXU1oEcuub-evFh-w&oe=64E82555'
+			},
+			user_first_name: 'Juan',
+			user_last_name: 'Perez'
 		},
 		{
-			_id: '3',
+			user_id: '3fff',
+			_id: '3fff',
 			comment_text: 'Hola Mundo',
 			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '4',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '5',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '6',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
+			user_photo: {
+				img_path:
+					'https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/364103707_975993543519709_3612431512803587105_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeEwJHZpCsZgpD_FUU2P5KSOQdEJOBSmWp1B0Qk4FKZandjUMKH74v2_LzVLOe4Vu-xlhYSxT72kLYsbBgnw5gqA&_nc_ohc=XY5pICYEY6UAX9v_-1o&_nc_ht=scontent.fuio35-1.fna&oh=00_AfAblqMWZ3sPaU7I5ovUGB4gRZuDsNXU1oEcuub-evFh-w&oe=64E82555'
+			},
+			user_first_name: 'Juan',
+			user_last_name: 'Perez'
 		}
 	];
 	/* const [comments, setComments] = useState<Comment[]>([

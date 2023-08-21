@@ -42,13 +42,16 @@ export type UserAptitude = Pick<
 >;
 
 export interface Interaction {
-	user: User;
+	user_id: string;
 }
 export interface Photo {
 	img_path: string;
 }
 export interface Comment extends Interaction {
 	_id: string;
+	user_photo: Photo;
+	user_first_name: string;
+	user_last_name: string;
 	comment_text: string;
 	comment_date: string;
 }
