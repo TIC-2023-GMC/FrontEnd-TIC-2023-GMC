@@ -373,7 +373,7 @@ export function UserAptitudeScreenForm() {
 					textColor={theme.colors.secondary}
 					onPress={() => {
 						reset();
-						navigation.goBack();
+						resetNavigationStack(navigation, 'Perfil');
 					}}
 				>
 					Cancelar
