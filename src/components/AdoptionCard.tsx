@@ -7,6 +7,9 @@ import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-pap
 import { AdoptionPublication, SaveOrRemoveFavoriteProps, User } from '../models/InterfacesModels';
 import { MutateOptions } from '@tanstack/react-query';
 import { CommentSection } from './CommentSection';
+import { CommonActions, useNavigation } from '@react-navigation/native';
+import { TabNavigationParamsList } from '../models/types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 interface ModalProps {
 	onOpenModal?: (_p: AdoptionPublication) => void;
@@ -34,6 +37,7 @@ const LeftContent = (props: { size: number; photo: string }) => (
 
 const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 	const theme = useTheme();
+	const navigation = useNavigation<NativeStackNavigationProp<TabNavigationParamsList>>();
 	const [like, setLike] = useState<boolean>();
 	const [comment, setComment] = useState<boolean>(false);
 	const [expanded, setExpanded] = useState<boolean>();
@@ -76,7 +80,24 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 			<CommentSection visible={comment} onDismiss={() => setComment(!comment)} />
 			<Card style={styles.card}>
 				<Card.Title
-					title={user.first_name + ' ' + user.last_name}
+					title={
+						<Button
+							onPress={() => {
+								navigation.dispatch(
+									CommonActions.reset({
+										index: 0,
+										routes: [{ name: 'Perfil' }]
+									})
+								);
+								navigation.navigate('Perfil', {
+									screen: 'Perfil de Usuarios',
+									params: { userId: user._id || '' }
+								});
+							}}
+						>
+							{user.first_name + ' ' + user.last_name}
+						</Button>
+					}
 					subtitle={
 						<Text style={{ color: theme.colors.tertiary }}>
 							{'Publicado el ' +

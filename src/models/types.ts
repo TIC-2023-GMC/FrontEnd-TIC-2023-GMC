@@ -1,14 +1,20 @@
-export type TabNavigation = {
+import { NavigatorScreenParams } from '@react-navigation/native';
+
+export type TabNavigationParamsList = {
 	Adopciones: undefined;
 	Experiencias: undefined;
 	'Agregar Publicación': { screen: string };
 	Organizaciones: undefined;
-	Perfil: undefined;
 	AdoptionScreenForm: undefined;
 	ExperienceScreenForm: undefined;
+	Perfil: NavigatorScreenParams<ProfileStackParamsList>;
+};
+
+export type ProfileStackParamsList = {
+	'Perfil de Usuarios': { userId: string };
+	'Editar Perfil': undefined;
 	'Mis Publicaciones': undefined;
 	Favoritos: undefined;
-	'Editar Perfil': undefined;
 };
 
 export type GameTabNavigation = {

@@ -13,16 +13,21 @@ import { createStackNavigator } from '@react-navigation/stack';
 import RightHeaderActions from '../components/LeftHeaderActions';
 import { OrganizationScreen } from '../Screens/Organization';
 import { getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/native';
-import { ProfileScreen } from '../Screens/Profile/ProfileScreen';
 import { UserAptitudeScreenForm } from '../Screens/User/UserAptitudeScreenForm';
 import { resetNavigationStack } from '../utils/utils';
+import { ProfileScreen } from '../Screens/Profile/ProfileScreen';
 
 interface TabsNavigationProps {
 	visible: boolean;
 	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const noTabBarProfileRoutes = ['Editar Perfil', 'Favoritos', 'Mis Publicaciones'];
+const noTabBarProfileRoutes = [
+	'Editar Perfil',
+	'Favoritos',
+	'Mis Publicaciones',
+	'Perfil de Usuarios'
+];
 
 const Stack = createStackNavigator();
 
@@ -48,9 +53,11 @@ export function AddNavigationStack() {
 		</Stack.Navigator>
 	);
 }
+
 export function ProfileNavigationStack() {
 	const navigation = useNavigation();
 	const theme = useTheme();
+
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -70,23 +77,41 @@ export function ProfileNavigationStack() {
 						size={35}
 						{...props}
 						onPress={() => {
-							resetNavigationStack(navigation, 'Mi Perfil');
+							resetNavigationStack(navigation, 'Perfil');
 						}}
 					/>
 				)
 			}}
 		>
 			<Stack.Screen
-				name="Mi Perfil"
+				name="Perfil de Usuario"
 				component={ProfileScreen}
 				options={{ headerLeft: () => null }}
 			/>
+
 			<Stack.Screen name="Mis Publicaciones" component={MyPublicationsScreen} />
 			<Stack.Screen name="Favoritos" component={FavoritesScreen} />
 			<Stack.Screen
 				name="Editar Perfil"
 				component={UserAptitudeScreenForm}
 				options={{ headerLeft: () => null }}
+			/>
+			<Stack.Screen
+				options={{
+					headerLeft: (props) => (
+						<IconButton
+							icon="arrow-left-thick"
+							iconColor={theme.colors.secondary}
+							size={35}
+							{...props}
+							onPress={() => {
+								resetNavigationStack(navigation, 'Adopciones');
+							}}
+						/>
+					)
+				}}
+				name="Perfil de Usuarios"
+				component={ProfileScreen}
 			/>
 		</Stack.Navigator>
 	);
@@ -219,7 +244,8 @@ export function TabsNavigation({ visible, setVisible }: TabsNavigationProps) {
 					tabBarIcon: (props) => {
 						return <Octicons {...props} name="person-fill" size={30} />;
 					},
-					headerShown: false
+					headerShown: false,
+					unmountOnBlur: true
 				}}
 			/>
 		</Tab.Navigator>

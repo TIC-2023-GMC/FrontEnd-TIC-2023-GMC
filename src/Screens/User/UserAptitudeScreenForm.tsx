@@ -1,7 +1,7 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useContext, useState } from 'react';
-import { Text, View, ScrollView } from 'react-native';
+import React, { useCallback, useContext, useState } from 'react';
+import { Text, View, ScrollView, BackHandler } from 'react-native';
 import { TextInput, Divider, RadioButton, useTheme, Button, HelperText } from 'react-native-paper';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { styles } from './UserAptitudeScreenForm.styles';
@@ -9,10 +9,11 @@ import { put } from '../../services/api';
 import { User, UserAptitude } from '../../models/InterfacesModels';
 import { useMutation } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigation } from '@react-navigation/native';
-import { parseNumber } from '../../utils/utils';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { parseNumber, resetNavigationStack } from '../../utils/utils';
 import { UserAptitudeSchema } from '../../models/Schemas';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import { getUpdateUserEndpoint } from '../../services/endpoints';
 
 export function UserAptitudeScreenForm() {
 	const theme = useTheme();
@@ -41,10 +42,11 @@ export function UserAptitudeScreenForm() {
 	});
 
 	const updateUserMutation = useMutation({
-		mutationFn: (data: User) => put('/user/update_user', data).then((response) => response.data),
+		mutationFn: (data: User) =>
+			put(getUpdateUserEndpoint(), data).then((response) => response.data),
 		onSuccess: () => {
 			setLoading(false);
-			navigation.goBack();
+			resetNavigationStack(navigation, 'Perfil');
 			reset();
 		}
 	});
@@ -56,10 +58,23 @@ export function UserAptitudeScreenForm() {
 			...user,
 			...data
 		};
-
 		setUser(updatedUser);
 		updateUserMutation.mutate(updatedUser);
 	};
+
+	useFocusEffect(
+		useCallback(() => {
+			const handleBackPress = () => {
+				if (navigation.isFocused()) {
+					resetNavigationStack(navigation, 'Perfil');
+					return true;
+				}
+				return false;
+			};
+			BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+		}, [])
+	);
 
 	return (
 		<ScrollView style={{ marginBottom: tabBarHeight }}>

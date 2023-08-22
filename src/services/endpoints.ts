@@ -71,6 +71,9 @@ export function getQuizGameByUserEndpoint(user: User) {
 export function getQuizGameEndpoint() {
 	return `match/quiz_game`;
 }
+export function getUpdateUserEndpoint() {
+	return '/user/update_user';
+}
 
 export function getAddAdoptionEndpoint() {
 	return `adoptions/add`;
@@ -82,6 +85,10 @@ export function getAddExperienceEndpoint() {
 
 export function getParishEndpoint() {
 	return `parish/get_all`;
+}
+
+export function getUserByIdEndpoint(id: string) {
+	return `user/get_by_id?_id=${id}`;
 }
 
 export function getGamesEnpoint() {
