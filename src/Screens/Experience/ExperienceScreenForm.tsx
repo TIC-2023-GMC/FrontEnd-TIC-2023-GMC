@@ -85,7 +85,6 @@ export function ExperienceScreenForm() {
 			const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);
 			const new_publication: ExperiencePublication = {
 				...data,
-				user: user,
 				publication_date: currentDateLocal,
 				photo: new_photo
 			};

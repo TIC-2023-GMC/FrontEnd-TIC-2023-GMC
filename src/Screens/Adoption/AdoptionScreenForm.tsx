@@ -2,6 +2,7 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useContext, useState } from 'react';
 import { Text, View, ScrollView, BackHandler } from 'react-native';
+
 import {
 	TextInput,
 	Checkbox,
@@ -126,7 +127,6 @@ export function AdoptionScreenForm() {
 			const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);
 			const new_publication: AdoptionPublication = {
 				...data,
-				user: user,
 				publication_date: currentDateLocal,
 				photo: new_photo
 			};
