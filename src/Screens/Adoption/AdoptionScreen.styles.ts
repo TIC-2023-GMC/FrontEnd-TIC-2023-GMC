@@ -17,5 +17,10 @@ export const styles = StyleSheet.create({
 		margin: 15,
 		justifyContent: 'center',
 		alignItems: 'center'
+	},
+	snackbarStyle: {
+		width: '90%',
+		alignSelf: 'center',
+		marginBottom: 20
 	}
 });

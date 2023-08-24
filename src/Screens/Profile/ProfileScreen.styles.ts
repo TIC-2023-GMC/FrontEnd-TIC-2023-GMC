@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
 	},
 	profileContainer: {
 		width: '90%',
-		height: 280,
+		height: 350,
 		marginTop: 25,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
@@ -80,9 +80,14 @@ export const styles = StyleSheet.create({
 		marginBottom: 20
 	},
 	button: {
-		width: '70%',
+		width: '80%',
 		alignSelf: 'center',
-		marginTop: 10,
+		marginTop: 15,
 		elevation: 20
+	},
+	snackbarStyle: {
+		width: '90%',
+		alignSelf: 'center',
+		marginBottom: 20
 	}
 });
