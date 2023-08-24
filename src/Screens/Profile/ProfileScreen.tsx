@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect } from 'react';
-import { Text, View, Image, ScrollView, BackHandler } from 'react-native';
+import { Text, View, Image, ScrollView, BackHandler, Linking } from 'react-native';
 import { styles } from './ProfileScreen.styles';
 import { ActivityIndicator, Button, Card, Divider, List, useTheme } from 'react-native-paper';
 import {
@@ -119,6 +119,8 @@ export function ProfileScreen({ route }: any) {
 									icon="phone"
 									onPress={() => {
 										console.log('phone pressed');
+										//Linking.openURL(`tel:${profileUser.mobile_phone}`);
+										Linking.openURL(`whatsapp://send?phone=${profileUser.mobile_phone}`);
 									}}
 								>
 									{profileUser.mobile_phone}
