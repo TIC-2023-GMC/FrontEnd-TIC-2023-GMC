@@ -11,8 +11,8 @@ export default function App() {
 	const [visible, setVisible] = useState<boolean>(true);
 	return (
 		<QueryClientProvider client={new QueryClient()}>
-			<AuthProvider>
-				<PaperProvider theme={theme}>
+			<PaperProvider theme={theme}>
+				<AuthProvider>
 					<SafeAreaProvider>
 						<NavigationContainer>
 							{visible ? (
@@ -22,8 +22,8 @@ export default function App() {
 							)}
 						</NavigationContainer>
 					</SafeAreaProvider>
-				</PaperProvider>
-			</AuthProvider>
+				</AuthProvider>
+			</PaperProvider>
 		</QueryClientProvider>
 	);
 }

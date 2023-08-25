@@ -9,6 +9,7 @@ export const UserSchema = z.object({
 	last_name: z.string(),
 	mobile_phone: z.string(),
 	neighborhood: z.string(),
+	birth_date: z.date(),
 	email: z.string().email(),
 	password: z.string(),
 	num_previous_pets: z
