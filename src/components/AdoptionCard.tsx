@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
 import { AdoptionPublication, SaveOrRemoveFavoriteProps, User } from '../models/InterfacesModels';
@@ -10,11 +10,11 @@ import { CommentSection } from './CommentSection';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { TabNavigationParamsList } from '../models/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { snapShotAndShare } from '../utils/utils';
 
-interface ModalProps {
+interface CardProps {
 	onOpenModal?: (_p: AdoptionPublication) => void;
 	userAccount: User;
-
 	setUserAccount: React.Dispatch<React.SetStateAction<User>>;
 	onSaveAsFavorite?: (
 		variables: SaveOrRemoveFavoriteProps,
@@ -35,8 +35,9 @@ const LeftContent = (props: { size: number; photo: string }) => (
 	/>
 );
 
-const PublicationCard = (props: AdoptionPublication & ModalProps) => {
+const PublicationCard = (props: AdoptionPublication & CardProps) => {
 	const theme = useTheme();
+	const ref = useRef(null);
 	const navigation = useNavigation<NativeStackNavigationProp<TabNavigationParamsList>>();
 	const [like, setLike] = useState<boolean>();
 	const [comment, setComment] = useState<boolean>(false);
@@ -78,194 +79,196 @@ const PublicationCard = (props: AdoptionPublication & ModalProps) => {
 	return (
 		<>
 			<CommentSection visible={comment} onDismiss={() => setComment(!comment)} />
-			<Card style={styles.card}>
-				<Card.Title
-					title={
-						<Button
-							onPress={() => {
-								navigation.dispatch(
-									CommonActions.reset({
-										index: 0,
-										routes: [{ name: 'Perfil' }]
-									})
-								);
-								navigation.navigate('Perfil', {
-									screen: 'Perfil de Usuarios',
-									params: { userId: user._id || '' }
-								});
-							}}
-						>
-							{user.first_name + ' ' + user.last_name}
-						</Button>
-					}
-					subtitle={
-						<Text style={{ color: theme.colors.tertiary }}>
-							{'Publicado el ' +
-								new Date(publicationDate).toLocaleString('es-ES', {
-									timeZone: 'America/Guayaquil',
-									year: 'numeric',
-									month: '2-digit',
-									day: '2-digit',
-									hour: '2-digit',
-									minute: '2-digit',
-									hour12: false, // Force 24-hour format
-									hourCycle: 'h23' // Ensure two digits for hours
-								})}
-						</Text>
-					}
-					left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
-					right={
-						onOpenModal !== undefined
-							? () => <IconButton icon="dots-vertical" onPress={() => onOpenModal(adoption)} />
-							: undefined
-					}
-				/>
-				<Card.Cover
-					theme={{ ...theme, roundness: 0.5 }}
-					style={styles.img}
-					resizeMode="contain"
-					resizeMethod="scale"
-					source={{ uri: photo.img_path }}
-					progressiveRenderingEnabled={true}
-				/>
-				<Card.Content style={styles.content}>
-					<View style={styles.contentColumn}>
-						<List.Item
-							style={styles.list}
-							title={
-								petAge >= 12
-									? Math.round(petAge / 12) > 1
-										? Math.round(petAge / 12) + ' años'
-										: Math.round(petAge / 12) + ' año'
-									: petAge + ' meses'
-							}
-							left={() => <List.Icon color={theme.colors.tertiary} icon="cake-variant" />}
-						/>
-						<List.Item
-							style={styles.list}
-							titleNumberOfLines={2}
-							title={petLocation}
-							left={() => <List.Icon color={theme.colors.tertiary} icon="map-marker" />}
-						/>
-						<List.Item
-							style={styles.list}
-							title={petSize}
-							left={() => <List.Icon color={theme.colors.tertiary} icon="ruler" />}
-						/>
-					</View>
-					<View style={styles.contentColumn}>
-						<List.Item
-							style={styles.list}
-							title={'Sexo'}
-							left={() => (
-								<List.Icon
-									color={theme.colors.tertiary}
-									icon={`gender-${petSex ? 'male' : 'female'}`}
-								/>
-							)}
-						/>
-						<List.Item
-							style={styles.list}
-							titleNumberOfLines={2}
-							title={'Carnet de Vacunación'}
-							left={() => (
-								<List.Icon
-									color={theme.colors.tertiary}
-									icon={`${vaccinationCard ? 'check-circle-outline' : 'close-circle-outline'}`}
-								/>
-							)}
-						/>
-						<List.Item
-							style={styles.list}
-							title={'Esterilización'}
-							left={() => (
-								<List.Icon
-									color={theme.colors.tertiary}
-									icon={`${sterilized ? 'check-circle-outline' : 'close-circle-outline'}`}
-								/>
-							)}
-						/>
-					</View>
-				</Card.Content>
-				{expanded && (
-					<Card.Content>
-						<List.Item style={styles.list} title="Raza" description={petBreed} />
-						<List.Item style={styles.list} title="Descripción" description={description} />
+			<View ref={ref}>
+				<Card style={styles.card}>
+					<Card.Title
+						title={
+							<Button
+								onPress={() => {
+									navigation.dispatch(
+										CommonActions.reset({
+											index: 0,
+											routes: [{ name: 'Perfil' }]
+										})
+									);
+									navigation.navigate('Perfil', {
+										screen: 'Perfil de Usuarios',
+										params: { userId: user._id || '' }
+									});
+								}}
+							>
+								{user.first_name + ' ' + user.last_name}
+							</Button>
+						}
+						subtitle={
+							<Text style={{ color: theme.colors.tertiary }}>
+								{'Publicado el ' +
+									new Date(publicationDate).toLocaleString('es-ES', {
+										timeZone: 'America/Guayaquil',
+										year: 'numeric',
+										month: '2-digit',
+										day: '2-digit',
+										hour: '2-digit',
+										minute: '2-digit',
+										hour12: false, // Force 24-hour format
+										hourCycle: 'h23' // Ensure two digits for hours
+									})}
+							</Text>
+						}
+						left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
+						right={
+							onOpenModal !== undefined
+								? () => <IconButton icon="dots-vertical" onPress={() => onOpenModal(adoption)} />
+								: undefined
+						}
+					/>
+					<Card.Cover
+						theme={{ ...theme, roundness: 0.5 }}
+						style={styles.img}
+						resizeMode="contain"
+						resizeMethod="scale"
+						source={{ uri: photo.img_path }}
+						progressiveRenderingEnabled={true}
+					/>
+					<Card.Content style={styles.content}>
+						<View style={styles.contentColumn}>
+							<List.Item
+								style={styles.list}
+								title={
+									petAge >= 12
+										? Math.round(petAge / 12) > 1
+											? Math.round(petAge / 12) + ' años'
+											: Math.round(petAge / 12) + ' año'
+										: petAge + ' meses'
+								}
+								left={() => <List.Icon color={theme.colors.tertiary} icon="cake-variant" />}
+							/>
+							<List.Item
+								style={styles.list}
+								titleNumberOfLines={2}
+								title={petLocation}
+								left={() => <List.Icon color={theme.colors.tertiary} icon="map-marker" />}
+							/>
+							<List.Item
+								style={styles.list}
+								title={petSize}
+								left={() => <List.Icon color={theme.colors.tertiary} icon="ruler" />}
+							/>
+						</View>
+						<View style={styles.contentColumn}>
+							<List.Item
+								style={styles.list}
+								title={'Sexo'}
+								left={() => (
+									<List.Icon
+										color={theme.colors.tertiary}
+										icon={`gender-${petSex ? 'male' : 'female'}`}
+									/>
+								)}
+							/>
+							<List.Item
+								style={styles.list}
+								titleNumberOfLines={2}
+								title={'Carnet de Vacunación'}
+								left={() => (
+									<List.Icon
+										color={theme.colors.tertiary}
+										icon={`${vaccinationCard ? 'check-circle-outline' : 'close-circle-outline'}`}
+									/>
+								)}
+							/>
+							<List.Item
+								style={styles.list}
+								title={'Esterilización'}
+								left={() => (
+									<List.Icon
+										color={theme.colors.tertiary}
+										icon={`${sterilized ? 'check-circle-outline' : 'close-circle-outline'}`}
+									/>
+								)}
+							/>
+						</View>
 					</Card.Content>
-				)}
+					{expanded && (
+						<Card.Content>
+							<List.Item style={styles.list} title="Raza" description={petBreed} />
+							<List.Item style={styles.list} title="Descripción" description={description} />
+						</Card.Content>
+					)}
 
-				<View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-					<View style={styles.actionMore}>
-						<Button mode="text" onPress={handleExpand}>
-							{expanded ? 'Ver menos' : 'Ver más'}
-						</Button>
-					</View>
-					<View style={styles.actionsContainer}>
-						{(onSaveAsFavorite !== undefined || onRemoveFromFavorites !== undefined) && (
+					<View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+						<View style={styles.actionMore}>
+							<Button mode="text" onPress={handleExpand}>
+								{expanded ? 'Ver menos' : 'Ver más'}
+							</Button>
+						</View>
+						<View style={styles.actionsContainer}>
+							{(onSaveAsFavorite !== undefined || onRemoveFromFavorites !== undefined) && (
+								<View style={styles.actions}>
+									<IconButton
+										onPress={() => {
+											if (!checkedFavorite && onSaveAsFavorite !== undefined) {
+												onSaveAsFavorite(removeRequest, {
+													onSuccess: () => {
+														setUserAccount({
+															...userAccount,
+															favorite_adoption_publications: [
+																...userAccount.favorite_adoption_publications,
+																adoption._id
+															]
+														});
+													}
+												});
+											} else if (checkedFavorite && onRemoveFromFavorites !== undefined) {
+												onRemoveFromFavorites(removeRequest, {
+													onSuccess: () => {
+														setUserAccount({
+															...userAccount,
+															favorite_adoption_publications:
+																userAccount.favorite_adoption_publications.filter(
+																	(id) => id !== adoption._id
+																)
+														});
+													}
+												});
+											}
+										}}
+										icon={`bookmark`}
+										iconColor={!checkedFavorite ? theme.colors.tertiary : theme.colors.primary}
+										size={28}
+									/>
+								</View>
+							)}
 							<View style={styles.actions}>
 								<IconButton
-									onPress={() => {
-										if (!checkedFavorite && onSaveAsFavorite !== undefined) {
-											onSaveAsFavorite(removeRequest, {
-												onSuccess: () => {
-													setUserAccount({
-														...userAccount,
-														favorite_adoption_publications: [
-															...userAccount.favorite_adoption_publications,
-															adoption._id
-														]
-													});
-												}
-											});
-										} else if (checkedFavorite && onRemoveFromFavorites !== undefined) {
-											onRemoveFromFavorites(removeRequest, {
-												onSuccess: () => {
-													setUserAccount({
-														...userAccount,
-														favorite_adoption_publications:
-															userAccount.favorite_adoption_publications.filter(
-																(id) => id !== adoption._id
-															)
-													});
-												}
-											});
-										}
-									}}
-									icon={`bookmark`}
-									iconColor={!checkedFavorite ? theme.colors.tertiary : theme.colors.primary}
+									animated={true}
 									size={28}
+									icon="heart"
+									iconColor={!like ? theme.colors.tertiary : theme.colors.primary}
+									onPress={() => setLike(!like)}
 								/>
 							</View>
-						)}
-						<View style={styles.actions}>
-							<IconButton
-								animated={true}
-								size={28}
-								icon="heart"
-								iconColor={!like ? theme.colors.tertiary : theme.colors.primary}
-								onPress={() => setLike(!like)}
-							/>
-						</View>
-						<View style={styles.actions}>
-							<IconButton
-								size={28}
-								icon="comment"
-								iconColor={theme.colors.tertiary}
-								onPress={() => setComment(!comment)}
-							/>
-						</View>
+							<View style={styles.actions}>
+								<IconButton
+									size={28}
+									icon="comment"
+									iconColor={theme.colors.tertiary}
+									onPress={() => setComment(!comment)}
+								/>
+							</View>
 
-						<View style={styles.actions}>
-							<IconButton
-								size={28}
-								icon="share-variant"
-								iconColor={theme.colors.tertiary}
-								onPress={() => console.log('Pressed')}
-							/>
+							<View style={styles.actions}>
+								<IconButton
+									size={28}
+									icon="share-variant"
+									iconColor={theme.colors.tertiary}
+									onPress={() => snapShotAndShare(ref)}
+								/>
+							</View>
 						</View>
 					</View>
-				</View>
-			</Card>
+				</Card>
+			</View>
 		</>
 	);
 };
