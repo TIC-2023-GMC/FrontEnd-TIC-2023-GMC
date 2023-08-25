@@ -12,7 +12,6 @@ import FilterModal from '../../components/AdoptionsFilterModal';
 import { useFocusEffect } from '@react-navigation/native';
 import MoreOptionsModal from '../../components/MoreOptionsModal';
 import { UserContext, UserContextParams } from '../../auth/userContext';
-
 import {
 	getAddFavoriteAdoptionEndpoint,
 	getListAdoptionsEndpoint,
@@ -28,6 +27,7 @@ interface AdoptionPublicationScreen {
 	0: AdoptionPublication[];
 	1: number;
 }
+
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedFilterModal = memo(FilterModal);
 const MemoizedMoreOptionsModal = memo(MoreOptionsModal);

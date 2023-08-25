@@ -2,7 +2,6 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useContext, useState } from 'react';
 import { Text, View, ScrollView, BackHandler } from 'react-native';
-
 import {
 	TextInput,
 	Checkbox,
