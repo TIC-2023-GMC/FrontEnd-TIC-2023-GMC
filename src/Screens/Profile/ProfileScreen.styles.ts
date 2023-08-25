@@ -16,11 +16,11 @@ export const styles = StyleSheet.create({
 		marginTop: 25,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
-		backgroundColor: '#CAD9B5'
+		backgroundColor: '#eef2e1'
 	},
 	aptitudeContainer: {
 		height: 'auto',
-		marginBottom: 20
+		marginBottom: 10
 	},
 	basicInfoContainer: {
 		marginTop: 20,
@@ -69,11 +69,11 @@ export const styles = StyleSheet.create({
 		textAlignVertical: 'center'
 	},
 	aptitudeFieldText: {
-		fontSize: 18,
-		fontWeight: '600'
+		fontSize: 14,
+		color: '#555'
 	},
 	aptitudeText: {
-		fontSize: 18
+		fontSize: 16
 	},
 	profileButtonsView: {
 		width: '100%',

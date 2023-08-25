@@ -124,7 +124,7 @@ export function ProfileScreen({ route }: any) {
 									<Button
 										style={styles.button}
 										mode="elevated"
-										buttonColor={theme.colors.tertiary}
+										buttonColor={theme.colors.primary}
 										textColor={theme.colors.secondary}
 										icon="phone"
 										onPress={() => {
@@ -136,7 +136,6 @@ export function ProfileScreen({ route }: any) {
 									<Button
 										style={styles.button}
 										mode="elevated"
-										//buttonColor={'#25D366'}
 										buttonColor={theme.colors.primary}
 										textColor={theme.colors.secondary}
 										icon="whatsapp"
@@ -171,14 +170,22 @@ export function ProfileScreen({ route }: any) {
 								<View style={styles.aptitudeFieldView}>
 									<Text style={styles.aptitudeFieldText}>Número de mascotas previas:</Text>
 									<Text style={styles.aptitudeText}>
-										{profileUser.num_previous_pets < 0 ? '' : profileUser.num_previous_pets}
+										{profileUser.num_previous_pets < 0
+											? ''
+											: profileUser.num_previous_pets > 20
+											? 'Más de 20'
+											: profileUser.num_previous_pets}
 									</Text>
 								</View>
 								<Divider style={{ backgroundColor: theme.colors.primary }} />
 								<View style={styles.aptitudeFieldView}>
 									<Text style={styles.aptitudeFieldText}>Número de mascotas actuales:</Text>
 									<Text style={styles.aptitudeText}>
-										{profileUser.num_current_pets < 0 ? '' : profileUser.num_current_pets}
+										{profileUser.num_current_pets < 0
+											? ''
+											: profileUser.num_current_pets > 20
+											? 'Más de 20'
+											: profileUser.num_current_pets}
 									</Text>
 								</View>
 								<Divider style={{ backgroundColor: theme.colors.primary }} />
