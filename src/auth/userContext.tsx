@@ -3,6 +3,8 @@ import { User } from '../models/InterfacesModels';
 import { useQuery } from '@tanstack/react-query';
 import { getUserByIdEndpoint } from '../services/endpoints';
 import { get } from '../services/api';
+import { ActivityIndicator } from 'react-native-paper';
+import { StyleSheet } from 'react-native';
 
 export interface UserContextParams {
 	user: User;
@@ -20,11 +22,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	});
 	const [user, setUser] = useState<User>({} as User);
 	useEffect(() => {
-		data && setUser(data);
+		if (data) {
+			const user: User = {
+				...data,
+				birth_date: new Date(data?.birth_date)
+			};
+			setUser(user);
+		}
 	}, [data]);
 	return data ? (
 		<UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>
 	) : (
-		<></>
+		<ActivityIndicator animating={true} size={'large'} style={styles.activityIndicator} />
 	);
 };
+
+const styles = StyleSheet.create({
+	activityIndicator: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center'
+	}
+});
