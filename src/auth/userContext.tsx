@@ -14,7 +14,7 @@ export const UserContext = createContext<UserContextParams>({} as UserContextPar
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const { data } = useQuery({
-		queryKey: ['userProfileData'],
+		queryKey: ['userContextData'],
 		queryFn: async () => {
 			const response = await get<User>(getUserByIdEndpoint('64c1b0ef0fd89c04b7114eb7'));
 			return response.data;
