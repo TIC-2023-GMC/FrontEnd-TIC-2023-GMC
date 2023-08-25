@@ -106,8 +106,8 @@ export function FavoritesScreen() {
 			<StatusBar style="light" />
 			<MemoizedMoreOptionsModal
 				publication={publicationSelected}
-				visible={isMoreModalVisible}
-				handlerVisible={() => setIsMoreModalVisible(false)}
+				modalVisible={isMoreModalVisible}
+				handleModalVisible={() => setIsMoreModalVisible(false)}
 				navBarHeight={tabBarHeight}
 			/>
 			<FlatList

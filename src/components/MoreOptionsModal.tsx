@@ -1,30 +1,32 @@
 import * as React from 'react';
-import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
-import { useTheme, Portal, Modal, List, IconButton, Divider } from 'react-native-paper';
+import { Dimensions, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { useTheme, Portal, Modal, List, IconButton, Divider, Snackbar } from 'react-native-paper';
 import { AdoptionPublication } from '../models/InterfacesModels';
+import { useState } from 'react';
 
 const deviceHeight = Dimensions.get('window').height;
 
 interface MoreOptionsModalProps {
 	publication: AdoptionPublication;
-	visible: boolean;
+	modalVisible: boolean;
 	navBarHeight: number;
-	handlerVisible: () => void;
+	handleModalVisible: () => void;
 }
 
 const MoreOptionsModal = ({
 	publication,
-	visible,
+	modalVisible,
 	navBarHeight,
-	handlerVisible
+	handleModalVisible
 }: MoreOptionsModalProps) => {
 	const theme = useTheme();
+	const [snackbarVisible, setSnackbarVisible] = useState(false);
 
 	return (
 		<Portal>
 			<Modal
-				visible={visible}
-				onDismiss={handlerVisible}
+				visible={modalVisible}
+				onDismiss={handleModalVisible}
 				theme={{ ...theme }}
 				contentContainerStyle={{
 					backgroundColor: theme.colors.secondary,
@@ -42,12 +44,48 @@ const MoreOptionsModal = ({
 						style={styles.iconButton}
 						iconColor={theme.colors.tertiary}
 						size={30}
-						onTouchEnd={handlerVisible}
+						onTouchEnd={handleModalVisible}
 					/>
 				</TouchableOpacity>
 
 				<Divider />
-				<TouchableOpacity style={styles.viewList}>
+				<TouchableOpacity
+					style={styles.viewList}
+					onPress={() => {
+						Linking.openURL(`tel:${publication.user.mobile_phone}`);
+					}}
+				>
+					<List.Item
+						style={styles.list}
+						titleStyle={{ fontWeight: 'bold' }}
+						title={`Llamar a ${publication.user.first_name}`}
+						left={(props) => (
+							<IconButton
+								{...props}
+								style={{ margin: 0, padding: 0 }}
+								icon={'phone'}
+								iconColor={theme.colors.primary}
+								size={50}
+							/>
+						)}
+					/>
+				</TouchableOpacity>
+
+				<Divider />
+				<TouchableOpacity
+					style={styles.viewList}
+					onPress={() => {
+						Linking.canOpenURL(`whatsapp://send?phone=${publication.user.mobile_phone}`).then(
+							(supported) => {
+								if (supported) {
+									Linking.openURL(`whatsapp://send?phone=${publication.user.mobile_phone}`);
+								} else {
+									setSnackbarVisible(true);
+								}
+							}
+						);
+					}}
+				>
 					<List.Item
 						style={styles.list}
 						titleStyle={{ fontWeight: 'bold' }}
@@ -63,25 +101,16 @@ const MoreOptionsModal = ({
 						)}
 					/>
 				</TouchableOpacity>
-
-				<Divider />
-				<TouchableOpacity style={styles.viewList}>
-					<List.Item
-						style={styles.list}
-						titleStyle={{ fontWeight: 'bold' }}
-						title={`Enviar mensaje a ${publication.user.first_name}`}
-						left={(props) => (
-							<IconButton
-								{...props}
-								style={{ margin: 0, padding: 0 }}
-								icon={'phone'}
-								iconColor={theme.colors.primary}
-								size={50}
-							/>
-						)}
-					/>
-				</TouchableOpacity>
 			</Modal>
+			<Snackbar
+				onIconPress={() => setSnackbarVisible(false)}
+				style={styles.snackbarStyle}
+				duration={3000}
+				visible={snackbarVisible}
+				onDismiss={() => setSnackbarVisible(false)}
+			>
+				Error al abrir Whatsapp...
+			</Snackbar>
 		</Portal>
 	);
 };
@@ -110,6 +139,12 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-around',
 		margin: 0,
 		height: 30
+	},
+	snackbarStyle: {
+		width: '90%',
+		alignSelf: 'center',
+		marginBottom: 20,
+		justifySelf: 'center'
 	}
 });
 

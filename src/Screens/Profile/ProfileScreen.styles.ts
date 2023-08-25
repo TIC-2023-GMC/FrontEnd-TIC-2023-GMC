@@ -12,15 +12,15 @@ export const styles = StyleSheet.create({
 	},
 	profileContainer: {
 		width: '90%',
-		height: 280,
+		height: 350,
 		marginTop: 25,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
-		backgroundColor: '#CAD9B5'
+		backgroundColor: '#eef2e1'
 	},
 	aptitudeContainer: {
 		height: 'auto',
-		marginBottom: 20
+		marginBottom: 10
 	},
 	basicInfoContainer: {
 		marginTop: 20,
@@ -69,20 +69,25 @@ export const styles = StyleSheet.create({
 		textAlignVertical: 'center'
 	},
 	aptitudeFieldText: {
-		fontSize: 18,
-		fontWeight: '600'
+		fontSize: 14,
+		color: '#555'
 	},
 	aptitudeText: {
-		fontSize: 18
+		fontSize: 16
 	},
 	profileButtonsView: {
 		width: '100%',
 		marginBottom: 20
 	},
 	button: {
-		width: '70%',
+		width: '80%',
 		alignSelf: 'center',
-		marginTop: 10,
+		marginTop: 15,
 		elevation: 20
+	},
+	snackbarStyle: {
+		width: '90%',
+		alignSelf: 'center',
+		marginBottom: 20
 	}
 });
