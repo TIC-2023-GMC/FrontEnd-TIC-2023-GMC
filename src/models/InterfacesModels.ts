@@ -55,9 +55,9 @@ export interface Comment extends Interaction {
 	comment_text: string;
 	comment_date: string;
 }
-export interface Like extends Interaction {
-	_id: string;
-}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Like extends Interaction {}
 
 export interface AdoptionPublication {
 	_id: string;
@@ -94,6 +94,12 @@ export interface Location {
 export interface SaveOrRemoveFavoriteProps {
 	user_id: string;
 	pub_id: string;
+}
+
+export interface AddOrRemoveLikeProps {
+	user_id: string;
+	pub_id: string;
+	is_adoption: boolean;
 }
 
 //Game Section

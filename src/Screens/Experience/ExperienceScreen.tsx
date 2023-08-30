@@ -39,14 +39,14 @@ export function ExperienceScreen({
 		useInfiniteQuery({
 			queryKey: ['Experience', filter],
 			queryFn: async ({ pageParam = 1 }) => {
-				const new_date = filter?.date ? new Date(filter?.date) : undefined;
+				const newDate = filter?.date ? new Date(filter?.date) : undefined;
 
-				if (new_date) {
-					new_date.setUTCHours(0, 0, 0, 0);
+				if (newDate) {
+					newDate.setUTCHours(0, 0, 0, 0);
 				}
 
 				const response = await get<ExperiencePublicationScreen>(
-					getListExperiencesEnpoint({ pageParam, pageSize, filter, new_date })
+					getListExperiencesEnpoint({ pageParam, pageSize, filter, newDate })
 				);
 				return response.data;
 			},

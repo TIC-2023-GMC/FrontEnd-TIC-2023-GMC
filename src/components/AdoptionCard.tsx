@@ -4,7 +4,12 @@ import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AdoptionPublication, SaveOrRemoveFavoriteProps, User } from '../models/InterfacesModels';
+import {
+	AddOrRemoveLikeProps,
+	AdoptionPublication,
+	SaveOrRemoveFavoriteProps,
+	User
+} from '../models/InterfacesModels';
 import { MutateOptions } from '@tanstack/react-query';
 import { CommentSection } from './CommentSection';
 import { CommonActions, useNavigation } from '@react-navigation/native';
@@ -24,6 +29,14 @@ interface CardProps {
 		variables: SaveOrRemoveFavoriteProps,
 		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
 	) => void;
+	onAddLike?: (
+		variables: AddOrRemoveLikeProps,
+		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
+	) => void;
+	onRemoveLike?: (
+		variables: AddOrRemoveLikeProps,
+		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
+	) => void;
 }
 
 const LeftContent = (props: { size: number; photo: string }) => (
@@ -39,7 +52,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 	const theme = useTheme();
 	const ref = useRef(null);
 	const navigation = useNavigation<NativeStackNavigationProp<TabNavigationParamsList>>();
-	const [like, setLike] = useState<boolean>();
+
 	const [comment, setComment] = useState<boolean>(false);
 	const [expanded, setExpanded] = useState<boolean>();
 	const {
@@ -51,6 +64,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 		pet_location: petLocation,
 		publication_date: publicationDate,
 		photo,
+		likes,
 		pet_sex: petSex,
 		vaccination_card: vaccinationCard,
 		sterilized
@@ -58,23 +72,41 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 	const handleExpand = () => {
 		setExpanded(!expanded);
 	};
-
 	const {
 		setUserAccount,
 		userAccount,
 		onOpenModal,
 		onSaveAsFavorite,
 		onRemoveFromFavorites,
+		onAddLike,
+		onRemoveLike,
 		...adoption
 	} = props;
 	const [checkedFavorite, setCheckedFavorite] = useState<boolean>(
 		userAccount.favorite_adoption_publications.includes(adoption._id)
 	);
 
-	const removeRequest = { user_id: userAccount._id ? userAccount._id : '', pub_id: adoption._id };
+	const [like, setLike] = useState<boolean>(likes.some((like) => like.user_id === userAccount._id));
+	const [numberOfLikes, setNumberOfLikes] = useState<number>(props.likes.length);
+
+	const addOrRemoveFavoriteRequest = {
+		user_id: userAccount._id ? userAccount._id : '',
+		pub_id: adoption._id
+	};
+
+	const addOrRemoveLikeRequest = {
+		user_id: userAccount._id ? userAccount._id : '',
+		pub_id: adoption._id,
+		is_adoption: true
+	};
+
 	useEffect(() => {
 		setCheckedFavorite(userAccount.favorite_adoption_publications.includes(adoption._id));
 	}, [userAccount.favorite_adoption_publications, adoption._id]);
+
+	/* useEffect(() => {
+		setLike(likes.some((like) => like.user_id === userAccount._id));
+	}, [likes, numberOfLikes]); */
 
 	return (
 		<>
@@ -203,12 +235,55 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 							</Button>
 						</View>
 						<View style={styles.actionsContainer}>
+							<View style={styles.actions}>
+								<Text style={{ color: theme.colors.tertiary }}>
+									{numberOfLikes >= 1000
+										? numberOfLikes >= 10000
+											? (numberOfLikes / 1000).toFixed(0) + 'K'
+											: (numberOfLikes / 1000).toFixed(1) + 'K'
+										: numberOfLikes}
+								</Text>
+							</View>
+							<View style={styles.actions}>
+								<IconButton
+									animated={true}
+									size={28}
+									icon="heart"
+									iconColor={!like ? theme.colors.tertiary : theme.colors.primary}
+									//onPress={() => setLike(!like)}
+									onPress={() => {
+										if (!like && onAddLike !== undefined) {
+											onAddLike(addOrRemoveLikeRequest, {
+												onSuccess: () => {
+													setNumberOfLikes(numberOfLikes + 1);
+													setLike(true);
+												}
+											});
+										} else if (like && onRemoveLike !== undefined) {
+											onRemoveLike(addOrRemoveLikeRequest, {
+												onSuccess: () => {
+													setNumberOfLikes(numberOfLikes - 1);
+													setLike(false);
+												}
+											});
+										}
+									}}
+								/>
+							</View>
+							<View style={styles.actions}>
+								<IconButton
+									size={28}
+									icon="comment"
+									iconColor={theme.colors.tertiary}
+									onPress={() => setComment(!comment)}
+								/>
+							</View>
 							{(onSaveAsFavorite !== undefined || onRemoveFromFavorites !== undefined) && (
 								<View style={styles.actions}>
 									<IconButton
 										onPress={() => {
 											if (!checkedFavorite && onSaveAsFavorite !== undefined) {
-												onSaveAsFavorite(removeRequest, {
+												onSaveAsFavorite(addOrRemoveFavoriteRequest, {
 													onSuccess: () => {
 														setUserAccount({
 															...userAccount,
@@ -220,7 +295,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 													}
 												});
 											} else if (checkedFavorite && onRemoveFromFavorites !== undefined) {
-												onRemoveFromFavorites(removeRequest, {
+												onRemoveFromFavorites(addOrRemoveFavoriteRequest, {
 													onSuccess: () => {
 														setUserAccount({
 															...userAccount,
@@ -239,24 +314,6 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 									/>
 								</View>
 							)}
-							<View style={styles.actions}>
-								<IconButton
-									animated={true}
-									size={28}
-									icon="heart"
-									iconColor={!like ? theme.colors.tertiary : theme.colors.primary}
-									onPress={() => setLike(!like)}
-								/>
-							</View>
-							<View style={styles.actions}>
-								<IconButton
-									size={28}
-									icon="comment"
-									iconColor={theme.colors.tertiary}
-									onPress={() => setComment(!comment)}
-								/>
-							</View>
-
 							<View style={styles.actions}>
 								<IconButton
 									size={28}
@@ -304,15 +361,17 @@ const styles = StyleSheet.create({
 		padding: 0,
 		marginTop: 0,
 		justifyContent: 'space-between',
-		flexDirection: 'row'
+		flexDirection: 'row',
+		width: '50%'
 	},
 	actions: {
+		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginLeft: 0,
 		borderRadius: 0,
 		padding: 0,
-		width: 45
+		width: '20%'
 	},
 	actionMore: {
 		alignItems: 'center',
