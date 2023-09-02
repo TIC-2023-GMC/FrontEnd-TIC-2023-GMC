@@ -12,7 +12,7 @@ import {
 } from '../models/InterfacesModels';
 import { MutateOptions } from '@tanstack/react-query';
 import { CommentSection } from './CommentSection';
-import { CommonActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { TabNavigationParamsList } from '../models/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { snapShotAndShare } from '../utils/utils';
@@ -87,7 +87,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 	);
 
 	const [like, setLike] = useState<boolean>(likes.some((like) => like.user_id === userAccount._id));
-	const [numberOfLikes, setNumberOfLikes] = useState<number>(props.likes.length);
+	const [numberOfLikes, setNumberOfLikes] = useState<number>(likes.length);
 
 	const addOrRemoveFavoriteRequest = {
 		user_id: userAccount._id ? userAccount._id : '',
@@ -104,10 +104,6 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 		setCheckedFavorite(userAccount.favorite_adoption_publications.includes(adoption._id));
 	}, [userAccount.favorite_adoption_publications, adoption._id]);
 
-	/* useEffect(() => {
-		setLike(likes.some((like) => like.user_id === userAccount._id));
-	}, [likes, numberOfLikes]); */
-
 	return (
 		<>
 			<CommentSection visible={comment} onDismiss={() => setComment(!comment)} />
@@ -117,12 +113,6 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 						title={
 							<Button
 								onPress={() => {
-									navigation.dispatch(
-										CommonActions.reset({
-											index: 0,
-											routes: [{ name: 'Perfil' }]
-										})
-									);
 									navigation.navigate('Perfil', {
 										screen: 'Perfil de Usuarios',
 										params: { userId: user._id || '' }
@@ -235,8 +225,13 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 							</Button>
 						</View>
 						<View style={styles.actionsContainer}>
-							<View style={styles.actions}>
-								<Text style={{ color: theme.colors.tertiary }}>
+							<View style={{ ...styles.actions, width: '5%' }}>
+								<Text
+									style={{
+										...styles.likeCountText,
+										color: like ? theme.colors.primary : theme.colors.tertiary
+									}}
+								>
 									{numberOfLikes >= 1000
 										? numberOfLikes >= 10000
 											? (numberOfLikes / 1000).toFixed(0) + 'K'
@@ -250,7 +245,6 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 									size={28}
 									icon="heart"
 									iconColor={!like ? theme.colors.tertiary : theme.colors.primary}
-									//onPress={() => setLike(!like)}
 									onPress={() => {
 										if (!like && onAddLike !== undefined) {
 											onAddLike(addOrRemoveLikeRequest, {
@@ -381,6 +375,9 @@ const styles = StyleSheet.create({
 		paddingVertical: 0,
 		paddingRight: 0,
 		marginVertical: 0
+	},
+	likeCountText: {
+		fontWeight: 'bold'
 	}
 });
 export default PublicationCard;
