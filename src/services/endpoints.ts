@@ -4,16 +4,16 @@ export function getListAdoptionsEndpoint({
 	pageParam,
 	pageSize,
 	filter,
-	new_date
+	newDate
 }: {
 	pageParam: number;
 	pageSize: number;
 	filter: AdoptionFilter;
-	new_date: Date | undefined;
+	newDate: Date | undefined;
 }) {
 	return `adoptions/list?page_number=${pageParam}&page_size=${pageSize}${
 		filter?.species ? '&species=' + filter.species : ''
-	}${filter?.date ? '&date=' + new_date?.toISOString() : ''}${
+	}${filter?.date ? '&date=' + newDate?.toISOString() : ''}${
 		filter?.location ? '&location=' + filter?.location : ''
 	}`;
 }
@@ -22,16 +22,16 @@ export function getListExperiencesEnpoint({
 	pageParam,
 	pageSize,
 	filter,
-	new_date
+	newDate
 }: {
 	pageParam: number;
 	pageSize: number;
 	filter: ExperienceFilter;
-	new_date: Date | undefined;
+	newDate: Date | undefined;
 }) {
 	return `experiences/list?page_number=${pageParam}&page_size=${pageSize}${
 		filter?.species ? '&species=' + filter.species : ''
-	}${filter?.date ? '&date=' + new_date?.toISOString() : ''}`;
+	}${filter?.date ? '&date=' + newDate?.toISOString() : ''}`;
 }
 
 export function getListFavoritesAdoptionsEndpoint({
@@ -43,9 +43,35 @@ export function getListFavoritesAdoptionsEndpoint({
 }) {
 	return `/user/list_favorite_adoptions?page_number=${pageParam}&page_size=${pageSize}`;
 }
+
+export function getAddLikeEndpoint({
+	userId,
+	pubId,
+	isAdoption
+}: {
+	userId: string;
+	pubId: string;
+	isAdoption: boolean;
+}) {
+	return `/like/add_like?user_id=${userId}&pub_id=${pubId}&is_adoption=${isAdoption}`;
+}
+
+export function getRemoveLikeEndpoint({
+	userId,
+	pubId,
+	isAdoption
+}: {
+	userId: string;
+	pubId: string;
+	isAdoption: boolean;
+}) {
+	return `/like/remove_like?user_id=${userId}&pub_id=${pubId}&is_adoption=${isAdoption}`;
+}
+
 export function getRemoveFavoriteAdoptionEndpoint() {
 	return '/user/remove_favorite_adoption';
 }
+
 export function getAddFavoriteAdoptionEndpoint() {
 	return '/user/add_favorite_adoption';
 }

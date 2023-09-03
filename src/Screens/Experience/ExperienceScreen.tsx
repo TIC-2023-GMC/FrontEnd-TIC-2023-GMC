@@ -1,16 +1,25 @@
-import React, { useRef, useState, memo, useCallback } from 'react';
+import React, { useRef, useState, memo, useCallback, useContext } from 'react';
 import { Text, View, FlatList, RefreshControl } from 'react-native';
 import { styles } from './ExperienceScreen.styles';
 import { StatusBar } from 'expo-status-bar';
-import { get } from '../../services/api';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { del, get, post } from '../../services/api';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/ExperiencesFilterModal';
-import { ExperienceFilter, ExperiencePublication } from '../../models/InterfacesModels';
+import {
+	AddOrRemoveLikeProps,
+	ExperienceFilter,
+	ExperiencePublication
+} from '../../models/InterfacesModels';
 import ExperienceCard from '../../components/ExperienceCard';
-import { getListExperiencesEnpoint } from '../../services/endpoints';
+import {
+	getAddLikeEndpoint,
+	getListExperiencesEnpoint,
+	getRemoveLikeEndpoint
+} from '../../services/endpoints';
+import { UserContext, UserContextParams } from '../../auth/userContext';
 
 interface ExperiencePublicationScreen {
 	0: ExperiencePublication[];
@@ -28,6 +37,7 @@ export function ExperienceScreen({
 	// eslint-disable-next-line no-unused-vars
 	setVisibleFilter: (visible: boolean) => void;
 }) {
+	const { user } = useContext<UserContextParams>(UserContext);
 	const theme = useTheme();
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
@@ -39,14 +49,14 @@ export function ExperienceScreen({
 		useInfiniteQuery({
 			queryKey: ['Experience', filter],
 			queryFn: async ({ pageParam = 1 }) => {
-				const new_date = filter?.date ? new Date(filter?.date) : undefined;
+				const newDate = filter?.date ? new Date(filter?.date) : undefined;
 
-				if (new_date) {
-					new_date.setUTCHours(0, 0, 0, 0);
+				if (newDate) {
+					newDate.setUTCHours(0, 0, 0, 0);
 				}
 
 				const response = await get<ExperiencePublicationScreen>(
-					getListExperiencesEnpoint({ pageParam, pageSize, filter, new_date })
+					getListExperiencesEnpoint({ pageParam, pageSize, filter, newDate })
 				);
 				return response.data;
 			},
@@ -69,6 +79,36 @@ export function ExperienceScreen({
 		}, [])
 	);
 
+	const addLikeMutation = useMutation({
+		mutationFn: (data: AddOrRemoveLikeProps) => {
+			return post(
+				getAddLikeEndpoint({
+					userId: data.user_id,
+					pubId: data.pub_id,
+					isAdoption: data.is_adoption
+				})
+			).then((response) => response.data);
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
+	const removeLikeMutation = useMutation({
+		mutationFn: (data: AddOrRemoveLikeProps) => {
+			return del(
+				getRemoveLikeEndpoint({
+					userId: data.user_id,
+					pubId: data.pub_id,
+					isAdoption: data.is_adoption
+				})
+			).then((response) => response.data);
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
 	return (
 		<>
 			<StatusBar style="light" />
@@ -90,7 +130,14 @@ export function ExperienceScreen({
 				onEndReached={handleLoadMore}
 				ref={ref}
 				data={data?.pages.flatMap((page) => page[0])}
-				renderItem={({ item }) => <MemoizedExperienceCard {...item} />}
+				renderItem={({ item }) => (
+					<MemoizedExperienceCard
+						{...item}
+						userAccount={user}
+						onAddLike={addLikeMutation.mutate}
+						onRemoveLike={removeLikeMutation.mutate}
+					/>
+				)}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={

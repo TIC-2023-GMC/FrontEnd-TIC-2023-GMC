@@ -15,12 +15,15 @@ import { UserContext, UserContextParams } from '../../auth/userContext';
 import {
 	getAddFavoriteAdoptionEndpoint,
 	getListAdoptionsEndpoint,
-	getRemoveFavoriteAdoptionEndpoint
+	getRemoveFavoriteAdoptionEndpoint,
+	getAddLikeEndpoint,
+	getRemoveLikeEndpoint
 } from '../../services/endpoints';
 import {
 	AdoptionPublication,
 	AdoptionFilter,
-	SaveOrRemoveFavoriteProps
+	SaveOrRemoveFavoriteProps,
+	AddOrRemoveLikeProps
 } from '../../models/InterfacesModels';
 
 interface AdoptionPublicationScreen {
@@ -42,7 +45,7 @@ export function AdoptionScreen({
 }) {
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
 	const theme = useTheme();
-	const [visibleSnackBar, setvisibleSnackBar] = useState([false, false]);
+	const [visibleSnackBar, setVisibleSnackBar] = useState([false, false]);
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [filter, setFilter] = useState<AdoptionFilter>({} as AdoptionFilter);
@@ -73,12 +76,12 @@ export function AdoptionScreen({
 		useInfiniteQuery({
 			queryKey: ['Adoption', filter],
 			queryFn: async ({ pageParam = 1 }) => {
-				const new_date = filter?.date ? new Date(filter?.date) : undefined;
-				if (new_date) {
-					new_date.setUTCHours(0, 0, 0, 0);
+				const newDate = filter?.date ? new Date(filter?.date) : undefined;
+				if (newDate) {
+					newDate.setUTCHours(0, 0, 0, 0);
 				}
 				const response = await get<AdoptionPublicationScreen>(
-					getListAdoptionsEndpoint({ pageParam, filter, pageSize, new_date })
+					getListAdoptionsEndpoint({ pageParam, filter, pageSize, newDate })
 				);
 				return response.data;
 			},
@@ -101,12 +104,42 @@ export function AdoptionScreen({
 		}, [])
 	);
 
+	const addLikeMutation = useMutation({
+		mutationFn: (data: AddOrRemoveLikeProps) => {
+			return post(
+				getAddLikeEndpoint({
+					userId: data.user_id,
+					pubId: data.pub_id,
+					isAdoption: data.is_adoption
+				})
+			).then((response) => response.data);
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
+	const removeLikeMutation = useMutation({
+		mutationFn: (data: AddOrRemoveLikeProps) => {
+			return del(
+				getRemoveLikeEndpoint({
+					userId: data.user_id,
+					pubId: data.pub_id,
+					isAdoption: data.is_adoption
+				})
+			).then((response) => response.data);
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
 	const savePublicationAsFavoriteMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) => {
 			return post(getAddFavoriteAdoptionEndpoint(), data).then((response) => response.data);
 		},
 		onSuccess: () => {
-			setvisibleSnackBar([true, false]);
+			setVisibleSnackBar([true, false]);
 		},
 		onError: (error) => {
 			console.log(error);
@@ -117,7 +150,7 @@ export function AdoptionScreen({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
 			del(getRemoveFavoriteAdoptionEndpoint(), { data: data }).then((response) => response.data),
 		onSuccess: () => {
-			setvisibleSnackBar([false, true]);
+			setVisibleSnackBar([false, true]);
 		},
 		onError: (error) => {
 			console.log(error);
@@ -164,6 +197,8 @@ export function AdoptionScreen({
 						onOpenModal={handleOpenModal}
 						onSaveAsFavorite={savePublicationAsFavoriteMutation.mutate}
 						onRemoveFromFavorites={removePublicationFromFavoritesMutation.mutate}
+						onAddLike={addLikeMutation.mutate}
+						onRemoveLike={removeLikeMutation.mutate}
 					/>
 				)}
 				initialNumToRender={pageSize}
@@ -200,7 +235,7 @@ export function AdoptionScreen({
 			<Snackbar
 				theme={theme}
 				visible={visibleSnackBar[0]}
-				onDismiss={() => setvisibleSnackBar([false, false])}
+				onDismiss={() => setVisibleSnackBar([false, false])}
 				duration={2000}
 				style={{ marginBottom: tabBarHeight + 10 }}
 			>
@@ -209,7 +244,7 @@ export function AdoptionScreen({
 			<Snackbar
 				theme={theme}
 				visible={visibleSnackBar[1]}
-				onDismiss={() => setvisibleSnackBar([false, false])}
+				onDismiss={() => setVisibleSnackBar([false, false])}
 				duration={2000}
 				style={{ marginBottom: tabBarHeight + 10 }}
 			>
