@@ -91,6 +91,16 @@ export function getUserByIdEndpoint(id: string) {
 	return `user/get_by_id?_id=${id}`;
 }
 
-export function getGamesEnpoint() {
+export function getGamesEndpoint() {
 	return `game/get_games`;
+}
+
+export function getListCommentsEndpoint({
+	pageParam,
+	pageSize
+}: {
+	pageParam: number;
+	pageSize: number;
+}) {
+	return `comments/list_comments?page_number=${pageParam}&page_size=${pageSize}`;
 }

@@ -51,6 +51,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 		pet_location: petLocation,
 		publication_date: publicationDate,
 		photo,
+		comments,
 		pet_sex: petSex,
 		vaccination_card: vaccinationCard,
 		sterilized
@@ -78,7 +79,13 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 
 	return (
 		<>
-			<CommentSection visible={comment} onDismiss={() => setComment(!comment)} />
+			<CommentSection
+				visible={comment}
+				onDismiss={() => {
+					setComment(!comment);
+				}}
+				comments={comments}
+			/>
 			<View ref={ref}>
 				<Card style={styles.card}>
 					<Card.Title

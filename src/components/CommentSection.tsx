@@ -1,140 +1,101 @@
 import { StyleSheet, Modal, View, FlatList, RefreshControl } from 'react-native';
-import { Text, MD3Theme, TextInput, useTheme } from 'react-native-paper';
+import { Text, MD3Theme, TextInput, useTheme, ActivityIndicator } from 'react-native-paper';
 import { CommentComponent } from './CommentComponent';
 import React, { useState } from 'react';
-
 import { Comment } from '../models/InterfacesModels';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { getListCommentsEndpoint } from '../services/endpoints';
+import { post } from '../services/api';
+
+interface CommentsResults {
+	0: Comment[];
+	1: number;
+}
 
 interface CommentSectionProps {
 	visible: boolean;
-	onDismiss: () => void;
-	handlerGetComments?: () => void;
-	isLoading?: boolean;
-	refresh?: () => void;
+	onDismiss?: () => void;
+	comments: Comment[];
 }
-export function CommentSection({
-	onDismiss,
-	visible,
-	handlerGetComments,
-	refresh,
-	isLoading
-}: CommentSectionProps) {
+export function CommentSection({ onDismiss, visible, comments }: CommentSectionProps) {
 	const theme = useTheme();
 	const styles = createStyles(theme);
-	const [comment, setComment] = useState('');
-	const comments: Comment[] = [
-		{
-			user_id: '64c1b0ef0fd89c04b7114eb8',
-			_id: '1fff',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user_photo: {
-				img_path:
-					'https://imagenes.elpais.com/resizer/fdGn2HZ-QXQJW92FNbeWU7Z9Da4=/1960x1470/cloudfront-eu-central-1.images.arcpublishing.com/prisa/TW5CHJTUY5B3DOS35VMOLZUVF4.jpg'
+	const [newComment, setNewComment] = useState('');
+
+	const pageSize = 6;
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isLoading } =
+		useInfiniteQuery({
+			queryKey: ['Comments'],
+			queryFn: async ({ pageParam = 1 }) => {
+				const response = await post<CommentsResults>(
+					getListCommentsEndpoint({ pageParam, pageSize }),
+					comments
+				);
+				return response.data;
 			},
-			user_first_name: 'Bil',
-			user_last_name: 'Gates'
-		},
-		{
-			user_id: '2fff',
-			_id: '2fff',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user_photo: {
-				img_path:
-					'https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/364103707_975993543519709_3612431512803587105_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeEwJHZpCsZgpD_FUU2P5KSOQdEJOBSmWp1B0Qk4FKZandjUMKH74v2_LzVLOe4Vu-xlhYSxT72kLYsbBgnw5gqA&_nc_ohc=XY5pICYEY6UAX9v_-1o&_nc_ht=scontent.fuio35-1.fna&oh=00_AfAblqMWZ3sPaU7I5ovUGB4gRZuDsNXU1oEcuub-evFh-w&oe=64E82555'
+			getNextPageParam: (lastPage) => {
+				if (lastPage[0].length !== 0) {
+					return lastPage[1];
+				}
+				return undefined;
 			},
-			user_first_name: 'Juan',
-			user_last_name: 'Perez'
-		},
-		{
-			user_id: '3fff',
-			_id: '3fff',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user_photo: {
-				img_path:
-					'https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/364103707_975993543519709_3612431512803587105_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeEwJHZpCsZgpD_FUU2P5KSOQdEJOBSmWp1B0Qk4FKZandjUMKH74v2_LzVLOe4Vu-xlhYSxT72kLYsbBgnw5gqA&_nc_ohc=XY5pICYEY6UAX9v_-1o&_nc_ht=scontent.fuio35-1.fna&oh=00_AfAblqMWZ3sPaU7I5ovUGB4gRZuDsNXU1oEcuub-evFh-w&oe=64E82555'
-			},
-			user_first_name: 'Juan',
-			user_last_name: 'Perez'
+			enabled: visible
+		});
+
+	const handleLoadMore = () => {
+		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
+			fetchNextPage();
 		}
-	];
-	/* const [comments, setComments] = useState<Comment[]>([
-		{
-			_id: '1',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '2',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '3',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '4',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '5',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '6',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		}
-	]); */
-	// const handleSendComment = () => {
-	// 	setComments((prevComments) => [...prevComments, comment]);
-	// 	setComment('');
-	// };
+	};
+
 	return (
-		<Modal
-			animationType="slide"
-			transparent
-			visible={visible}
-			onDismiss={onDismiss}
-			onRequestClose={onDismiss}
-			onShow={handlerGetComments}
-		>
+		<Modal animationType="slide" transparent visible={visible} onRequestClose={onDismiss}>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					<Text style={styles.modalText}>Comentarios</Text>
 					<FlatList
+						style={styles.flatList}
+						keyExtractor={(item) => item._id}
+						onEndReached={handleLoadMore}
+						data={data?.pages.flatMap((page) => page[0])}
+						renderItem={({ item }) => <CommentComponent {...item} />}
+						initialNumToRender={pageSize}
+						onEndReachedThreshold={0.5}
+						ListEmptyComponent={
+							hasNextPage ? (
+								<View style={styles.activityIndicator}>
+									<Text>No hay más comentarios</Text>
+								</View>
+							) : null
+						}
 						refreshControl={
 							<RefreshControl
-								refreshing={isLoading ? true : false}
+								refreshing={isFetchingNextPage || isLoading}
 								onRefresh={() => {
-									refresh ? refresh() : null;
+									refetch();
 								}}
 							/>
 						}
-						ListEmptyComponent={() => <Text style={styles.emptyList}>No hay comentarios</Text>}
-						style={styles.flatList}
-						data={comments}
-						keyExtractor={(item) => item._id}
-						renderItem={({ item }) => <CommentComponent {...item} />}
+						ListFooterComponent={
+							hasNextPage ? (
+								<>
+									{isFetchingNextPage ? (
+										<ActivityIndicator size="large" style={styles.activityIndicator} />
+									) : null}
+								</>
+							) : (
+								<View style={styles.activityIndicator}>
+									<Text>No hay más comentarios</Text>
+								</View>
+							)
+						}
 					/>
 					<View style={styles.inputContainer}>
 						<TextInput
 							theme={theme}
 							style={styles.input}
-							value={comment}
-							onChangeText={setComment}
+							value={newComment}
+							onChangeText={setNewComment}
 							placeholder="Escribe un comentario..."
 							mode="outlined"
 							right={<TextInput.Icon icon="send-circle" size={40} color={theme.colors.primary} />}
@@ -153,6 +114,7 @@ const createStyles = (theme: MD3Theme) =>
 			alignItems: 'center'
 		},
 		modalView: {
+			flex: 1,
 			width: '99.5%',
 			height: '100%',
 			backgroundColor: theme.colors.secondary,
@@ -199,5 +161,10 @@ const createStyles = (theme: MD3Theme) =>
 			textAlign: 'center',
 			fontSize: 15,
 			marginTop: 10
+		},
+		activityIndicator: {
+			margin: 15,
+			justifyContent: 'center',
+			alignItems: 'center'
 		}
 	});
