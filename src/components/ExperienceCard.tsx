@@ -1,13 +1,28 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-native/no-unused-styles */
 import React, { useRef } from 'react';
 import { useState } from 'react';
 import { StyleSheet, View, Image, TextLayoutEventData, NativeSyntheticEvent } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { ExperiencePublication } from '../models/InterfacesModels';
+import { AddOrRemoveLikeProps, ExperiencePublication, User } from '../models/InterfacesModels';
 import { useNavigation } from '@react-navigation/native';
 import { TabNavigationParamsList } from '../models/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { snapShotAndShare } from '../utils/utils';
+import { MutateOptions } from '@tanstack/react-query';
+import { CommentSection } from './CommentSection';
+
+interface CardProps {
+	userAccount: User;
+	onAddLike?: (
+		variables: AddOrRemoveLikeProps,
+		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
+	) => void;
+	onRemoveLike?: (
+		variables: AddOrRemoveLikeProps,
+		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
+	) => void;
+}
 
 const LeftContent = (props: { size: number; photo: string }) => (
 	<Image
@@ -18,17 +33,29 @@ const LeftContent = (props: { size: number; photo: string }) => (
 	/>
 );
 
-const ExperienceCard = (props: ExperiencePublication) => {
+const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 	const theme = useTheme();
 	const ref = useRef(null);
 	const navigation = useNavigation<NativeStackNavigationProp<TabNavigationParamsList>>();
-	const [like, setLike] = useState<boolean>();
-	const { user, description, publication_date: publicationDate, photo } = props;
+
+	const [comment, setComment] = useState<boolean>(false);
+	const { user, description, publication_date: publicationDate, photo, likes } = props;
 	const [expanded, setExpanded] = useState<boolean>();
 	const [isTruncated, setIsTruncated] = useState<boolean>(false);
 
 	const handleExpand = () => {
 		setExpanded(!expanded);
+	};
+
+	const { userAccount, onAddLike, onRemoveLike, ...adoption } = props;
+
+	const [like, setLike] = useState<boolean>(likes.some((like) => like.user_id === userAccount._id));
+	const [numberOfLikes, setNumberOfLikes] = useState<number>(likes.length);
+
+	const addOrRemoveLikeRequest = {
+		user_id: userAccount._id ? userAccount._id : '',
+		pub_id: adoption._id,
+		is_adoption: false
 	};
 
 	const handleTextLayout = (event: NativeSyntheticEvent<TextLayoutEventData>) => {
@@ -41,101 +68,134 @@ const ExperienceCard = (props: ExperiencePublication) => {
 	};
 
 	return (
-		<View ref={ref}>
-			<Card style={styles.card}>
-				<Card.Title
-					title={
-						<Button
-							onPress={() => {
-								navigation.navigate('Perfil', {
-									screen: 'Perfil de Usuarios',
-									params: { userId: user._id || '' }
-								});
-							}}
-						>
-							{user.first_name + ' ' + user.last_name}
-						</Button>
-					}
-					subtitle={
-						<Text style={{ color: theme.colors.tertiary }}>
-							{'Publicado el ' +
-								new Date(publicationDate).toLocaleString('es-ES', {
-									timeZone: 'America/Guayaquil',
-									year: 'numeric',
-									month: '2-digit',
-									day: '2-digit',
-									hour: '2-digit',
-									minute: '2-digit',
-									hour12: false, // Force 24-hour format
-									hourCycle: 'h23' // Ensure two digits for hours
-								})}
-						</Text>
-					}
-					left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
-				/>
-				<Card.Cover
-					theme={{ ...theme, roundness: 0.5 }}
-					style={styles.img}
-					resizeMode="contain"
-					resizeMethod="scale"
-					source={{ uri: photo.img_path }}
-					loadingIndicatorSource={{ uri: photo.img_path }}
-					progressiveRenderingEnabled={true}
-				/>
-				<Card.Content style={styles.content}>
-					<List.Item
-						style={styles.list}
-						titleStyle={styles.title}
-						title={'Mi experiencia'}
-						left={() => <List.Icon color={theme.colors.tertiary} icon="account-heart" />}
+		<>
+			<CommentSection visible={comment} onDismiss={() => setComment(!comment)} />
+			<View ref={ref}>
+				<Card style={styles.card}>
+					<Card.Title
+						title={
+							<Button
+								onPress={() => {
+									navigation.navigate('Perfil', {
+										screen: 'Perfil de Usuarios',
+										params: { userId: user._id || '' }
+									});
+								}}
+							>
+								{user.first_name + ' ' + user.last_name}
+							</Button>
+						}
+						subtitle={
+							<Text style={{ color: theme.colors.tertiary }}>
+								{'Publicado el ' +
+									new Date(publicationDate).toLocaleString('es-ES', {
+										timeZone: 'America/Guayaquil',
+										year: 'numeric',
+										month: '2-digit',
+										day: '2-digit',
+										hour: '2-digit',
+										minute: '2-digit',
+										hour12: false, // Force 24-hour format
+										hourCycle: 'h23' // Ensure two digits for hours
+									})}
+							</Text>
+						}
+						left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
 					/>
-					<Text
-						style={styles.description}
-						numberOfLines={expanded ? undefined : 2}
-						onTextLayout={handleTextLayout}
-					>
-						{description}
-					</Text>
-				</Card.Content>
+					<Card.Cover
+						theme={{ ...theme, roundness: 0.5 }}
+						style={styles.img}
+						resizeMode="contain"
+						resizeMethod="scale"
+						source={{ uri: photo.img_path }}
+						loadingIndicatorSource={{ uri: photo.img_path }}
+						progressiveRenderingEnabled={true}
+					/>
+					<Card.Content style={styles.content}>
+						<List.Item
+							style={styles.list}
+							titleStyle={styles.title}
+							title={'Mi experiencia'}
+							left={() => <List.Icon color={theme.colors.tertiary} icon="account-heart" />}
+						/>
+						<Text
+							style={styles.description}
+							numberOfLines={expanded ? undefined : 2}
+							onTextLayout={handleTextLayout}
+						>
+							{description}
+						</Text>
+					</Card.Content>
 
-				<View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-					<View style={styles.actionMore}>
-						<Button mode="text" onPress={handleExpand} disabled={!isTruncated}>
-							{expanded ? 'Ver menos' : 'Ver más'}
-						</Button>
+					<View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
+						<View style={styles.actionMore}>
+							<Button mode="text" onPress={handleExpand} disabled={!isTruncated}>
+								{expanded ? 'Ver menos' : 'Ver más'}
+							</Button>
+						</View>
+
+						<View style={styles.actionsContainer}>
+							<View style={{ ...styles.actions, width: '5%' }}>
+								<Text
+									style={{
+										...styles.likeCountText,
+										color: like ? theme.colors.primary : theme.colors.tertiary
+									}}
+								>
+									{numberOfLikes >= 1000
+										? numberOfLikes >= 10000
+											? (numberOfLikes / 1000).toFixed(0) + 'K'
+											: (numberOfLikes / 1000).toFixed(1) + 'K'
+										: numberOfLikes}
+								</Text>
+							</View>
+							<View style={styles.actions}>
+								<IconButton
+									animated={true}
+									size={28}
+									icon="heart"
+									iconColor={!like ? theme.colors.tertiary : theme.colors.primary}
+									onPress={() => {
+										if (!like && onAddLike !== undefined) {
+											onAddLike(addOrRemoveLikeRequest, {
+												onSuccess: () => {
+													setNumberOfLikes(numberOfLikes + 1);
+													setLike(true);
+												}
+											});
+										} else if (like && onRemoveLike !== undefined) {
+											onRemoveLike(addOrRemoveLikeRequest, {
+												onSuccess: () => {
+													setNumberOfLikes(numberOfLikes - 1);
+													setLike(false);
+												}
+											});
+										}
+									}}
+								/>
+							</View>
+							<View style={styles.actions}>
+								<IconButton
+									size={28}
+									icon="comment"
+									iconColor={theme.colors.tertiary}
+									onPress={() => setComment(!comment)}
+								/>
+							</View>
+
+							<View style={styles.actions}>
+								<IconButton
+									size={28}
+									icon="share-variant"
+									iconColor={theme.colors.tertiary}
+									onPress={() => snapShotAndShare(ref)}
+								/>
+							</View>
+						</View>
 					</View>
-
-					<View style={styles.actionsContainer}>
-						<View style={styles.actions}>
-							<IconButton
-								animated={true}
-								size={28}
-								icon="heart"
-								iconColor={!like ? theme.colors.tertiary : theme.colors.primary}
-								onPress={() => setLike(!like)}
-							/>
-						</View>
-						<View style={styles.actions}>
-							<IconButton
-								size={28}
-								icon="comment"
-								iconColor={theme.colors.tertiary}
-								onPress={() => console.log('Pressed')}
-							/>
-						</View>
-
-						<View style={styles.actions}>
-							<IconButton
-								size={28}
-								icon="share-variant"
-								iconColor={theme.colors.tertiary}
-								onPress={() => snapShotAndShare(ref)}
-							/>
-						</View>
-					</View>
-				</View>
-			</Card>
-		</View>
+				</Card>
+			</View>
+		</>
 	);
 };
 
@@ -155,7 +215,6 @@ const styles = StyleSheet.create({
 		marginTop: 15
 	},
 	content: {
-		//flexDirection: 'row',
 		marginTop: 10,
 		paddingHorizontal: 15,
 		justifyContent: 'space-between'
@@ -164,7 +223,8 @@ const styles = StyleSheet.create({
 		padding: 0,
 		marginTop: 0,
 		justifyContent: 'space-between',
-		flexDirection: 'row'
+		flexDirection: 'row',
+		width: '40%'
 	},
 	actions: {
 		justifyContent: 'center',
@@ -172,7 +232,7 @@ const styles = StyleSheet.create({
 		marginLeft: 0,
 		borderRadius: 0,
 		padding: 0,
-		width: 45
+		width: '30%'
 	},
 	actionMore: {
 		alignItems: 'center',
@@ -190,6 +250,9 @@ const styles = StyleSheet.create({
 		paddingVertical: 0,
 		paddingRight: 0,
 		marginVertical: 0
+	},
+	likeCountText: {
+		fontWeight: 'bold'
 	}
 });
 export default ExperienceCard;
