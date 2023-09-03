@@ -89,9 +89,6 @@ export function ExperienceScreen({
 				})
 			).then((response) => response.data);
 		},
-		onSuccess: () => {
-			console.log('like');
-		},
 		onError: (error) => {
 			console.log(error);
 		}
@@ -106,9 +103,6 @@ export function ExperienceScreen({
 					isAdoption: data.is_adoption
 				})
 			).then((response) => response.data);
-		},
-		onSuccess: () => {
-			console.log('remove like');
 		},
 		onError: (error) => {
 			console.log(error);
