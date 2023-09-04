@@ -4,7 +4,12 @@ import React, { useRef } from 'react';
 import { useState } from 'react';
 import { StyleSheet, View, Image, TextLayoutEventData, NativeSyntheticEvent } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AddCommentProps, AddOrRemoveLikeProps, ExperiencePublication, User } from '../models/InterfacesModels';
+import {
+	AddCommentProps,
+	AddOrRemoveLikeProps,
+	ExperiencePublication,
+	User
+} from '../models/InterfacesModels';
 import { useNavigation } from '@react-navigation/native';
 import { TabNavigationParamsList } from '../models/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
