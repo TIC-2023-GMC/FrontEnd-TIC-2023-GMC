@@ -1,10 +1,11 @@
-import * as React from 'react';
-import { StyleSheet, Image } from 'react-native';
-import { Comment } from '../models/InterfacesModels';
-import { Button, Card, MD3Theme, Text, useTheme } from 'react-native-paper';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { TabNavigationParamsList } from '../models/types';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as React from 'react';
+import { Image, StyleSheet } from 'react-native';
+import { Button, Card, MD3Theme, Text, useTheme } from 'react-native-paper';
+import ReactTimeAgo from 'react-time-ago';
+import { Comment } from '../models/InterfacesModels';
+import { TabNavigationParamsList } from '../models/types';
 
 export const CommentComponent = ({
 	user_id,
@@ -34,19 +35,12 @@ export const CommentComponent = ({
 					</Button>
 				}
 				subtitle={
-					<Text style={{ color: theme.colors.tertiary }}>
-						{'Publicado el ' +
-							new Date(comment_date).toLocaleString('es-ES', {
-								timeZone: 'America/Guayaquil',
-								year: 'numeric',
-								month: '2-digit',
-								day: '2-digit',
-								hour: '2-digit',
-								minute: '2-digit',
-								hour12: false,
-								hourCycle: 'h23'
-							})}
-					</Text>
+					<ReactTimeAgo
+						date={new Date(comment_date)}
+						timeStyle="round-minute"
+						component={Text}
+						style={{ color: theme.colors.tertiary }}
+					/>
 				}
 				left={(props) => (
 					<Image

@@ -1,17 +1,16 @@
-import React, { useRef, memo, useCallback, useContext } from 'react';
-import { Text, View, FlatList, RefreshControl } from 'react-native';
-import { styles } from './MyPublicationsScreen.styles';
-import { StatusBar } from 'expo-status-bar';
-import { get } from '../../../services/api';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
-import AdoptionCard from '../../../components/AdoptionCard';
-import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { AdoptionPublication } from '../../../models/InterfacesModels';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { StatusBar } from 'expo-status-bar';
+import React, { memo, useCallback, useContext, useRef } from 'react';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { UserContext, UserContextParams } from '../../../auth/userContext';
+import AdoptionCard from '../../../components/AdoptionCard';
+import { AdoptionPublication } from '../../../models/InterfacesModels';
+import { get } from '../../../services/api';
 import { getMyPublicationsEndpoint } from '../../../services/endpoints';
+import { styles } from './MyPublicationsScreen.styles';
 
 interface MyPublicationsScreenValues {
 	0: AdoptionPublication[];

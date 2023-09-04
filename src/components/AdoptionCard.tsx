@@ -1,9 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-native/no-unused-styles */
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MutateOptions } from '@tanstack/react-query';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
-import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
+import { Image, StyleSheet, View } from 'react-native';
+import { Button, Card, IconButton, List, Text, useTheme } from 'react-native-paper';
+import ReactTimeAgo from 'react-time-ago';
 import {
 	AddCommentProps,
 	AddOrRemoveLikeProps,
@@ -11,12 +15,9 @@ import {
 	SaveOrRemoveFavoriteProps,
 	User
 } from '../models/InterfacesModels';
-import { MutateOptions } from '@tanstack/react-query';
-import { CommentSection } from './CommentSection';
-import { useNavigation } from '@react-navigation/native';
 import { TabNavigationParamsList } from '../models/types';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { snapShotAndShare } from '../utils/utils';
+import { CommentSection } from './CommentSection';
 
 interface CardProps {
 	onOpenModal?: (_p: AdoptionPublication) => void;
@@ -135,19 +136,12 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 							</Button>
 						}
 						subtitle={
-							<Text style={{ color: theme.colors.tertiary }}>
-								{'Publicado el ' +
-									new Date(publicationDate).toLocaleString('es-ES', {
-										timeZone: 'America/Guayaquil',
-										year: 'numeric',
-										month: '2-digit',
-										day: '2-digit',
-										hour: '2-digit',
-										minute: '2-digit',
-										hour12: false, // Force 24-hour format
-										hourCycle: 'h23' // Ensure two digits for hours
-									})}
-							</Text>
+							<ReactTimeAgo
+								date={new Date(publicationDate)}
+								timeStyle="round-minute"
+								component={Text}
+								style={{ color: theme.colors.tertiary }}
+							/>
 						}
 						left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
 						right={
