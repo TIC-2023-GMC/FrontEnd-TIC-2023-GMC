@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import { useState } from 'react';
 import { StyleSheet, View, Image, TextLayoutEventData, NativeSyntheticEvent } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AddOrRemoveLikeProps, ExperiencePublication, User } from '../models/InterfacesModels';
+import { AddCommentProps, AddOrRemoveLikeProps, ExperiencePublication, User } from '../models/InterfacesModels';
 import { useNavigation } from '@react-navigation/native';
 import { TabNavigationParamsList } from '../models/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -21,6 +21,10 @@ interface CardProps {
 	onRemoveLike?: (
 		variables: AddOrRemoveLikeProps,
 		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
+	) => void;
+	onAddComment?: (
+		variables: AddCommentProps,
+		options?: MutateOptions<AddCommentProps> | undefined
 	) => void;
 }
 
@@ -47,14 +51,14 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 		setExpanded(!expanded);
 	};
 
-	const { userAccount, onAddLike, onRemoveLike, ...adoption } = props;
+	const { userAccount, onAddLike, onRemoveLike, onAddComment, ...experience } = props;
 
 	const [like, setLike] = useState<boolean>(likes.some((like) => like.user_id === userAccount._id));
 	const [numberOfLikes, setNumberOfLikes] = useState<number>(likes.length);
 
 	const addOrRemoveLikeRequest = {
 		user_id: userAccount._id ? userAccount._id : '',
-		pub_id: adoption._id,
+		pub_id: experience._id,
 		is_adoption: false
 	};
 
@@ -69,7 +73,13 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 
 	return (
 		<>
-			<CommentSection visible={comment} onDismiss={() => setComment(!comment)} />
+			<CommentSection
+				visible={comment}
+				onDismiss={() => setComment(!comment)}
+				onAddComment={onAddComment}
+				pubId={experience._id}
+				isAdoption={false}
+			/>
 			<View ref={ref}>
 				<Card style={styles.card}>
 					<Card.Title

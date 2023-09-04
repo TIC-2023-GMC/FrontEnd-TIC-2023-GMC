@@ -17,13 +17,15 @@ import {
 	getListAdoptionsEndpoint,
 	getRemoveFavoriteAdoptionEndpoint,
 	getAddLikeEndpoint,
-	getRemoveLikeEndpoint
+	getRemoveLikeEndpoint,
+	getAddCommentEndpoint
 } from '../../services/endpoints';
 import {
 	AdoptionPublication,
 	AdoptionFilter,
 	SaveOrRemoveFavoriteProps,
-	AddOrRemoveLikeProps
+	AddOrRemoveLikeProps,
+	AddCommentProps
 } from '../../models/InterfacesModels';
 
 interface AdoptionPublicationScreen {
@@ -134,6 +136,15 @@ export function AdoptionScreen({
 		}
 	});
 
+	const addCommentMutation = useMutation({
+		mutationFn: (data: AddCommentProps) => {
+			return post(getAddCommentEndpoint(), data).then((response) => response.data);
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
 	const savePublicationAsFavoriteMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) => {
 			return post(getAddFavoriteAdoptionEndpoint(), data).then((response) => response.data);
@@ -199,6 +210,7 @@ export function AdoptionScreen({
 						onRemoveFromFavorites={removePublicationFromFavoritesMutation.mutate}
 						onAddLike={addLikeMutation.mutate}
 						onRemoveLike={removeLikeMutation.mutate}
+						onAddComment={addCommentMutation.mutate}
 					/>
 				)}
 				initialNumToRender={pageSize}

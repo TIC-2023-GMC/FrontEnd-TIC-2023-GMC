@@ -1,11 +1,25 @@
+/* eslint-disable no-unused-vars */
 import { StyleSheet, Modal, View, FlatList, RefreshControl } from 'react-native';
-import { Text, MD3Theme, TextInput, useTheme, ActivityIndicator } from 'react-native-paper';
+import {
+	Text,
+	MD3Theme,
+	TextInput,
+	useTheme,
+	ActivityIndicator,
+	Snackbar,
+	IconButton,
+	HelperText
+} from 'react-native-paper';
 import { CommentComponent } from './CommentComponent';
-import React, { useState } from 'react';
-import { Comment } from '../models/InterfacesModels';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import React, { useContext, useState } from 'react';
+import { AddCommentProps, Comment, CommentText } from '../models/InterfacesModels';
+import { MutateOptions, useInfiniteQuery } from '@tanstack/react-query';
 import { getListCommentsEndpoint } from '../services/endpoints';
-import { post } from '../services/api';
+import { get } from '../services/api';
+import { UserContext, UserContextParams } from '../auth/userContext';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CommentTextSchema } from '../models/Schemas';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 interface CommentsResults {
 	0: Comment[];
@@ -15,21 +29,44 @@ interface CommentsResults {
 interface CommentSectionProps {
 	visible: boolean;
 	onDismiss?: () => void;
-	comments: Comment[];
+	onAddComment?: (
+		variables: AddCommentProps,
+		options?: MutateOptions<AddCommentProps> | undefined
+	) => void;
+	pubId: string;
+	isAdoption: boolean;
 }
-export function CommentSection({ onDismiss, visible, comments }: CommentSectionProps) {
+export function CommentSection({
+	onDismiss,
+	visible,
+	onAddComment,
+	pubId,
+	isAdoption
+}: CommentSectionProps) {
+	const { user } = useContext<UserContextParams>(UserContext);
 	const theme = useTheme();
 	const styles = createStyles(theme);
-	const [newComment, setNewComment] = useState('');
+	const [loading, setLoading] = useState<boolean>(false);
+
+	const {
+		control,
+		formState: { errors },
+		handleSubmit,
+		reset
+	} = useForm({
+		resolver: zodResolver(CommentTextSchema),
+		defaultValues: {
+			comment_text: ''
+		}
+	});
 
 	const pageSize = 6;
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isLoading } =
 		useInfiniteQuery({
 			queryKey: ['Comments'],
 			queryFn: async ({ pageParam = 1 }) => {
-				const response = await post<CommentsResults>(
-					getListCommentsEndpoint({ pageParam, pageSize }),
-					comments
+				const response = await get<CommentsResults>(
+					getListCommentsEndpoint({ pubId, pageParam, pageSize, isAdoption })
 				);
 				return response.data;
 			},
@@ -45,6 +82,27 @@ export function CommentSection({ onDismiss, visible, comments }: CommentSectionP
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
 			fetchNextPage();
+		}
+	};
+
+	const onSubmitComment: SubmitHandler<CommentText> = async (data) => {
+		setLoading(true);
+
+		const addCommentRequest = {
+			pub_id: pubId,
+			user_id: user?._id ? user._id : '',
+			comment_text: data.comment_text,
+			is_adoption: isAdoption
+		};
+
+		if (onAddComment !== undefined) {
+			onAddComment(addCommentRequest, {
+				onSuccess: () => {
+					setLoading(false);
+					reset();
+					refetch();
+				}
+			});
 		}
 	};
 
@@ -89,20 +147,66 @@ export function CommentSection({ onDismiss, visible, comments }: CommentSectionP
 								</View>
 							)
 						}
+						extraData={data}
 					/>
 					<View style={styles.inputContainer}>
-						<TextInput
-							theme={theme}
-							style={styles.input}
-							value={newComment}
-							onChangeText={setNewComment}
-							placeholder="Escribe un comentario..."
-							mode="outlined"
-							right={<TextInput.Icon icon="send-circle" size={40} color={theme.colors.primary} />}
+						<Controller
+							control={control}
+							rules={{
+								required: true
+							}}
+							render={({ field: { onChange, onBlur, value } }) => (
+								<View
+									style={{
+										...styles.commentContainer,
+										height: errors.comment_text ? 120 : 100
+									}}
+								>
+									<TextInput
+										numberOfLines={3}
+										contentStyle={{
+											margin: 0,
+											padding: 0,
+											lineHeight: 20
+										}}
+										multiline={true}
+										theme={theme}
+										placeholderTextColor={theme.colors.tertiary}
+										onBlur={onBlur}
+										value={value}
+										onChangeText={onChange}
+										style={styles.input}
+										placeholder="Escribe un comentario..."
+										mode="outlined"
+										error={!!errors.comment_text}
+									/>
+									{errors.comment_text && (
+										<HelperText type="error">{errors.comment_text.message}</HelperText>
+									)}
+								</View>
+							)}
+							name="comment_text"
+						/>
+
+						<IconButton
+							icon="send-circle"
+							size={45}
+							iconColor={theme.colors.primary}
+							onPress={handleSubmit(onSubmitComment)}
+							disabled={loading}
 						/>
 					</View>
 				</View>
 			</View>
+			<Snackbar
+				theme={theme}
+				visible={false}
+				onDismiss={() => reset()}
+				duration={2000}
+				style={{ marginBottom: 150 }}
+			>
+				Comentario agregado
+			</Snackbar>
 		</Modal>
 	);
 }
@@ -153,6 +257,7 @@ const createStyles = (theme: MD3Theme) =>
 		input: {
 			flex: 1,
 			backgroundColor: theme.colors.secondary,
+			height: 80,
 			marginBottom: 10,
 			marginTop: 5
 		},
@@ -166,5 +271,9 @@ const createStyles = (theme: MD3Theme) =>
 			margin: 15,
 			justifyContent: 'center',
 			alignItems: 'center'
+		},
+		commentContainer: {
+			flex: 1,
+			flexDirection: 'column'
 		}
 	});

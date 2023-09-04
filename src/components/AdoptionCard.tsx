@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
 import {
+	AddCommentProps,
 	AddOrRemoveLikeProps,
 	AdoptionPublication,
 	SaveOrRemoveFavoriteProps,
@@ -37,6 +38,10 @@ interface CardProps {
 		variables: AddOrRemoveLikeProps,
 		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
 	) => void;
+	onAddComment?: (
+		variables: AddCommentProps,
+		options?: MutateOptions<AddCommentProps> | undefined
+	) => void;
 }
 
 const LeftContent = (props: { size: number; photo: string }) => (
@@ -65,7 +70,6 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 		publication_date: publicationDate,
 		photo,
 		likes,
-		comments,
 		pet_sex: petSex,
 		vaccination_card: vaccinationCard,
 		sterilized
@@ -81,6 +85,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 		onRemoveFromFavorites,
 		onAddLike,
 		onRemoveLike,
+		onAddComment,
 		...adoption
 	} = props;
 	const [checkedFavorite, setCheckedFavorite] = useState<boolean>(
@@ -109,10 +114,10 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 		<>
 			<CommentSection
 				visible={comment}
-				onDismiss={() => {
-					setComment(!comment);
-				}}
-				comments={comments}
+				onDismiss={() => setComment(!comment)}
+				onAddComment={onAddComment}
+				pubId={adoption._id}
+				isAdoption={true}
 			/>
 			<View ref={ref}>
 				<Card style={styles.card}>

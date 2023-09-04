@@ -9,12 +9,14 @@ import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import FilterModal from '../../components/ExperiencesFilterModal';
 import {
+	AddCommentProps,
 	AddOrRemoveLikeProps,
 	ExperienceFilter,
 	ExperiencePublication
 } from '../../models/InterfacesModels';
 import ExperienceCard from '../../components/ExperienceCard';
 import {
+	getAddCommentEndpoint,
 	getAddLikeEndpoint,
 	getListExperiencesEnpoint,
 	getRemoveLikeEndpoint
@@ -109,6 +111,15 @@ export function ExperienceScreen({
 		}
 	});
 
+	const addCommentMutation = useMutation({
+		mutationFn: (data: AddCommentProps) => {
+			return post(getAddCommentEndpoint(), data).then((response) => response.data);
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
 	return (
 		<>
 			<StatusBar style="light" />
@@ -136,6 +147,7 @@ export function ExperienceScreen({
 						userAccount={user}
 						onAddLike={addLikeMutation.mutate}
 						onRemoveLike={removeLikeMutation.mutate}
+						onAddComment={addCommentMutation.mutate}
 					/>
 				)}
 				initialNumToRender={pageSize}

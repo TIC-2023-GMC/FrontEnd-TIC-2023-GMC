@@ -93,3 +93,20 @@ export const UserAptitudeSchema = UserSchema.pick({
 	pet_expenses: true,
 	motivation: true
 });
+
+export const CommentTextSchema = z.object({
+	comment_text: z
+		.string()
+		.nonempty('El comentario no puede estar vacío')
+		.max(150, 'Máx. caracteres: 150')
+		.refine(
+			(value) => {
+				// Remove whitespace characters and check if the resulting string is empty
+				const trimmedValue = value.trim();
+				return trimmedValue.length > 0;
+			},
+			{
+				message: 'El comentario no puede estar vacío'
+			}
+		)
+});
