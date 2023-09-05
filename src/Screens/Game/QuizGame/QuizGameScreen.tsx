@@ -267,7 +267,7 @@ const createStyles = () =>
 		cardContainer: {
 			width: 325,
 			height: 150,
-			backgroundColor: '#EDE4AB',
+			backgroundColor: '#F3FFE5',
 			justifyContent: 'center',
 			alignItems: 'center'
 		},
@@ -284,7 +284,7 @@ const createStyles = () =>
 		},
 		answerContainer: {
 			marginTop: 25,
-			backgroundColor: '#B2AAED',
+			backgroundColor: '#4caf5066',
 			width: '90%',
 			padding: 25,
 			borderRadius: 10,
@@ -328,7 +328,7 @@ const createStyles = () =>
 			height: '100%'
 		},
 		gameStatisticsContainer: {
-			backgroundColor: '#EDE4AB',
+			backgroundColor: '#4cb95099',
 			width: '90%',
 			height: '25%',
 			borderRadius: 10,
@@ -340,10 +340,10 @@ const createStyles = () =>
 			textAlign: 'center',
 			fontWeight: 'bold',
 			fontSize: 20,
-			color: '#534F6E'
+			color: '#fff'
 		},
 		leaderboardContainer: {
-			backgroundColor: '#B2AAED',
+			backgroundColor: '#4caf5066',
 			width: '90%',
 			height: '62%',
 			borderRadius: 10,
@@ -366,7 +366,7 @@ const createStyles = () =>
 		},
 		leaderboardHeader: {
 			justifyContent: 'center',
-			backgroundColor: '#EDE4AB',
+			backgroundColor: '#4cb95099',
 			textAlign: 'center',
 			fontFamily: 'sans-serif',
 			fontSize: 15,
@@ -390,7 +390,7 @@ const createStyles = () =>
 			textAlign: 'center',
 			fontFamily: 'sans-serif',
 			fontSize: 17,
-			color: '#534F6E',
+			color: '#000',
 			borderRadius: 5,
 			textAlignVertical: 'center'
 		},
@@ -398,8 +398,8 @@ const createStyles = () =>
 			width: '90%',
 			alignSelf: 'center'
 		},
-		clicked: { backgroundColor: '#40FF49' },
-		notClicked: { backgroundColor: '#FF4040' },
+		clicked: { backgroundColor: '#98FB98' },
+		notClicked: { backgroundColor: '#FF6B6B' },
 		snackbarStyle: {
 			width: '90%',
 			alignSelf: 'center',
