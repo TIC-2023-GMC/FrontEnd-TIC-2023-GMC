@@ -76,7 +76,7 @@ export function AdoptionScreen({
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
 		useInfiniteQuery({
-			queryKey: ['Adoption'],
+			queryKey: ['Adoption', filter],
 			queryFn: async ({ pageParam = 1 }) => {
 				const newDate = filter?.date ? new Date(filter?.date) : undefined;
 				if (newDate) {
