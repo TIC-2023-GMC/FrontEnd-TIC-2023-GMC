@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-native-paper';
 import { styles } from './MenuGameScreen.styles';
-import { ImageBackground, Image, Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Game } from '../../models/InterfacesModels';
@@ -10,11 +10,8 @@ import { getGamesEnpoint } from '../../services/endpoints';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { GameTabNavigation } from '../../models/types';
 
-const imgBackground = {
-	uri: 'https://firebasestorage.googleapis.com/v0/b/pawq-fc6dc.appspot.com/o/Game_Menu.png?alt=media&token=d178bc66-6db3-4f39-a80c-baf296ee424c'
-};
 const imgLogo = {
-	uri: 'https://firebasestorage.googleapis.com/v0/b/pawq-fc6dc.appspot.com/o/logo_a_jugar.png?alt=media&token=7c812384-d538-47fd-88ad-1bcf0dd8bac0'
+	uri: 'https://firebasestorage.googleapis.com/v0/b/pawq-fc6dc.appspot.com/o/logo_a_jugar.png?alt=media&token=fd695e63-f0f5-467e-a95f-e481b7f1c705'
 };
 
 export function MenuGameScreen() {
@@ -33,7 +30,7 @@ export function MenuGameScreen() {
 	});
 
 	return (
-		<ImageBackground source={imgBackground} resizeMode="cover" style={styles.container}>
+		<View style={styles.container}>
 			<Image source={imgLogo} resizeMode="cover" style={styles.imgLogo} />
 			{games?.map((opcion, index) => (
 				<View key={index} style={styles.cardContainer}>
@@ -62,6 +59,6 @@ export function MenuGameScreen() {
 					</View>
 				</View>
 			))}
-		</ImageBackground>
+		</View>
 	);
 }
