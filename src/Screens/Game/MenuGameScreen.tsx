@@ -28,10 +28,9 @@ export function MenuGameScreen() {
 			setGames(data);
 		}
 	});
-
 	return (
 		<View style={styles.container}>
-			<Image source={imgLogo} resizeMode="cover" style={styles.imgLogo} />
+			<Image source={imgLogo} resizeMode="contain" style={styles.imgLogo} />
 			{games?.map((opcion, index) => (
 				<View key={index} style={styles.cardContainer}>
 					<Image source={{ uri: opcion.game_image.img_path }} style={styles.gameIcon} />
@@ -39,6 +38,8 @@ export function MenuGameScreen() {
 						<Text style={styles.gameTitle}>{opcion.game_name}</Text>
 						<Button
 							style={styles.button}
+							labelStyle={styles.buttonText}
+							contentStyle={styles.buttonContent}
 							mode="elevated"
 							onPress={() => {
 								switch (opcion.game_name) {
@@ -54,7 +55,7 @@ export function MenuGameScreen() {
 								}
 							}}
 						>
-							<Text style={styles.button.buttonText}>Jugar</Text>
+							Jugar
 						</Button>
 					</View>
 				</View>

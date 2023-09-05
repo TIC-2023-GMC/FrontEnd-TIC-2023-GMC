@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
 		flexDirection: 'column'
 	},
 	imgLogo: {
-		width: '34%',
+		width: '35%',
 		height: '15%',
 		top: 10,
 		marginBottom: 25
@@ -49,16 +49,14 @@ export const styles = StyleSheet.create({
 		textAlign: 'center'
 	},
 	button: {
-		width: '70%',
-		height: '27%',
 		margin: 20,
-		padding: 0,
-		backgroundColor: '#4caf5066',
-		buttonText: {
-			fontSize: 17,
-			margin: 0,
-			padding: 0,
-			color: '#fff'
-		}
+		backgroundColor: '#4caf5066'
+	},
+	buttonText: {
+		color: '#fff',
+		fontSize: 17
+	},
+	buttonContent: {
+		marginHorizontal: 20
 	}
 });
