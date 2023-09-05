@@ -1,22 +1,25 @@
-import React, { useRef, useState, memo, useCallback, useContext } from 'react';
-import { Text, View, FlatList, RefreshControl, BackHandler } from 'react-native';
-import { styles } from './FavoritesScreen.styles';
-import { StatusBar } from 'expo-status-bar';
-import { del, post } from '../../../services/api';
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
-import AdoptionCard from '../../../components/AdoptionCard';
-import { NavigationProp, useNavigation, useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import {
+	NavigationProp,
+	useFocusEffect,
+	useNavigation,
+	useScrollToTop
+} from '@react-navigation/native';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { StatusBar } from 'expo-status-bar';
+import React, { memo, useCallback, useContext, useRef, useState } from 'react';
+import { BackHandler, FlatList, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
+import { UserContext, UserContextParams } from '../../../auth/userContext';
+import AdoptionCard from '../../../components/AdoptionCard';
+import MoreOptionsModal from '../../../components/MoreOptionsModal';
 import {
 	AddCommentProps,
 	AddOrRemoveLikeProps,
 	AdoptionPublication,
 	SaveOrRemoveFavoriteProps
 } from '../../../models/InterfacesModels';
-import { useFocusEffect } from '@react-navigation/native';
-import MoreOptionsModal from '../../../components/MoreOptionsModal';
-import { UserContext, UserContextParams } from '../../../auth/userContext';
+import { del, post } from '../../../services/api';
 import {
 	getAddCommentEndpoint,
 	getAddLikeEndpoint,
@@ -25,6 +28,7 @@ import {
 	getRemoveLikeEndpoint
 } from '../../../services/endpoints';
 import { resetNavigationStack } from '../../../utils/utils';
+import { styles } from './FavoritesScreen.styles';
 
 interface FavoritesScreenValues {
 	0: AdoptionPublication[];
@@ -80,7 +84,10 @@ export function FavoritesScreen() {
 					return lastPage[1];
 				}
 				return undefined;
-			}
+			},
+			refetchOnWindowFocus: true,
+			refetchIntervalInBackground: true,
+			refetchOnMount: 'always'
 		});
 
 	const handleLoadMore = () => {

@@ -24,8 +24,8 @@ import {
 	getMyPublicationsEndpoint,
 	getRemoveLikeEndpoint
 } from '../../../services/endpoints';
-import { styles } from './MyPublicationsScreen.styles';
 import { resetNavigationStack } from '../../../utils/utils';
+import { styles } from './MyPublicationsScreen.styles';
 
 interface MyPublicationsScreenValues {
 	0: AdoptionPublication[];
@@ -46,7 +46,7 @@ export function MyPublicationsScreen() {
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
 		useInfiniteQuery({
-			queryKey: ['MyPublicationsScreen'],
+			queryKey: ['MyPublications'],
 			queryFn: async ({ pageParam = 1 }) => {
 				const response = await get<MyPublicationsScreenValues>(
 					getMyPublicationsEndpoint({ pageParam, pageSize, user_id: user._id ? user._id : '' })
@@ -59,7 +59,10 @@ export function MyPublicationsScreen() {
 					return lastPage[1];
 				}
 				return undefined;
-			}
+			},
+			refetchOnWindowFocus: true,
+			refetchIntervalInBackground: true,
+			refetchOnMount: 'always'
 		});
 
 	const handleLoadMore = () => {
@@ -81,13 +84,6 @@ export function MyPublicationsScreen() {
 			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
 		}, [])
 	);
-
-	useFocusEffect(
-		useCallback(() => {
-			refetch();
-		}, [])
-	);
-
 	const addLikeMutation = useMutation({
 		mutationFn: (data: AddOrRemoveLikeProps) => {
 			return post(

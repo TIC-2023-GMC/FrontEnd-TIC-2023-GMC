@@ -39,7 +39,8 @@ const theme: MD3Theme = {
 		secondary: '#ECEBEB',
 		tertiary: '#A3A3A3',
 		inverseSurface: '#7A8A50',
-		inversePrimary: '#ECEBEB'
+		inversePrimary: '#ECEBEB',
+		onSurfaceVariant: '#A3A3A3'
 	}
 
 	// Agrega cualquier otra configuración de tema que desees
