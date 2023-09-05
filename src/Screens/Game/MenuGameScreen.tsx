@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Game } from '../../models/InterfacesModels';
 import { get } from '../../services/api';
-import { getGamesEnpoint } from '../../services/endpoints';
+import { getGamesEndpoint } from '../../services/endpoints';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { GameTabNavigation } from '../../models/types';
 
@@ -21,7 +21,7 @@ export function MenuGameScreen() {
 	useQuery({
 		queryKey: ['listGames'],
 		queryFn: async () => {
-			const response = await get<Game[]>(getGamesEnpoint());
+			const response = await get<Game[]>(getGamesEndpoint());
 			return response.data;
 		},
 		onSuccess: (data: Game[]) => {

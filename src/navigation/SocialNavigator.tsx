@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import { Feather, MaterialIcons, Octicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AdoptionScreen, AdoptionScreenForm } from '../Screens/Adoption';
+import { getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { MaterialIcons, Feather, Octicons } from '@expo/vector-icons';
-import { ExperienceScreen, ExperienceScreenForm } from '../Screens/Experience';
 import { IconButton, useTheme } from 'react-native-paper';
-import AddTabBarButton from '../components/AddTabBarButton';
+import { AdoptionScreen, AdoptionScreenForm } from '../Screens/Adoption';
+import { ExperienceScreen, ExperienceScreenForm } from '../Screens/Experience';
+import { OrganizationScreen } from '../Screens/Organization';
 import { FavoritesScreen } from '../Screens/Profile/Favorites';
 import { MyPublicationsScreen } from '../Screens/Profile/MyPublications';
-import { createStackNavigator } from '@react-navigation/stack';
-import RightHeaderActions from '../components/LeftHeaderActions';
-import { OrganizationScreen } from '../Screens/Organization';
-import { getFocusedRouteNameFromRoute, useNavigation } from '@react-navigation/native';
-import { UserAptitudeScreenForm } from '../Screens/User/UserAptitudeScreenForm';
-import { resetNavigationStack } from '../utils/utils';
 import { ProfileScreen } from '../Screens/Profile/ProfileScreen';
+import { UserAptitudeScreenForm } from '../Screens/User/UserAptitudeScreenForm';
+import AddTabBarButton from '../components/AddTabBarButton';
+import RightHeaderActions from '../components/LeftHeaderActions';
+import { resetNavigationStack } from '../utils/utils';
 
 interface TabsNavigationProps {
 	visible: boolean;

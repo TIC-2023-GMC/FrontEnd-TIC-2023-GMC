@@ -1,21 +1,34 @@
-import React, { useRef, useState, memo, useCallback, useContext } from 'react';
-import { Text, View, FlatList, RefreshControl } from 'react-native';
-import { styles } from './FavoritesScreen.styles';
-import { StatusBar } from 'expo-status-bar';
-import { del, post } from '../../../services/api';
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
-import AdoptionCard from '../../../components/AdoptionCard';
-import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../../../models/InterfacesModels';
-import { useFocusEffect } from '@react-navigation/native';
-import MoreOptionsModal from '../../../components/MoreOptionsModal';
-import { UserContext, UserContextParams } from '../../../auth/userContext';
 import {
+	NavigationProp,
+	useFocusEffect,
+	useNavigation,
+	useScrollToTop
+} from '@react-navigation/native';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { StatusBar } from 'expo-status-bar';
+import React, { memo, useCallback, useContext, useRef, useState } from 'react';
+import { BackHandler, FlatList, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
+import { UserContext, UserContextParams } from '../../../auth/userContext';
+import AdoptionCard from '../../../components/AdoptionCard';
+import MoreOptionsModal from '../../../components/MoreOptionsModal';
+import {
+	AddCommentProps,
+	AddOrRemoveLikeProps,
+	AdoptionPublication,
+	SaveOrRemoveFavoriteProps
+} from '../../../models/InterfacesModels';
+import { del, post } from '../../../services/api';
+import {
+	getAddCommentEndpoint,
+	getAddLikeEndpoint,
 	getListFavoritesAdoptionsEndpoint,
-	getRemoveFavoriteAdoptionEndpoint
+	getRemoveFavoriteAdoptionEndpoint,
+	getRemoveLikeEndpoint
 } from '../../../services/endpoints';
+import { resetNavigationStack } from '../../../utils/utils';
+import { styles } from './FavoritesScreen.styles';
 
 interface FavoritesScreenValues {
 	0: AdoptionPublication[];
@@ -28,6 +41,7 @@ const MemoizedMoreOptionsModal = memo(MoreOptionsModal);
 export function FavoritesScreen() {
 	const theme = useTheme();
 	const ref = useRef<FlatList>(null);
+	const navigation = useNavigation<NavigationProp<ReactNavigation.RootParamList>>();
 	const tabBarHeight = useBottomTabBarHeight();
 	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
 	const [visibleSnackBar, setvisibleSnackBar] = useState(false);
@@ -54,7 +68,7 @@ export function FavoritesScreen() {
 	const pageSize = 2;
 	useScrollToTop(ref);
 
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
 		useInfiniteQuery({
 			queryKey: ['Favorites'],
 			queryFn: async ({ pageParam = 1 }) => {
@@ -70,7 +84,10 @@ export function FavoritesScreen() {
 					return lastPage[1];
 				}
 				return undefined;
-			}
+			},
+			refetchOnWindowFocus: true,
+			refetchIntervalInBackground: true,
+			refetchOnMount: 'always'
 		});
 
 	const handleLoadMore = () => {
@@ -81,9 +98,68 @@ export function FavoritesScreen() {
 
 	useFocusEffect(
 		useCallback(() => {
+			const handleBackPress = () => {
+				if (navigation.isFocused()) {
+					resetNavigationStack(navigation, 'Perfil');
+					return true;
+				}
+				return false;
+			};
+			BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+		}, [])
+	);
+
+	useFocusEffect(
+		useCallback(() => {
 			refetch();
 		}, [user.favorite_adoption_publications])
 	);
+
+	const addLikeMutation = useMutation({
+		mutationFn: (data: AddOrRemoveLikeProps) => {
+			return post(
+				getAddLikeEndpoint({
+					userId: data.user_id,
+					pubId: data.pub_id,
+					isAdoption: data.is_adoption
+				})
+			).then((response) => response.data);
+		},
+		onSuccess: () => {
+			refetch();
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
+	const removeLikeMutation = useMutation({
+		mutationFn: (data: AddOrRemoveLikeProps) => {
+			return del(
+				getRemoveLikeEndpoint({
+					userId: data.user_id,
+					pubId: data.pub_id,
+					isAdoption: data.is_adoption
+				})
+			).then((response) => response.data);
+		},
+		onSuccess: () => {
+			refetch();
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
+	const addCommentMutation = useMutation({
+		mutationFn: (data: AddCommentProps) => {
+			return post(getAddCommentEndpoint(), data).then((response) => response.data);
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
 
 	const removePublicationFromFavoritesMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
@@ -127,6 +203,9 @@ export function FavoritesScreen() {
 						userAccount={user}
 						onOpenModal={handleOpenModal}
 						onRemoveFromFavorites={removePublicationFromFavoritesMutation.mutate}
+						onAddLike={addLikeMutation.mutate}
+						onRemoveLike={removeLikeMutation.mutate}
+						onAddComment={addCommentMutation.mutate}
 					/>
 				)}
 				initialNumToRender={pageSize}
@@ -140,7 +219,7 @@ export function FavoritesScreen() {
 				}
 				refreshControl={
 					<RefreshControl
-						refreshing={isFetchingNextPage || isLoading}
+						refreshing={isFetchingNextPage || isLoading || isFetching}
 						onRefresh={() => {
 							refetch();
 						}}

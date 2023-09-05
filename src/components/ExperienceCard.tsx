@@ -1,26 +1,40 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react-native/no-unused-styles */
-import React, { useRef } from 'react';
-import { useState } from 'react';
-import { StyleSheet, View, Image, TextLayoutEventData, NativeSyntheticEvent } from 'react-native';
-import { Button, Card, useTheme, Text, IconButton, List } from 'react-native-paper';
-import { AddOrRemoveLikeProps, ExperiencePublication, User } from '../models/InterfacesModels';
 import { useNavigation } from '@react-navigation/native';
-import { TabNavigationParamsList } from '../models/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { snapShotAndShare } from '../utils/utils';
 import { MutateOptions } from '@tanstack/react-query';
+import React, { useRef, useState } from 'react';
+import { Image, NativeSyntheticEvent, StyleSheet, TextLayoutEventData, View } from 'react-native';
+import { Button, Card, IconButton, List, Text, useTheme } from 'react-native-paper';
+import ReactTimeAgo from 'react-time-ago';
+import {
+	AddCommentProps,
+	AddOrRemoveLikeProps,
+	ExperiencePublication,
+	User
+} from '../models/InterfacesModels';
+import { TabNavigationParamsList } from '../models/types';
+import { snapShotAndShare } from '../utils/utils';
 import { CommentSection } from './CommentSection';
 
 interface CardProps {
 	userAccount: User;
 	onAddLike?: (
+		// eslint-disable-next-line no-unused-vars
 		variables: AddOrRemoveLikeProps,
+		// eslint-disable-next-line no-unused-vars
 		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
 	) => void;
 	onRemoveLike?: (
+		// eslint-disable-next-line no-unused-vars
 		variables: AddOrRemoveLikeProps,
+		// eslint-disable-next-line no-unused-vars
 		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
+	) => void;
+	onAddComment?: (
+		// eslint-disable-next-line no-unused-vars
+		variables: AddCommentProps,
+		// eslint-disable-next-line no-unused-vars
+		options?: MutateOptions<AddCommentProps> | undefined
 	) => void;
 }
 
@@ -46,15 +60,19 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 	const handleExpand = () => {
 		setExpanded(!expanded);
 	};
-
-	const { userAccount, onAddLike, onRemoveLike, ...adoption } = props;
-
-	const [like, setLike] = useState<boolean>(likes.some((like) => like.user_id === userAccount._id));
-	const [numberOfLikes, setNumberOfLikes] = useState<number>(likes.length);
+	const handleLike = () => {
+		const like = likes.some((like) => like.user_id === userAccount._id);
+		if (!like && onAddLike !== undefined) {
+			onAddLike(addOrRemoveLikeRequest);
+		} else if (like && onRemoveLike !== undefined) {
+			onRemoveLike(addOrRemoveLikeRequest);
+		}
+	};
+	const { userAccount, onAddLike, onRemoveLike, onAddComment, ...experience } = props;
 
 	const addOrRemoveLikeRequest = {
 		user_id: userAccount._id ? userAccount._id : '',
-		pub_id: adoption._id,
+		pub_id: experience._id,
 		is_adoption: false
 	};
 
@@ -69,7 +87,13 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 
 	return (
 		<>
-			<CommentSection visible={comment} onDismiss={() => setComment(!comment)} />
+			<CommentSection
+				visible={comment}
+				onDismiss={() => setComment(!comment)}
+				onAddComment={onAddComment}
+				pubId={experience._id}
+				isAdoption={false}
+			/>
 			<View ref={ref}>
 				<Card style={styles.card}>
 					<Card.Title
@@ -86,19 +110,12 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 							</Button>
 						}
 						subtitle={
-							<Text style={{ color: theme.colors.tertiary }}>
-								{'Publicado el ' +
-									new Date(publicationDate).toLocaleString('es-ES', {
-										timeZone: 'America/Guayaquil',
-										year: 'numeric',
-										month: '2-digit',
-										day: '2-digit',
-										hour: '2-digit',
-										minute: '2-digit',
-										hour12: false, // Force 24-hour format
-										hourCycle: 'h23' // Ensure two digits for hours
-									})}
-							</Text>
+							<ReactTimeAgo
+								date={new Date(publicationDate)}
+								timeStyle="round-minute"
+								component={Text}
+								style={{ color: theme.colors.tertiary }}
+							/>
 						}
 						left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
 					/>
@@ -139,43 +156,30 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 								<Text
 									style={{
 										...styles.likeCountText,
-										color: like ? theme.colors.primary : theme.colors.tertiary
+										color: likes.some((like) => like.user_id === userAccount._id)
+											? theme.colors.primary
+											: theme.colors.tertiary
 									}}
 								>
-									{numberOfLikes >= 1000
-										? numberOfLikes >= 10000
-											? (numberOfLikes / 1000).toFixed(0) + 'K'
-											: (numberOfLikes / 1000).toFixed(1) + 'K'
-										: numberOfLikes}
+									{likes.length >= 1000
+										? likes.length >= 10000
+											? (likes.length / 1000).toFixed(0) + 'K'
+											: (likes.length / 1000).toFixed(1) + 'K'
+										: likes.length}
 								</Text>
 							</View>
 							<View style={styles.actions}>
 								<IconButton
 									animated={true}
+									selected={likes.some((like) => like.user_id === userAccount._id)}
 									size={28}
 									icon="heart"
-									iconColor={!like ? theme.colors.tertiary : theme.colors.primary}
-									onPress={() => {
-										if (!like && onAddLike !== undefined) {
-											onAddLike(addOrRemoveLikeRequest, {
-												onSuccess: () => {
-													setNumberOfLikes(numberOfLikes + 1);
-													setLike(true);
-												}
-											});
-										} else if (like && onRemoveLike !== undefined) {
-											onRemoveLike(addOrRemoveLikeRequest, {
-												onSuccess: () => {
-													setNumberOfLikes(numberOfLikes - 1);
-													setLike(false);
-												}
-											});
-										}
-									}}
+									onPress={handleLike}
 								/>
 							</View>
 							<View style={styles.actions}>
 								<IconButton
+									animated={true}
 									size={28}
 									icon="comment"
 									iconColor={theme.colors.tertiary}
@@ -185,6 +189,7 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 
 							<View style={styles.actions}>
 								<IconButton
+									animated={true}
 									size={28}
 									icon="share-variant"
 									iconColor={theme.colors.tertiary}

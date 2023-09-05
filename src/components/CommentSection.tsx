@@ -1,147 +1,212 @@
+/* eslint-disable no-unused-vars */
 import { StyleSheet, Modal, View, FlatList, RefreshControl } from 'react-native';
-import { Text, MD3Theme, TextInput, useTheme } from 'react-native-paper';
+import {
+	Text,
+	MD3Theme,
+	TextInput,
+	useTheme,
+	ActivityIndicator,
+	Snackbar,
+	IconButton,
+	HelperText
+} from 'react-native-paper';
 import { CommentComponent } from './CommentComponent';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { AddCommentProps, Comment, CommentText } from '../models/InterfacesModels';
+import { MutateOptions, useInfiniteQuery } from '@tanstack/react-query';
+import { getListCommentsEndpoint } from '../services/endpoints';
+import { get } from '../services/api';
+import { UserContext, UserContextParams } from '../auth/userContext';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CommentTextSchema } from '../models/Schemas';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
-import { Comment } from '../models/InterfacesModels';
+interface CommentsResults {
+	0: Comment[];
+	1: number;
+}
 
 interface CommentSectionProps {
 	visible: boolean;
-	onDismiss: () => void;
-	handlerGetComments?: () => void;
-	isLoading?: boolean;
-	refresh?: () => void;
+	onDismiss?: () => void;
+	onAddComment?: (
+		variables: AddCommentProps,
+		options?: MutateOptions<AddCommentProps> | undefined
+	) => void;
+	pubId: string;
+	isAdoption: boolean;
 }
 export function CommentSection({
 	onDismiss,
 	visible,
-	handlerGetComments,
-	refresh,
-	isLoading
+	onAddComment,
+	pubId,
+	isAdoption
 }: CommentSectionProps) {
+	const { user } = useContext<UserContextParams>(UserContext);
 	const theme = useTheme();
 	const styles = createStyles(theme);
-	const [comment, setComment] = useState('');
-	const comments: Comment[] = [
-		{
-			user_id: '64c1b0ef0fd89c04b7114eb8',
-			_id: '1fff',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user_photo: {
-				img_path:
-					'https://imagenes.elpais.com/resizer/fdGn2HZ-QXQJW92FNbeWU7Z9Da4=/1960x1470/cloudfront-eu-central-1.images.arcpublishing.com/prisa/TW5CHJTUY5B3DOS35VMOLZUVF4.jpg'
-			},
-			user_first_name: 'Bil',
-			user_last_name: 'Gates'
-		},
-		{
-			user_id: '2fff',
-			_id: '2fff',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user_photo: {
-				img_path:
-					'https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/364103707_975993543519709_3612431512803587105_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeEwJHZpCsZgpD_FUU2P5KSOQdEJOBSmWp1B0Qk4FKZandjUMKH74v2_LzVLOe4Vu-xlhYSxT72kLYsbBgnw5gqA&_nc_ohc=XY5pICYEY6UAX9v_-1o&_nc_ht=scontent.fuio35-1.fna&oh=00_AfAblqMWZ3sPaU7I5ovUGB4gRZuDsNXU1oEcuub-evFh-w&oe=64E82555'
-			},
-			user_first_name: 'Juan',
-			user_last_name: 'Perez'
-		},
-		{
-			user_id: '3fff',
-			_id: '3fff',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user_photo: {
-				img_path:
-					'https://scontent.fuio35-1.fna.fbcdn.net/v/t39.30808-6/364103707_975993543519709_3612431512803587105_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeEwJHZpCsZgpD_FUU2P5KSOQdEJOBSmWp1B0Qk4FKZandjUMKH74v2_LzVLOe4Vu-xlhYSxT72kLYsbBgnw5gqA&_nc_ohc=XY5pICYEY6UAX9v_-1o&_nc_ht=scontent.fuio35-1.fna&oh=00_AfAblqMWZ3sPaU7I5ovUGB4gRZuDsNXU1oEcuub-evFh-w&oe=64E82555'
-			},
-			user_first_name: 'Juan',
-			user_last_name: 'Perez'
+	const [loading, setLoading] = useState<boolean>(false);
+
+	const {
+		control,
+		formState: { errors },
+		handleSubmit,
+		reset
+	} = useForm({
+		resolver: zodResolver(CommentTextSchema),
+		defaultValues: {
+			comment_text: ''
 		}
-	];
-	/* const [comments, setComments] = useState<Comment[]>([
-		{
-			_id: '1',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '2',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '3',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '4',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '5',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
-		},
-		{
-			_id: '6',
-			comment_text: 'Hola Mundo',
-			comment_date: new Date().toISOString(),
-			user: user
+	});
+
+	const pageSize = 6;
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isLoading } =
+		useInfiniteQuery({
+			queryKey: ['Comments'],
+			queryFn: async ({ pageParam = 1 }) => {
+				const response = await get<CommentsResults>(
+					getListCommentsEndpoint({ pubId, pageParam, pageSize, isAdoption })
+				);
+				return response.data;
+			},
+			getNextPageParam: (lastPage) => {
+				if (lastPage[0].length !== 0) {
+					return lastPage[1];
+				}
+				return undefined;
+			},
+			enabled: visible
+		});
+
+	const handleLoadMore = () => {
+		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
+			fetchNextPage();
 		}
-	]); */
-	// const handleSendComment = () => {
-	// 	setComments((prevComments) => [...prevComments, comment]);
-	// 	setComment('');
-	// };
+	};
+
+	const onSubmitComment: SubmitHandler<CommentText> = async (data) => {
+		setLoading(true);
+
+		const addCommentRequest = {
+			pub_id: pubId,
+			user_id: user?._id ? user._id : '',
+			comment_text: data.comment_text,
+			is_adoption: isAdoption
+		};
+
+		if (onAddComment !== undefined) {
+			onAddComment(addCommentRequest, {
+				onSuccess: () => {
+					setLoading(false);
+					reset();
+					refetch();
+				}
+			});
+		}
+	};
+
 	return (
-		<Modal
-			animationType="slide"
-			transparent
-			visible={visible}
-			onDismiss={onDismiss}
-			onRequestClose={onDismiss}
-			onShow={handlerGetComments}
-		>
+		<Modal animationType="slide" transparent visible={visible} onRequestClose={onDismiss}>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					<Text style={styles.modalText}>Comentarios</Text>
 					<FlatList
+						style={styles.flatList}
+						keyExtractor={(item) => item._id}
+						onEndReached={handleLoadMore}
+						data={data?.pages.flatMap((page) => page[0])}
+						renderItem={({ item }) => <CommentComponent {...item} />}
+						initialNumToRender={pageSize}
+						onEndReachedThreshold={0.5}
+						ListEmptyComponent={
+							hasNextPage ? (
+								<View style={styles.activityIndicator}>
+									<Text>No hay más comentarios</Text>
+								</View>
+							) : null
+						}
 						refreshControl={
 							<RefreshControl
-								refreshing={isLoading ? true : false}
+								refreshing={isFetchingNextPage || isLoading}
 								onRefresh={() => {
-									refresh ? refresh() : null;
+									refetch();
 								}}
 							/>
 						}
-						ListEmptyComponent={() => <Text style={styles.emptyList}>No hay comentarios</Text>}
-						style={styles.flatList}
-						data={comments}
-						keyExtractor={(item) => item._id}
-						renderItem={({ item }) => <CommentComponent {...item} />}
+						ListFooterComponent={
+							hasNextPage ? (
+								<>
+									{isFetchingNextPage ? (
+										<ActivityIndicator size="large" style={styles.activityIndicator} />
+									) : null}
+								</>
+							) : (
+								<View style={styles.activityIndicator}>
+									<Text>No hay más comentarios</Text>
+								</View>
+							)
+						}
+						extraData={data}
 					/>
 					<View style={styles.inputContainer}>
-						<TextInput
-							theme={theme}
-							style={styles.input}
-							value={comment}
-							onChangeText={setComment}
-							placeholder="Escribe un comentario..."
-							mode="outlined"
-							right={<TextInput.Icon icon="send-circle" size={40} color={theme.colors.primary} />}
+						<Controller
+							control={control}
+							rules={{
+								required: true
+							}}
+							render={({ field: { onChange, onBlur, value } }) => (
+								<View
+									style={{
+										...styles.commentContainer,
+										height: errors.comment_text ? 120 : 100
+									}}
+								>
+									<TextInput
+										numberOfLines={3}
+										contentStyle={{
+											margin: 0,
+											padding: 0,
+											lineHeight: 20
+										}}
+										multiline={true}
+										theme={theme}
+										placeholderTextColor={theme.colors.tertiary}
+										onBlur={onBlur}
+										value={value}
+										onChangeText={onChange}
+										style={styles.input}
+										placeholder="Escribe un comentario..."
+										mode="outlined"
+										error={!!errors.comment_text}
+									/>
+									{errors.comment_text && (
+										<HelperText type="error">{errors.comment_text.message}</HelperText>
+									)}
+								</View>
+							)}
+							name="comment_text"
+						/>
+
+						<IconButton
+							icon="send-circle"
+							size={45}
+							iconColor={theme.colors.primary}
+							onPress={handleSubmit(onSubmitComment)}
+							disabled={loading}
 						/>
 					</View>
 				</View>
 			</View>
+			<Snackbar
+				theme={theme}
+				visible={false}
+				onDismiss={() => reset()}
+				duration={2000}
+				style={{ marginBottom: 150 }}
+			>
+				Comentario agregado
+			</Snackbar>
 		</Modal>
 	);
 }
@@ -153,6 +218,7 @@ const createStyles = (theme: MD3Theme) =>
 			alignItems: 'center'
 		},
 		modalView: {
+			flex: 1,
 			width: '99.5%',
 			height: '100%',
 			backgroundColor: theme.colors.secondary,
@@ -191,6 +257,7 @@ const createStyles = (theme: MD3Theme) =>
 		input: {
 			flex: 1,
 			backgroundColor: theme.colors.secondary,
+			height: 80,
 			marginBottom: 10,
 			marginTop: 5
 		},
@@ -199,5 +266,14 @@ const createStyles = (theme: MD3Theme) =>
 			textAlign: 'center',
 			fontSize: 15,
 			marginTop: 10
+		},
+		activityIndicator: {
+			margin: 15,
+			justifyContent: 'center',
+			alignItems: 'center'
+		},
+		commentContainer: {
+			flex: 1,
+			flexDirection: 'column'
 		}
 	});

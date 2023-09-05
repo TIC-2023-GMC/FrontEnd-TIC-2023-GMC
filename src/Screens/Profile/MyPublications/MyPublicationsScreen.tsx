@@ -1,17 +1,31 @@
-import React, { useRef, memo, useCallback, useContext } from 'react';
-import { Text, View, FlatList, RefreshControl } from 'react-native';
-import { styles } from './MyPublicationsScreen.styles';
-import { StatusBar } from 'expo-status-bar';
-import { get } from '../../../services/api';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
-import AdoptionCard from '../../../components/AdoptionCard';
-import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { AdoptionPublication } from '../../../models/InterfacesModels';
-import { useFocusEffect } from '@react-navigation/native';
+import {
+	NavigationProp,
+	useFocusEffect,
+	useNavigation,
+	useScrollToTop
+} from '@react-navigation/native';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { StatusBar } from 'expo-status-bar';
+import React, { memo, useCallback, useContext, useRef } from 'react';
+import { BackHandler, FlatList, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { UserContext, UserContextParams } from '../../../auth/userContext';
-import { getMyPublicationsEndpoint } from '../../../services/endpoints';
+import AdoptionCard from '../../../components/AdoptionCard';
+import {
+	AddCommentProps,
+	AddOrRemoveLikeProps,
+	AdoptionPublication
+} from '../../../models/InterfacesModels';
+import { del, get, post } from '../../../services/api';
+import {
+	getAddCommentEndpoint,
+	getAddLikeEndpoint,
+	getMyPublicationsEndpoint,
+	getRemoveLikeEndpoint
+} from '../../../services/endpoints';
+import { resetNavigationStack } from '../../../utils/utils';
+import { styles } from './MyPublicationsScreen.styles';
 
 interface MyPublicationsScreenValues {
 	0: AdoptionPublication[];
@@ -23,15 +37,16 @@ const MemoizedAdoptionCard = memo(AdoptionCard);
 export function MyPublicationsScreen() {
 	const theme = useTheme();
 	const ref = useRef<FlatList>(null);
+	const navigation = useNavigation<NavigationProp<ReactNavigation.RootParamList>>();
 	const tabBarHeight = useBottomTabBarHeight();
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
 
 	const pageSize = 2;
 	useScrollToTop(ref);
 
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
 		useInfiniteQuery({
-			queryKey: ['MyPublicationsScreen'],
+			queryKey: ['MyPublications'],
 			queryFn: async ({ pageParam = 1 }) => {
 				const response = await get<MyPublicationsScreenValues>(
 					getMyPublicationsEndpoint({ pageParam, pageSize, user_id: user._id ? user._id : '' })
@@ -44,7 +59,10 @@ export function MyPublicationsScreen() {
 					return lastPage[1];
 				}
 				return undefined;
-			}
+			},
+			refetchOnWindowFocus: true,
+			refetchIntervalInBackground: true,
+			refetchOnMount: 'always'
 		});
 
 	const handleLoadMore = () => {
@@ -55,9 +73,61 @@ export function MyPublicationsScreen() {
 
 	useFocusEffect(
 		useCallback(() => {
-			refetch();
+			const handleBackPress = () => {
+				if (navigation.isFocused()) {
+					resetNavigationStack(navigation, 'Perfil');
+					return true;
+				}
+				return false;
+			};
+			BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
 		}, [])
 	);
+	const addLikeMutation = useMutation({
+		mutationFn: (data: AddOrRemoveLikeProps) => {
+			return post(
+				getAddLikeEndpoint({
+					userId: data.user_id,
+					pubId: data.pub_id,
+					isAdoption: data.is_adoption
+				})
+			).then((response) => response.data);
+		},
+		onSuccess: () => {
+			refetch();
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
+	const removeLikeMutation = useMutation({
+		mutationFn: (data: AddOrRemoveLikeProps) => {
+			return del(
+				getRemoveLikeEndpoint({
+					userId: data.user_id,
+					pubId: data.pub_id,
+					isAdoption: data.is_adoption
+				})
+			).then((response) => response.data);
+		},
+		onSuccess: () => {
+			refetch();
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
+	const addCommentMutation = useMutation({
+		mutationFn: (data: AddCommentProps) => {
+			return post(getAddCommentEndpoint(), data).then((response) => response.data);
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
 
 	return (
 		<>
@@ -73,7 +143,14 @@ export function MyPublicationsScreen() {
 				ref={ref}
 				data={data?.pages.flatMap((page) => page[0])}
 				renderItem={({ item }) => (
-					<MemoizedAdoptionCard {...item} setUserAccount={setUser} userAccount={user} />
+					<MemoizedAdoptionCard
+						{...item}
+						setUserAccount={setUser}
+						userAccount={user}
+						onAddLike={addLikeMutation.mutate}
+						onRemoveLike={removeLikeMutation.mutate}
+						onAddComment={addCommentMutation.mutate}
+					/>
 				)}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
@@ -86,7 +163,7 @@ export function MyPublicationsScreen() {
 				}
 				refreshControl={
 					<RefreshControl
-						refreshing={isFetchingNextPage || isLoading}
+						refreshing={isFetchingNextPage || isLoading || isFetching}
 						onRefresh={() => {
 							refetch();
 						}}

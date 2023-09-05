@@ -17,13 +17,15 @@ import {
 	getListAdoptionsEndpoint,
 	getRemoveFavoriteAdoptionEndpoint,
 	getAddLikeEndpoint,
-	getRemoveLikeEndpoint
+	getRemoveLikeEndpoint,
+	getAddCommentEndpoint
 } from '../../services/endpoints';
 import {
 	AdoptionPublication,
 	AdoptionFilter,
 	SaveOrRemoveFavoriteProps,
-	AddOrRemoveLikeProps
+	AddOrRemoveLikeProps,
+	AddCommentProps
 } from '../../models/InterfacesModels';
 
 interface AdoptionPublicationScreen {
@@ -72,9 +74,9 @@ export function AdoptionScreen({
 	const pageSize = 2;
 	useScrollToTop(ref);
 
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
 		useInfiniteQuery({
-			queryKey: ['Adoption', filter],
+			queryKey: ['Adoption'],
 			queryFn: async ({ pageParam = 1 }) => {
 				const newDate = filter?.date ? new Date(filter?.date) : undefined;
 				if (newDate) {
@@ -114,6 +116,9 @@ export function AdoptionScreen({
 				})
 			).then((response) => response.data);
 		},
+		onSuccess: () => {
+			refetch();
+		},
 		onError: (error) => {
 			console.log(error);
 		}
@@ -128,6 +133,18 @@ export function AdoptionScreen({
 					isAdoption: data.is_adoption
 				})
 			).then((response) => response.data);
+		},
+		onSuccess: () => {
+			refetch();
+		},
+		onError: (error) => {
+			console.log(error);
+		}
+	});
+
+	const addCommentMutation = useMutation({
+		mutationFn: (data: AddCommentProps) => {
+			return post(getAddCommentEndpoint(), data).then((response) => response.data);
 		},
 		onError: (error) => {
 			console.log(error);
@@ -199,6 +216,7 @@ export function AdoptionScreen({
 						onRemoveFromFavorites={removePublicationFromFavoritesMutation.mutate}
 						onAddLike={addLikeMutation.mutate}
 						onRemoveLike={removeLikeMutation.mutate}
+						onAddComment={addCommentMutation.mutate}
 					/>
 				)}
 				initialNumToRender={pageSize}
@@ -212,7 +230,7 @@ export function AdoptionScreen({
 				}
 				refreshControl={
 					<RefreshControl
-						refreshing={isFetchingNextPage || isLoading}
+						refreshing={isFetchingNextPage || isLoading || isFetching}
 						onRefresh={() => {
 							refetch();
 						}}

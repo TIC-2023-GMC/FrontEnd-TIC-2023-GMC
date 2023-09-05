@@ -53,8 +53,10 @@ export interface Comment extends Interaction {
 	user_first_name: string;
 	user_last_name: string;
 	comment_text: string;
-	comment_date: string;
+	comment_date: Date;
 }
+
+export type CommentText = Pick<Comment, 'comment_text'>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Like extends Interaction {}
@@ -99,6 +101,13 @@ export interface SaveOrRemoveFavoriteProps {
 export interface AddOrRemoveLikeProps {
 	user_id: string;
 	pub_id: string;
+	is_adoption: boolean;
+}
+
+export interface AddCommentProps {
+	pub_id: string;
+	user_id: string;
+	comment_text: string;
 	is_adoption: boolean;
 }
 

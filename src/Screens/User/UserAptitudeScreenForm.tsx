@@ -90,7 +90,7 @@ export function UserAptitudeScreenForm() {
 				render={({ field: { onChange, onBlur, value } }) => (
 					<>
 						<TextInput
-							placeholderTextColor={theme.colors.tertiary}
+							textColor={theme.colors.shadow}
 							placeholder="Ingrese el número de mascotas que ha tenido"
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
@@ -124,7 +124,7 @@ export function UserAptitudeScreenForm() {
 				render={({ field: { onChange, onBlur, value } }) => (
 					<>
 						<TextInput
-							placeholderTextColor={theme.colors.tertiary}
+							textColor={theme.colors.shadow}
 							placeholder="Ingrese el número de mascotas que tiene"
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
@@ -158,8 +158,7 @@ export function UserAptitudeScreenForm() {
 				render={({ field: { onChange, onBlur, value } }) => (
 					<>
 						<TextInput
-							numberOfLines={2}
-							placeholderTextColor={theme.colors.tertiary}
+							textColor={theme.colors.shadow}
 							placeholder="Indique el tiempo que pasa fuera de su hogar"
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
@@ -193,7 +192,7 @@ export function UserAptitudeScreenForm() {
 				render={({ field: { onChange, onBlur, value } }) => (
 					<>
 						<TextInput
-							placeholderTextColor={theme.colors.tertiary}
+							textColor={theme.colors.shadow}
 							placeholder="Indique el área de su domicilio (m2)"
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
@@ -266,7 +265,7 @@ export function UserAptitudeScreenForm() {
 				render={({ field: { onChange, onBlur, value } }) => (
 					<>
 						<TextInput
-							placeholderTextColor={theme.colors.tertiary}
+							textColor={theme.colors.shadow}
 							placeholder='Ej: "Comida casera", "Croquetas"'
 							onBlur={onBlur}
 							onChangeText={onChange}
@@ -299,7 +298,7 @@ export function UserAptitudeScreenForm() {
 				render={({ field: { onChange, onBlur, value } }) => (
 					<>
 						<TextInput
-							placeholderTextColor={theme.colors.tertiary}
+							textColor={theme.colors.shadow}
 							placeholder="Indique sus gastos mensuales por mascota"
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
@@ -335,7 +334,7 @@ export function UserAptitudeScreenForm() {
 						<TextInput
 							numberOfLines={2}
 							multiline={true}
-							placeholderTextColor={theme.colors.tertiary}
+							textColor={theme.colors.shadow}
 							placeholder="Ingrese su principal motivación por adoptar"
 							onBlur={onBlur}
 							onChangeText={onChange}

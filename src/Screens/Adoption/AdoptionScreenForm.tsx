@@ -212,6 +212,7 @@ export function AdoptionScreenForm() {
 				render={({ field: { onChange, onBlur, value } }) => (
 					<>
 						<TextInput
+							textColor={theme.colors.shadow}
 							placeholder="Ingrese la raza del animal"
 							onBlur={onBlur}
 							onChangeText={onChange}
@@ -241,6 +242,7 @@ export function AdoptionScreenForm() {
 				render={({ field: { onChange, onBlur, value } }) => (
 					<>
 						<TextInput
+							textColor={theme.colors.shadow}
 							placeholder="Ingrese la edad en meses del animal"
 							onBlur={onBlur}
 							onChangeText={(newValue) => onChange(parseNumber(newValue))}
@@ -389,6 +391,7 @@ export function AdoptionScreenForm() {
 				render={({ field: { onChange, onBlur, value } }) => (
 					<>
 						<TextInput
+							textColor={theme.colors.shadow}
 							placeholder="Ingrese alguna información adicional del animal"
 							onBlur={onBlur}
 							onChangeText={onChange}
