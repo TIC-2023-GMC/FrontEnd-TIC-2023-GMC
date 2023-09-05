@@ -35,7 +35,16 @@ export const UserSchema = z.object({
 	motivation: z
 		.string()
 		.nonempty('Su motivación para adoptar es requerida')
-		.max(150, 'Por favor, ingrese una motivación de 150 caracteres o menos'),
+		.max(150, 'Por favor, ingrese una motivación de 150 caracteres o menos')
+		.refine(
+			(value) => {
+				const trimmedValue = value.trim();
+				return trimmedValue.length > 0;
+			},
+			{
+				message: 'Este campo no puede estar vacío'
+			}
+		),
 	favorite_adoption_publications: z.array(z.string()),
 	photo: PhotoSchema
 });
@@ -101,7 +110,6 @@ export const CommentTextSchema = z.object({
 		.max(150, 'Máx. caracteres: 150')
 		.refine(
 			(value) => {
-				// Remove whitespace characters and check if the resulting string is empty
 				const trimmedValue = value.trim();
 				return trimmedValue.length > 0;
 			},

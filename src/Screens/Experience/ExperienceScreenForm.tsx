@@ -135,6 +135,7 @@ export function ExperienceScreenForm() {
 				render={({ field: { onChange, onBlur, value } }) => (
 					<>
 						<TextInput
+							textColor={theme.colors.shadow}
 							placeholder="Ingrese su historia o experiencia"
 							onBlur={onBlur}
 							onChangeText={onChange}
