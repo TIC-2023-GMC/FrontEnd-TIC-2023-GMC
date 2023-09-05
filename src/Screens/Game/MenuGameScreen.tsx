@@ -48,7 +48,7 @@ export function MenuGameScreen() {
 									case 'Cuidado Responsable':
 										navigation.navigate('Search Words Game');
 										break;
-									case 'Quiz':
+									case 'Evaluándome':
 										navigation.navigate('Quiz Game');
 										break;
 								}
