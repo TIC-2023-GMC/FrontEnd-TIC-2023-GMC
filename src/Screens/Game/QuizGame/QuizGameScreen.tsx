@@ -284,7 +284,7 @@ const createStyles = () =>
 		},
 		answerContainer: {
 			marginTop: 25,
-			backgroundColor: '#4caf5066',
+			backgroundColor: '#A3A3A3',
 			width: '90%',
 			padding: 25,
 			borderRadius: 10,
@@ -319,7 +319,7 @@ const createStyles = () =>
 			borderRadius: 20,
 			justifyContent: 'space-between',
 			alignSelf: 'center',
-			backgroundColor: '#fff',
+			backgroundColor: '#ECEBEB',
 			paddingVertical: 20
 		},
 		leaderboardBackgroundImage: {
@@ -328,22 +328,25 @@ const createStyles = () =>
 			height: '100%'
 		},
 		gameStatisticsContainer: {
-			backgroundColor: '#4cb95099',
+			backgroundColor: '#F3FFE5',
 			width: '90%',
 			height: '25%',
 			borderRadius: 10,
 			alignSelf: 'center',
 			justifyContent: 'space-between',
-			paddingVertical: 10
+			paddingVertical: 10,
+			borderColor: '#A3A3A3',
+			borderWidth: 1
 		},
 		statisticsText: {
 			textAlign: 'center',
 			fontWeight: 'bold',
 			fontSize: 20,
-			color: '#fff'
+			color: '#000',
+			shadowColor: '#000'
 		},
 		leaderboardContainer: {
-			backgroundColor: '#4caf5066',
+			backgroundColor: '#A3A3A3',
 			width: '90%',
 			height: '62%',
 			borderRadius: 10,
@@ -366,7 +369,7 @@ const createStyles = () =>
 		},
 		leaderboardHeader: {
 			justifyContent: 'center',
-			backgroundColor: '#4cb95099',
+			backgroundColor: '#F3FFE5',
 			textAlign: 'center',
 			fontFamily: 'sans-serif',
 			fontSize: 15,

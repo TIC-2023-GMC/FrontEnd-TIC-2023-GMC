@@ -11,7 +11,7 @@ import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { GameTabNavigation } from '../../models/types';
 
 const imgLogo = {
-	uri: 'https://firebasestorage.googleapis.com/v0/b/pawq-fc6dc.appspot.com/o/logo_a_jugar.png?alt=media&token=5e617c15-22c3-4e8d-b87b-debb4c063cb0'
+	uri: 'https://firebasestorage.googleapis.com/v0/b/pawq-fc6dc.appspot.com/o/logo_a_jugar.png?alt=media&token=fd695e63-f0f5-467e-a95f-e481b7f1c705'
 };
 
 export function MenuGameScreen() {
