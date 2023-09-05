@@ -61,7 +61,7 @@ export function CommentSection({
 	});
 
 	const pageSize = 6;
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isLoading } =
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isLoading, remove } =
 		useInfiniteQuery({
 			queryKey: ['Comments'],
 			queryFn: async ({ pageParam = 1 }) => {
@@ -107,7 +107,15 @@ export function CommentSection({
 	};
 
 	return (
-		<Modal animationType="slide" transparent visible={visible} onRequestClose={onDismiss}>
+		<Modal
+			animationType="slide"
+			transparent
+			visible={visible}
+			onRequestClose={() => {
+				onDismiss && onDismiss();
+				remove();
+			}}
+		>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					<Text style={styles.modalText}>Comentarios</Text>
