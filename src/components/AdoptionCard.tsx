@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react-native/no-unused-styles */
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -24,23 +23,33 @@ interface CardProps {
 	userAccount: User;
 	setUserAccount: React.Dispatch<React.SetStateAction<User>>;
 	onSaveAsFavorite?: (
+		// eslint-disable-next-line no-unused-vars
 		variables: SaveOrRemoveFavoriteProps,
+		// eslint-disable-next-line no-unused-vars
 		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
 	) => void;
 	onRemoveFromFavorites?: (
+		// eslint-disable-next-line no-unused-vars
 		variables: SaveOrRemoveFavoriteProps,
+		// eslint-disable-next-line no-unused-vars
 		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
 	) => void;
-	onAddLike?: (
+	onAddLike: (
+		// eslint-disable-next-line no-unused-vars
 		variables: AddOrRemoveLikeProps,
+		// eslint-disable-next-line no-unused-vars
 		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
 	) => void;
-	onRemoveLike?: (
+	onRemoveLike: (
+		// eslint-disable-next-line no-unused-vars
 		variables: AddOrRemoveLikeProps,
+		// eslint-disable-next-line no-unused-vars
 		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
 	) => void;
-	onAddComment?: (
+	onAddComment: (
+		// eslint-disable-next-line no-unused-vars
 		variables: AddCommentProps,
+		// eslint-disable-next-line no-unused-vars
 		options?: MutateOptions<AddCommentProps> | undefined
 	) => void;
 }
@@ -75,9 +84,11 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 		vaccination_card: vaccinationCard,
 		sterilized
 	} = props;
+
 	const handleExpand = () => {
 		setExpanded(!expanded);
 	};
+
 	const {
 		setUserAccount,
 		userAccount,
@@ -93,7 +104,9 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 		userAccount.favorite_adoption_publications.includes(adoption._id)
 	);
 
-	const [like, setLike] = useState<boolean>(likes.some((like) => like.user_id === userAccount._id));
+	const [like, setLike] = useState<boolean>(
+		likes.includes({ user_id: userAccount._id ? userAccount._id : '' })
+	);
 	const [numberOfLikes, setNumberOfLikes] = useState<number>(likes.length);
 
 	const addOrRemoveFavoriteRequest = {
@@ -106,6 +119,11 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 		pub_id: adoption._id,
 		is_adoption: true
 	};
+
+	useEffect(() => {
+		setLike(likes.some((like) => like.user_id === userAccount._id));
+		setNumberOfLikes(likes.length);
+	}, [likes]);
 
 	useEffect(() => {
 		setCheckedFavorite(userAccount.favorite_adoption_publications.includes(adoption._id));
@@ -248,30 +266,23 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 							<View style={styles.actions}>
 								<IconButton
 									animated={true}
+									selected={true}
 									size={28}
 									icon="heart"
 									iconColor={!like ? theme.colors.tertiary : theme.colors.primary}
 									onPress={() => {
 										if (!like && onAddLike !== undefined) {
-											onAddLike(addOrRemoveLikeRequest, {
-												onSuccess: () => {
-													setNumberOfLikes(numberOfLikes + 1);
-													setLike(true);
-												}
-											});
+											onAddLike(addOrRemoveLikeRequest);
 										} else if (like && onRemoveLike !== undefined) {
-											onRemoveLike(addOrRemoveLikeRequest, {
-												onSuccess: () => {
-													setNumberOfLikes(numberOfLikes - 1);
-													setLike(false);
-												}
-											});
+											onRemoveLike(addOrRemoveLikeRequest);
 										}
+										setLike(!like);
 									}}
 								/>
 							</View>
 							<View style={styles.actions}>
 								<IconButton
+									animated={true}
 									size={28}
 									icon="comment"
 									iconColor={theme.colors.tertiary}
@@ -281,6 +292,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 							{(onSaveAsFavorite !== undefined || onRemoveFromFavorites !== undefined) && (
 								<View style={styles.actions}>
 									<IconButton
+										animated={true}
 										onPress={() => {
 											if (!checkedFavorite && onSaveAsFavorite !== undefined) {
 												onSaveAsFavorite(addOrRemoveFavoriteRequest, {
@@ -316,6 +328,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 							)}
 							<View style={styles.actions}>
 								<IconButton
+									animated={true}
 									size={28}
 									icon="share-variant"
 									iconColor={theme.colors.tertiary}

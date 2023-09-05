@@ -74,9 +74,9 @@ export function AdoptionScreen({
 	const pageSize = 2;
 	useScrollToTop(ref);
 
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
 		useInfiniteQuery({
-			queryKey: ['Adoption', filter],
+			queryKey: ['Adoption'],
 			queryFn: async ({ pageParam = 1 }) => {
 				const newDate = filter?.date ? new Date(filter?.date) : undefined;
 				if (newDate) {
@@ -116,6 +116,9 @@ export function AdoptionScreen({
 				})
 			).then((response) => response.data);
 		},
+		onSuccess: () => {
+			refetch();
+		},
 		onError: (error) => {
 			console.log(error);
 		}
@@ -130,6 +133,9 @@ export function AdoptionScreen({
 					isAdoption: data.is_adoption
 				})
 			).then((response) => response.data);
+		},
+		onSuccess: () => {
+			refetch();
 		},
 		onError: (error) => {
 			console.log(error);
@@ -224,7 +230,7 @@ export function AdoptionScreen({
 				}
 				refreshControl={
 					<RefreshControl
-						refreshing={isFetchingNextPage || isLoading}
+						refreshing={isFetchingNextPage || isLoading || isFetching}
 						onRefresh={() => {
 							refetch();
 						}}

@@ -47,7 +47,7 @@ export function ExperienceScreen({
 	const pageSize = 2;
 	useScrollToTop(ref);
 
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
 		useInfiniteQuery({
 			queryKey: ['Experience', filter],
 			queryFn: async ({ pageParam = 1 }) => {
@@ -91,6 +91,9 @@ export function ExperienceScreen({
 				})
 			).then((response) => response.data);
 		},
+		onSuccess: () => {
+			refetch();
+		},
 		onError: (error) => {
 			console.log(error);
 		}
@@ -105,6 +108,9 @@ export function ExperienceScreen({
 					isAdoption: data.is_adoption
 				})
 			).then((response) => response.data);
+		},
+		onSuccess: () => {
+			refetch();
 		},
 		onError: (error) => {
 			console.log(error);
@@ -161,7 +167,7 @@ export function ExperienceScreen({
 				}
 				refreshControl={
 					<RefreshControl
-						refreshing={isFetchingNextPage || isLoading}
+						refreshing={isFetchingNextPage || isLoading || isFetching}
 						onRefresh={() => {
 							refetch();
 						}}

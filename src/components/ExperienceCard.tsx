@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react-native/no-unused-styles */
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MutateOptions } from '@tanstack/react-query';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, NativeSyntheticEvent, StyleSheet, TextLayoutEventData, View } from 'react-native';
 import { Button, Card, IconButton, List, Text, useTheme } from 'react-native-paper';
 import ReactTimeAgo from 'react-time-ago';
@@ -20,15 +19,21 @@ import { CommentSection } from './CommentSection';
 interface CardProps {
 	userAccount: User;
 	onAddLike?: (
+		// eslint-disable-next-line no-unused-vars
 		variables: AddOrRemoveLikeProps,
+		// eslint-disable-next-line no-unused-vars
 		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
 	) => void;
 	onRemoveLike?: (
+		// eslint-disable-next-line no-unused-vars
 		variables: AddOrRemoveLikeProps,
+		// eslint-disable-next-line no-unused-vars
 		options?: MutateOptions<AddOrRemoveLikeProps> | undefined
 	) => void;
 	onAddComment?: (
+		// eslint-disable-next-line no-unused-vars
 		variables: AddCommentProps,
+		// eslint-disable-next-line no-unused-vars
 		options?: MutateOptions<AddCommentProps> | undefined
 	) => void;
 }
@@ -58,7 +63,9 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 
 	const { userAccount, onAddLike, onRemoveLike, onAddComment, ...experience } = props;
 
-	const [like, setLike] = useState<boolean>(likes.some((like) => like.user_id === userAccount._id));
+	const [like, setLike] = useState<boolean>(
+		likes.includes({ user_id: userAccount._id ? userAccount._id : '' })
+	);
 	const [numberOfLikes, setNumberOfLikes] = useState<number>(likes.length);
 
 	const addOrRemoveLikeRequest = {
@@ -66,6 +73,11 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 		pub_id: experience._id,
 		is_adoption: false
 	};
+
+	useEffect(() => {
+		setLike(likes.some((like) => like.user_id === userAccount._id));
+		setNumberOfLikes(likes.length);
+	}, [likes]);
 
 	const handleTextLayout = (event: NativeSyntheticEvent<TextLayoutEventData>) => {
 		const { lines } = event.nativeEvent;
@@ -160,30 +172,23 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 							<View style={styles.actions}>
 								<IconButton
 									animated={true}
+									selected={true}
 									size={28}
 									icon="heart"
 									iconColor={!like ? theme.colors.tertiary : theme.colors.primary}
 									onPress={() => {
 										if (!like && onAddLike !== undefined) {
-											onAddLike(addOrRemoveLikeRequest, {
-												onSuccess: () => {
-													setNumberOfLikes(numberOfLikes + 1);
-													setLike(true);
-												}
-											});
+											onAddLike(addOrRemoveLikeRequest);
 										} else if (like && onRemoveLike !== undefined) {
-											onRemoveLike(addOrRemoveLikeRequest, {
-												onSuccess: () => {
-													setNumberOfLikes(numberOfLikes - 1);
-													setLike(false);
-												}
-											});
+											onRemoveLike(addOrRemoveLikeRequest);
 										}
+										setLike(!like);
 									}}
 								/>
 							</View>
 							<View style={styles.actions}>
 								<IconButton
+									animated={true}
 									size={28}
 									icon="comment"
 									iconColor={theme.colors.tertiary}
@@ -193,6 +198,7 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 
 							<View style={styles.actions}>
 								<IconButton
+									animated={true}
 									size={28}
 									icon="share-variant"
 									iconColor={theme.colors.tertiary}
