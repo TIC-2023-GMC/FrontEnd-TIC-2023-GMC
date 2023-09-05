@@ -189,7 +189,9 @@ export function CommentSection({
 										error={!!errors.comment_text}
 									/>
 									{errors.comment_text && (
-										<HelperText type="error">{errors.comment_text.message}</HelperText>
+										<HelperText type="error" style={styles.errorText}>
+											{errors.comment_text.message}
+										</HelperText>
 									)}
 								</View>
 							)}
@@ -283,5 +285,9 @@ const createStyles = (theme: MD3Theme) =>
 		commentContainer: {
 			flex: 1,
 			flexDirection: 'column'
+		},
+		errorText: {
+			marginTop: -10,
+			marginBottom: 10
 		}
 	});
