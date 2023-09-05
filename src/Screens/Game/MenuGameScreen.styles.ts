@@ -3,17 +3,20 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		alignItems: 'center'
+		alignItems: 'center',
+		backgroundColor: '#fff',
+		flexDirection: 'column'
 	},
 	imgLogo: {
-		width: 200,
-		height: 137,
-		marginTop: 20
+		width: '34%',
+		height: '15%',
+		top: 10,
+		marginBottom: 25
 	},
 	cardContainer: {
 		flexDirection: 'row',
-		width: 335,
-		height: 125,
+		width: '90%',
+		height: '20%',
 		margin: 10,
 		backgroundColor: '#F3FFE5',
 		alignItems: 'center',
@@ -26,8 +29,8 @@ export const styles = StyleSheet.create({
 		shadowRadius: 4
 	},
 	gameIcon: {
-		width: 100,
-		height: 100,
+		width: '40%',
+		height: '80%',
 		margin: 10,
 		borderRadius: 10
 	},
@@ -42,12 +45,14 @@ export const styles = StyleSheet.create({
 		marginHorizontal: 0,
 		alignItems: 'center',
 		color: '#000',
-		fontWeight: 'bold'
+		fontWeight: 'bold',
+		textAlign: 'center'
 	},
 	button: {
-		width: 100,
-		height: 40,
+		width: '70%',
+		height: '27%',
 		margin: 20,
+		padding: 0,
 		backgroundColor: '#4caf5066',
 		buttonText: {
 			fontSize: 20,
