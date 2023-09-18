@@ -1,37 +1,16 @@
-import React, { useRef, useState, memo, useCallback, useContext } from 'react';
-import { Text, View, FlatList, RefreshControl } from 'react-native';
-import { styles } from './AdoptionScreen.styles';
-import { StatusBar } from 'expo-status-bar';
-import { get, post, del } from '../../services/api';
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
-import AdoptionCard from '../../components/AdoptionCard';
-import { useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import FilterModal from '../../components/AdoptionsFilterModal';
-import { useFocusEffect } from '@react-navigation/native';
-import MoreOptionsModal from '../../components/MoreOptionsModal';
+import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
+import React, { memo, useCallback, useContext, useRef, useState } from 'react';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
 import { UserContext, UserContextParams } from '../../auth/userContext';
-import {
-	getAddFavoriteAdoptionEndpoint,
-	getListAdoptionsEndpoint,
-	getRemoveFavoriteAdoptionEndpoint,
-	getAddLikeEndpoint,
-	getRemoveLikeEndpoint,
-	getAddCommentEndpoint
-} from '../../services/endpoints';
-import {
-	AdoptionPublication,
-	AdoptionFilter,
-	SaveOrRemoveFavoriteProps,
-	AddOrRemoveLikeProps,
-	AddCommentProps
-} from '../../models/InterfacesModels';
-
-interface AdoptionPublicationScreen {
-	0: AdoptionPublication[];
-	1: number;
-}
+import AdoptionCard from '../../components/AdoptionCard';
+import FilterModal from '../../components/AdoptionsFilterModal';
+import MoreOptionsModal from '../../components/MoreOptionsModal';
+import { useFavorite, useLike, useMutationComment, useQueryAdoption } from '../../hooks';
+import { AdoptionFilter, AdoptionPublication } from '../../models/InterfacesModels';
+import { styles } from './AdoptionScreen.styles';
 
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedFilterModal = memo(FilterModal);
@@ -45,55 +24,25 @@ export function AdoptionScreen({
 	// eslint-disable-next-line no-unused-vars
 	setVisibleFilter: (visible: boolean) => void;
 }) {
-	const { user, setUser } = useContext<UserContextParams>(UserContext);
+	const pageSize = 2;
 	const theme = useTheme();
+
+	const { addCommentMutation } = useMutationComment();
 	const [visibleSnackBar, setVisibleSnackBar] = useState([false, false]);
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [filter, setFilter] = useState<AdoptionFilter>({} as AdoptionFilter);
 	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
-	const [publicationSelected, setPublicationSelected] = useState<AdoptionPublication>({
-		_id: '',
-		user: user,
-		description: '',
-		publication_date: new Date(),
-		photo: {
-			img_path: ''
-		},
-		likes: [],
-		comments: [],
-		species: '',
-		pet_size: '',
-		pet_breed: '',
-		pet_age: 0,
-		pet_sex: undefined,
-		pet_location: '',
-		sterilized: false,
-		vaccination_card: false
-	});
-	const pageSize = 2;
-	useScrollToTop(ref);
-
+	const [publicationSelected, setPublicationSelected] = useState<AdoptionPublication | undefined>(
+		undefined
+	);
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		useInfiniteQuery({
-			queryKey: ['Adoption', filter],
-			queryFn: async ({ pageParam = 1 }) => {
-				const newDate = filter?.date ? new Date(filter?.date) : undefined;
-				if (newDate) {
-					newDate.setUTCHours(0, 0, 0, 0);
-				}
-				const response = await get<AdoptionPublicationScreen>(
-					getListAdoptionsEndpoint({ pageParam, filter, pageSize, newDate })
-				);
-				return response.data;
-			},
-			getNextPageParam: (lastPage) => {
-				if (lastPage[0].length !== 0) {
-					return lastPage[1];
-				}
-				return undefined;
-			}
-		});
+		useQueryAdoption(filter, pageSize);
+	const { user, setUser } = useContext<UserContextParams>(UserContext);
+	const { savePublicationAsFavoriteMutation, removePublicationFromFavoritesMutation } =
+		useFavorite(setVisibleSnackBar);
+	const { addLikeMutation, removeLikeMutation } = useLike('Adoption');
+	useScrollToTop(ref);
 
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
@@ -106,74 +55,6 @@ export function AdoptionScreen({
 		}, [])
 	);
 
-	const addLikeMutation = useMutation({
-		mutationFn: (data: AddOrRemoveLikeProps) => {
-			return post(
-				getAddLikeEndpoint({
-					userId: data.user_id,
-					pubId: data.pub_id,
-					isAdoption: data.is_adoption
-				})
-			).then((response) => response.data);
-		},
-		onSuccess: () => {
-			refetch();
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-
-	const removeLikeMutation = useMutation({
-		mutationFn: (data: AddOrRemoveLikeProps) => {
-			return del(
-				getRemoveLikeEndpoint({
-					userId: data.user_id,
-					pubId: data.pub_id,
-					isAdoption: data.is_adoption
-				})
-			).then((response) => response.data);
-		},
-		onSuccess: () => {
-			refetch();
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-
-	const addCommentMutation = useMutation({
-		mutationFn: (data: AddCommentProps) => {
-			return post(getAddCommentEndpoint(), data).then((response) => response.data);
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-
-	const savePublicationAsFavoriteMutation = useMutation({
-		mutationFn: (data: SaveOrRemoveFavoriteProps) => {
-			return post(getAddFavoriteAdoptionEndpoint(), data).then((response) => response.data);
-		},
-		onSuccess: () => {
-			setVisibleSnackBar([true, false]);
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-
-	const removePublicationFromFavoritesMutation = useMutation({
-		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
-			del(getRemoveFavoriteAdoptionEndpoint(), { data: data }).then((response) => response.data),
-		onSuccess: () => {
-			setVisibleSnackBar([false, true]);
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-
 	const handleOpenModal = (publication: AdoptionPublication) => {
 		setPublicationSelected(publication);
 		setIsMoreModalVisible(true);
@@ -182,12 +63,14 @@ export function AdoptionScreen({
 	return (
 		<>
 			<StatusBar style="light" />
-			<MemoizedMoreOptionsModal
-				publication={publicationSelected}
-				modalVisible={isMoreModalVisible}
-				handleModalVisible={() => setIsMoreModalVisible(false)}
-				navBarHeight={tabBarHeight}
-			/>
+			{publicationSelected && (
+				<MemoizedMoreOptionsModal
+					publication={publicationSelected}
+					modalVisible={isMoreModalVisible}
+					handleModalVisible={() => setIsMoreModalVisible(false)}
+					navBarHeight={tabBarHeight}
+				/>
+			)}
 			<MemoizedFilterModal
 				filter={filter}
 				visible={visibleFilter}

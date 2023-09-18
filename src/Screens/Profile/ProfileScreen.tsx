@@ -1,6 +1,12 @@
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import {
+	CommonActions,
+	NavigationProp,
+	useFocusEffect,
+	useNavigation
+} from '@react-navigation/native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Text, View, Image, ScrollView, BackHandler, Linking } from 'react-native';
-import { styles } from './ProfileScreen.styles';
+import { BackHandler, Image, Linking, ScrollView, Text, View } from 'react-native';
 import {
 	ActivityIndicator,
 	Button,
@@ -10,20 +16,13 @@ import {
 	Snackbar,
 	useTheme
 } from 'react-native-paper';
-import {
-	CommonActions,
-	NavigationProp,
-	useFocusEffect,
-	useNavigation
-} from '@react-navigation/native';
-import { TabNavigationParamsList } from '../../models/types';
-import { useQuery } from '@tanstack/react-query';
-import { getUserByIdEndpoint } from '../../services/endpoints';
-import { User } from '../../models/InterfacesModels';
-import { get } from '../../services/api';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { UserContext, UserContextParams } from '../../auth/userContext';
+import { User } from '../../models/InterfacesModels';
+import { TabNavigationParamsList } from '../../models/types';
+import { styles } from './ProfileScreen.styles';
+import { useQueryUser } from '../../hooks';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function ProfileScreen({ route }: any) {
 	const theme = useTheme();
 	const tabBarHeight = useBottomTabBarHeight();
@@ -33,14 +32,7 @@ export function ProfileScreen({ route }: any) {
 	const [profileUser, setProfileUser] = React.useState<User>(user);
 	const [snackbarVisible, setSnackbarVisible] = useState(false);
 
-	const { isLoading, isRefetching, isSuccess, data } = useQuery({
-		queryKey: ['userProfileData'],
-		queryFn: async () => {
-			const response = await get<User>(getUserByIdEndpoint(userId || ''));
-			return response.data;
-		},
-		enabled: !!userId
-	});
+	const { isLoading, isRefetching, isSuccess, data } = useQueryUser(userId);
 
 	useEffect(() => {
 		if (isSuccess) {
@@ -206,7 +198,7 @@ export function ProfileScreen({ route }: any) {
 								<View style={styles.aptitudeFieldView}>
 									<Text style={styles.aptitudeFieldText}>Casa con patio:</Text>
 									<Text style={styles.aptitudeText}>
-										{profileUser.has_yard !== undefined ? (profileUser.has_yard ? 'Si' : 'No') : ''}
+										{profileUser.has_yard !== undefined && (profileUser.has_yard ? 'Si' : 'No')}
 									</Text>
 								</View>
 								<Divider style={{ backgroundColor: theme.colors.primary }} />

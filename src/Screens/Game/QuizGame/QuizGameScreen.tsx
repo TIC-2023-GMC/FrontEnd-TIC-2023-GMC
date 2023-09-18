@@ -1,27 +1,26 @@
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
-import { ActivityIndicator, Button, Card, Text, Modal, Portal, Snackbar } from 'react-native-paper';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { QuizGameMatch, UserScore } from '../../../models/InterfacesModels';
-import { get, put } from '../../../services/api';
+import { Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Button, Card, Modal, Portal, Snackbar, Text } from 'react-native-paper';
 import { useStopwatch } from 'react-timer-hook';
 import { UserContext, UserContextParams } from '../../../auth/userContext';
 import {
-	getLeaderBoardEndpoint,
-	getQuizGameByUserEndpoint,
-	getQuizGameEndpoint
-} from '../../../services/endpoints';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+	useQueryLeaderboard,
+	useQueryQuizGame,
+	useQuestion,
+	useQuizGame,
+	useSendScoreQuizzGame
+} from '../../../hooks';
+import { UserScore } from '../../../models/InterfacesModels';
 import { GameTabNavigation } from '../../../models/types';
 
-const timeOutAnswer = 3000;
+const timeOutAnswer = 2000;
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
 const levelImages = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
 
 export function QuizGameScreen() {
 	const styles = createStyles();
 	const { user } = useContext<UserContextParams>(UserContext);
-	const [question, setQuestion] = useState(-1);
 	const [modalVisible, setModalVisible] = useState(false);
 	const navigation = useNavigation<NavigationProp<GameTabNavigation>>();
 	const [isClicked, setIsClicked] = useState(-1);
@@ -29,43 +28,16 @@ export function QuizGameScreen() {
 	const { totalSeconds, seconds, minutes, pause, reset } = useStopwatch({
 		autoStart: true
 	});
-	const [quizzGame, setQuizzGame] = useState<QuizGameMatch>({
-		_id: '',
-		user_id: user._id ? user._id : '',
-		match_name: '',
-		match_game_score: 0,
-		match_game_time: 0,
-		match_game_onboarding: '',
-		match_game_questions: []
-	});
+	const { quizzGame, changeScore, changeTime, setQuizzGame } = useQuizGame(user);
+	const { question, changeQuestion, updateQuestion } = useQuestion();
+	const { sendScoreQuizzGame } = useSendScoreQuizzGame();
 
-	useQuery({
-		queryKey: ['question'],
-		queryFn: async () => {
-			const response = await get<QuizGameMatch>(getQuizGameByUserEndpoint(user));
-			return response.data;
-		},
-		onSuccess: (data: QuizGameMatch) => {
-			data.match_game_score = 0;
-			data.match_game_time = 0;
-			setQuizzGame(data);
-			setQuestion(data?.match_game_questions?.length ? data?.match_game_questions?.length - 1 : 0);
-		}
-	});
+	const { loading } = useQueryQuizGame(user, setQuizzGame, updateQuestion);
 
-	const sendScoreQuizzGame = useMutation({
-		mutationFn: (data: QuizGameMatch) =>
-			put(getQuizGameEndpoint(), data).then((response) => response.data)
-	});
-
-	const { data, isSuccess, isLoading, isFetching } = useQuery({
-		queryKey: ['leaderboard'],
-		queryFn: async () => {
-			const response = await get(getLeaderBoardEndpoint(user));
-			return response.data;
-		},
-		enabled: sendScoreQuizzGame.isSuccess
-	});
+	const { data, isSuccess, isLoading, isFetching } = useQueryLeaderboard(
+		user,
+		sendScoreQuizzGame.isSuccess
+	);
 
 	useEffect(() => {
 		if (question === 0) {
@@ -78,7 +50,13 @@ export function QuizGameScreen() {
 		setSnackbarVisible(true);
 		setTimeout(() => setIsClicked(-1), timeOutAnswer - 100); // Cambia el color de vuelta después de 2 segundos
 	};
-	return (
+	return loading ? (
+		<ActivityIndicator
+			style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+			animating={true}
+			size="large"
+		/>
+	) : (
 		<ImageBackground source={image} resizeMode="cover" style={styles.container}>
 			<Text style={styles.timer}>
 				{minutes < 10 ? '0' + minutes : minutes}:{seconds < 10 ? '0' + seconds : seconds}
@@ -92,9 +70,8 @@ export function QuizGameScreen() {
 						]}
 					>
 						<Text style={styles.questionText}>
-							{quizzGame.match_game_questions.length > 0
-								? quizzGame.match_game_questions[question].question_text
-								: ''}
+							{quizzGame.match_game_questions.length > 0 &&
+								quizzGame.match_game_questions[question].question_text}
 						</Text>
 					</Card>
 				</Card>
@@ -112,37 +89,15 @@ export function QuizGameScreen() {
 							onPress={() => {
 								handlePress(index);
 								setTimeout(() => {
-									setQuestion((prevQuestion) => (prevQuestion === 0 ? 0 : prevQuestion - 1));
+									changeQuestion();
 								}, timeOutAnswer);
-								setQuizzGame((prevQuizzGame) => {
-									if (data.is_correct) {
-										const object: QuizGameMatch = {
-											...prevQuizzGame,
-											match_game_score: prevQuizzGame.match_game_score + 1
-										};
-										return object;
-									}
-									return prevQuizzGame;
-								});
-
+								changeScore(data.is_correct);
 								if (question === 0) {
 									pause();
-									setQuizzGame((prevQuizzGame) => {
-										const object: QuizGameMatch = {
-											...prevQuizzGame,
-											match_game_time: totalSeconds,
-
-											match_game_score: Math.round(
-												prevQuizzGame.match_game_score * 10 +
-													(10 * Math.pow(prevQuizzGame.match_game_score, 2)) / totalSeconds
-											)
-										};
-										return object;
-									});
-
+									changeTime(totalSeconds);
 									setTimeout(() => {
-										setModalVisible(true);
-									}, 2000);
+										setModalVisible(!modalVisible);
+									}, timeOutAnswer);
 								}
 							}}
 						>
@@ -154,22 +109,20 @@ export function QuizGameScreen() {
 				<Snackbar
 					onIconPress={() => setSnackbarVisible(false)}
 					icon={
-						quizzGame.match_game_questions[question].answers[isClicked]
-							? quizzGame.match_game_questions[question].answers[isClicked].is_correct
-								? 'check-all'
-								: 'close'
-							: ''
+						quizzGame.match_game_questions[question].answers[isClicked] &&
+						quizzGame.match_game_questions[question].answers[isClicked].is_correct
+							? 'check-all'
+							: 'close'
 					}
 					style={styles.snackbarStyle}
 					duration={timeOutAnswer - 1000}
 					visible={snackbarVisible}
 					onDismiss={() => setSnackbarVisible(false)}
 				>
-					{quizzGame.match_game_questions[question].answers[isClicked]
-						? !quizzGame.match_game_questions[question].answers[isClicked].is_correct
-							? 'Oh no! Respuesta incorrecta'
-							: 'Muy bien! Respuesta correcta'
-						: ''}
+					{quizzGame.match_game_questions[question].answers[isClicked] &&
+					!quizzGame.match_game_questions[question].answers[isClicked].is_correct
+						? 'Oh no! Respuesta incorrecta'
+						: 'Muy bien! Respuesta correcta'}
 				</Snackbar>
 			)}
 			<Portal>

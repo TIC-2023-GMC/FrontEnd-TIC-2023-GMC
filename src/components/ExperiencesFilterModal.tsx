@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-unused-styles */
-import * as React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
-import { useTheme, Portal, Modal, List, IconButton, Divider, Button } from 'react-native-paper';
-import { registerTranslation, DatePickerInput } from 'react-native-paper-dates';
+import { Button, Divider, IconButton, List, Modal, Portal, useTheme } from 'react-native-paper';
+import { DatePickerInput, registerTranslation } from 'react-native-paper-dates';
 import { ExperienceFilter } from '../Screens/Experience/ExperienceScreen';
 registerTranslation('es', {
 	save: 'Guardar',

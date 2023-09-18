@@ -1,30 +1,28 @@
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useState } from 'react';
-import { Text, View, ScrollView, BackHandler } from 'react-native';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { BackHandler, ScrollView, Text, View } from 'react-native';
+import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import {
-	TextInput,
+	Button,
 	Checkbox,
 	Divider,
+	HelperText,
 	RadioButton,
-	useTheme,
-	Button,
-	HelperText
+	TextInput,
+	useTheme
 } from 'react-native-paper';
-import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { styles } from './AdoptionScreenForm.styles';
-import PhotoSelection from '../../components/PhotoSelection';
-import { post, get } from '../../services/api';
-import { AdoptionPublication, Photo } from '../../models/InterfacesModels';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { parseNumber, resetNavigationStack, uploadImg } from '../../utils/utils';
-import { AdoptionPublicationSchema } from '../../models/Schemas';
-import { SnackBarError } from '../../components/SnackBarError';
 import { UserContext, UserContextParams } from '../../auth/userContext';
-import { getAddAdoptionEndpoint, getParishEndpoint } from '../../services/endpoints';
+import PhotoSelection from '../../components/PhotoSelection';
+import { SnackBarError } from '../../components/SnackBarError';
+import { useMutationAdoptionPublication, useParish } from '../../hooks';
+import { AdoptionPublication, Photo } from '../../models/InterfacesModels';
+import { AdoptionPublicationSchema } from '../../models/Schemas';
+import { parseNumber, resetNavigationStack, uploadImg } from '../../utils/utils';
+import { styles } from './AdoptionScreenForm.styles';
 
 export function AdoptionScreenForm() {
 	const theme = useTheme();
@@ -32,7 +30,6 @@ export function AdoptionScreenForm() {
 	const navigation = useNavigation();
 	const tabBarHeight = useBottomTabBarHeight();
 	const [image, setImage] = useState<string>();
-	const [loading, setLoading] = useState<boolean>(false);
 	const [failUpload, setFailUpload] = useState<string>('');
 
 	useFocusEffect(
@@ -84,33 +81,20 @@ export function AdoptionScreenForm() {
 		{ label: 'Grande', value: 'Grande' }
 	]);
 	const [openLocation, setOpenLocation] = useState(false);
-	const [itemsLocation, setItemsLocation] = useState<Location[]>([]);
 
-	const { isLoading } = useQuery({
-		queryKey: ['location'],
-		queryFn: async () => {
-			const response = await get<Location[]>(getParishEndpoint());
-			return response.data;
-		},
-		onSuccess: (data) => {
-			setItemsLocation(data);
-		}
-	});
+	const { isLoading, itemsLocation, setItemsLocation } = useParish();
 	const [size, setSize] = useState<string>('');
 	const [location, setLocation] = useState<string>('');
 
-	const createPublicationMutation = useMutation({
-		mutationFn: (data: AdoptionPublication) =>
-			post(getAddAdoptionEndpoint(), data).then((response) => response.data),
-		onSuccess: () => {
-			setLoading(false);
-			reset();
-			resetNavigationStack(navigation, 'Adopciones');
-			setSize('');
-			setLocation('');
-			setImage(undefined);
-		}
-	});
+	const resetForm = () => {
+		reset();
+		resetNavigationStack(navigation, 'Adopciones');
+		setSize('');
+		setLocation('');
+		setImage(undefined);
+	};
+	const { createPublicationMutation, loading, setLoading } =
+		useMutationAdoptionPublication(resetForm);
 
 	const onSubmit: SubmitHandler<AdoptionPublication> = async (data) => {
 		if (image) {
@@ -121,9 +105,7 @@ export function AdoptionScreenForm() {
 				...response
 			};
 
-			const currentDateUTC = new Date();
-			const timezoneOffset = currentDateUTC.getTimezoneOffset() * 60000;
-			const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);
+			const currentDateLocal = new Date();
 			const new_publication: AdoptionPublication = {
 				...data,
 				publication_date: currentDateLocal,
