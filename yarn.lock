@@ -4326,7 +4326,7 @@ flow-enums-runtime@^0.0.5:
 
 flow-parser@0.*:
   version "0.185.2"
-  resolved "https://registry.npmjs.org/flow-parser/-/flow-parser-0.185.2.tgz"
+  resolved "https://registry.yarnpkg.com/flow-parser/-/flow-parser-0.185.2.tgz#cb7ee57f77377d6c5d69a469e980f6332a15e492"
   integrity sha512-2hJ5ACYeJCzNtiVULov6pljKOLygy0zddoqSI1fFetM+XRPpRshFdGEijtqlamA1XwyZ+7rhryI6FQFzvtLWUQ==
 
 flow-parser@^0.206.0:

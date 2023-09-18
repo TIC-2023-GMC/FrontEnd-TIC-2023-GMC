@@ -154,7 +154,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 				pubId={adoption._id}
 				isAdoption={true}
 			/>
-			<View ref={ref}>
+			<View ref={ref} collapsable={false}>
 				<Card style={styles.card}>
 					<Card.Title
 						title={
