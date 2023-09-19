@@ -2,8 +2,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MutateOptions } from '@tanstack/react-query';
-import * as React from 'react';
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Button, Card, IconButton, List, Text, useTheme } from 'react-native-paper';
 import ReactTimeAgo from 'react-time-ago';
@@ -102,12 +101,12 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 	} = props;
 
 	const addOrRemoveFavoriteRequest = {
-		user_id: userAccount._id ? userAccount._id : '',
+		user_id: userAccount._id ?? '',
 		pub_id: adoption._id
 	};
 
 	const addOrRemoveLikeRequest = {
-		user_id: userAccount._id ? userAccount._id : '',
+		user_id: userAccount._id ?? '',
 		pub_id: adoption._id,
 		is_adoption: true
 	};
@@ -155,7 +154,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 				pubId={adoption._id}
 				isAdoption={true}
 			/>
-			<View ref={ref}>
+			<View ref={ref} collapsable={false}>
 				<Card style={styles.card}>
 					<Card.Title
 						title={

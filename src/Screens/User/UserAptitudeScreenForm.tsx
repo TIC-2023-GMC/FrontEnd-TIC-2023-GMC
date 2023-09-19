@@ -1,26 +1,23 @@
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { Text, View, ScrollView, BackHandler } from 'react-native';
 import { TextInput, Divider, RadioButton, useTheme, Button, HelperText } from 'react-native-paper';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { styles } from './UserAptitudeScreenForm.styles';
-import { put } from '../../services/api';
 import { User, UserAptitude } from '../../models/InterfacesModels';
-import { useMutation } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { parseNumber, resetNavigationStack } from '../../utils/utils';
 import { UserAptitudeSchema } from '../../models/Schemas';
 import { UserContext, UserContextParams } from '../../auth/userContext';
-import { getUpdateUserEndpoint } from '../../services/endpoints';
+import { useMutationUser } from '../../hooks';
 
 export function UserAptitudeScreenForm() {
 	const theme = useTheme();
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
 	const navigation = useNavigation();
 	const tabBarHeight = useBottomTabBarHeight();
-	const [loading, setLoading] = useState<boolean>(false);
 
 	const {
 		control,
@@ -40,20 +37,15 @@ export function UserAptitudeScreenForm() {
 			motivation: user.motivation
 		}
 	});
+	const resetForm = () => {
+		resetNavigationStack(navigation, 'Perfil');
+		reset();
+	};
 
-	const updateUserMutation = useMutation({
-		mutationFn: (data: User) =>
-			put(getUpdateUserEndpoint(), data).then((response) => response.data),
-		onSuccess: () => {
-			setLoading(false);
-			resetNavigationStack(navigation, 'Perfil');
-			reset();
-		}
-	});
+	const { updateUserMutation, loading, setLoading } = useMutationUser(resetForm);
 
 	const onSubmit: SubmitHandler<UserAptitude> = async (data) => {
 		setLoading(true);
-
 		const updatedUser: User = {
 			...user,
 			...data

@@ -1,14 +1,10 @@
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Button } from 'react-native-paper';
-import { styles } from './MenuGameScreen.styles';
 import { Image, Text, View } from 'react-native';
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Game } from '../../models/InterfacesModels';
-import { get } from '../../services/api';
-import { getGamesEndpoint } from '../../services/endpoints';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { ActivityIndicator, Button } from 'react-native-paper';
+import { useQueryGames } from '../../hooks';
 import { GameTabNavigation } from '../../models/types';
+import { styles } from './MenuGameScreen.styles';
 
 const imgLogo = {
 	uri: 'https://firebasestorage.googleapis.com/v0/b/pawq-fc6dc.appspot.com/o/logo_a_jugar.png?alt=media&token=fd695e63-f0f5-467e-a95f-e481b7f1c705'
@@ -16,19 +12,10 @@ const imgLogo = {
 
 export function MenuGameScreen() {
 	const navigation = useNavigation<NavigationProp<GameTabNavigation>>();
-	const [games, setGames] = useState<Game[]>();
-
-	useQuery({
-		queryKey: ['listGames'],
-		queryFn: async () => {
-			const response = await get<Game[]>(getGamesEndpoint());
-			return response.data;
-		},
-		onSuccess: (data: Game[]) => {
-			setGames(data);
-		}
-	});
-	return (
+	const { loading, games } = useQueryGames();
+	return loading ? (
+		<ActivityIndicator animating={true} size={'large'} style={styles.activityIndicator} />
+	) : (
 		<View style={styles.container}>
 			<Image source={imgLogo} resizeMode="contain" style={styles.imgLogo} />
 			{games?.map((opcion, index) => (

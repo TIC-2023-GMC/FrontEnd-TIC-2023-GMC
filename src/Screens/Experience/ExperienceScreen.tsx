@@ -1,32 +1,15 @@
-import React, { useRef, useState, memo, useCallback, useContext } from 'react';
-import { Text, View, FlatList, RefreshControl } from 'react-native';
-import { styles } from './ExperienceScreen.styles';
-import { StatusBar } from 'expo-status-bar';
-import { del, get, post } from '../../services/api';
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
-import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import FilterModal from '../../components/ExperiencesFilterModal';
-import {
-	AddCommentProps,
-	AddOrRemoveLikeProps,
-	ExperienceFilter,
-	ExperiencePublication
-} from '../../models/InterfacesModels';
-import ExperienceCard from '../../components/ExperienceCard';
-import {
-	getAddCommentEndpoint,
-	getAddLikeEndpoint,
-	getListExperiencesEnpoint,
-	getRemoveLikeEndpoint
-} from '../../services/endpoints';
+import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
+import React, { memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { UserContext, UserContextParams } from '../../auth/userContext';
-
-interface ExperiencePublicationScreen {
-	0: ExperiencePublication[];
-	1: number;
-}
+import ExperienceCard from '../../components/ExperienceCard';
+import FilterModal from '../../components/ExperiencesFilterModal';
+import { useLike, useMutationComment, useQueryExperience } from '../../hooks';
+import { ExperienceFilter } from '../../models/InterfacesModels';
+import { styles } from './ExperienceScreen.styles';
 
 const MemoizedExperienceCard = memo(ExperienceCard);
 const MemoizedFilterModal = memo(FilterModal);
@@ -48,27 +31,7 @@ export function ExperienceScreen({
 	useScrollToTop(ref);
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		useInfiniteQuery({
-			queryKey: ['Experience', filter],
-			queryFn: async ({ pageParam = 1 }) => {
-				const newDate = filter?.date ? new Date(filter?.date) : undefined;
-
-				if (newDate) {
-					newDate.setUTCHours(0, 0, 0, 0);
-				}
-
-				const response = await get<ExperiencePublicationScreen>(
-					getListExperiencesEnpoint({ pageParam, pageSize, filter, newDate })
-				);
-				return response.data;
-			},
-			getNextPageParam: (lastPage) => {
-				if (lastPage[0].length !== 0) {
-					return lastPage[1];
-				}
-				return undefined;
-			}
-		});
+		useQueryExperience(filter, pageSize);
 
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
@@ -80,51 +43,12 @@ export function ExperienceScreen({
 			refetch();
 		}, [])
 	);
+	useEffect(() => {
+		refetch();
+	}, [filter]);
 
-	const addLikeMutation = useMutation({
-		mutationFn: (data: AddOrRemoveLikeProps) => {
-			return post(
-				getAddLikeEndpoint({
-					userId: data.user_id,
-					pubId: data.pub_id,
-					isAdoption: data.is_adoption
-				})
-			).then((response) => response.data);
-		},
-		onSuccess: () => {
-			refetch();
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-
-	const removeLikeMutation = useMutation({
-		mutationFn: (data: AddOrRemoveLikeProps) => {
-			return del(
-				getRemoveLikeEndpoint({
-					userId: data.user_id,
-					pubId: data.pub_id,
-					isAdoption: data.is_adoption
-				})
-			).then((response) => response.data);
-		},
-		onSuccess: () => {
-			refetch();
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-
-	const addCommentMutation = useMutation({
-		mutationFn: (data: AddCommentProps) => {
-			return post(getAddCommentEndpoint(), data).then((response) => response.data);
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
+	const { addLikeMutation, removeLikeMutation } = useLike('Experience');
+	const { addCommentMutation } = useMutationComment();
 
 	return (
 		<>

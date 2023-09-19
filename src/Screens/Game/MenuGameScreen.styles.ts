@@ -58,5 +58,10 @@ export const styles = StyleSheet.create({
 	},
 	buttonContent: {
 		marginHorizontal: 20
+	},
+	activityIndicator: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center'
 	}
 });

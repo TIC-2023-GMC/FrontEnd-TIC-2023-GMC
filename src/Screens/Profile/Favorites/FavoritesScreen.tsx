@@ -5,7 +5,6 @@ import {
 	useNavigation,
 	useScrollToTop
 } from '@react-navigation/native';
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import React, { memo, useCallback, useContext, useRef, useState } from 'react';
 import { BackHandler, FlatList, RefreshControl, Text, View } from 'react-native';
@@ -13,27 +12,10 @@ import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
 import { UserContext, UserContextParams } from '../../../auth/userContext';
 import AdoptionCard from '../../../components/AdoptionCard';
 import MoreOptionsModal from '../../../components/MoreOptionsModal';
-import {
-	AddCommentProps,
-	AddOrRemoveLikeProps,
-	AdoptionPublication,
-	SaveOrRemoveFavoriteProps
-} from '../../../models/InterfacesModels';
-import { del, post } from '../../../services/api';
-import {
-	getAddCommentEndpoint,
-	getAddLikeEndpoint,
-	getListFavoritesAdoptionsEndpoint,
-	getRemoveFavoriteAdoptionEndpoint,
-	getRemoveLikeEndpoint
-} from '../../../services/endpoints';
+import { useFavorite, useLike, useMutationComment, useQueryFavorite } from '../../../hooks';
+import { AdoptionPublication } from '../../../models/InterfacesModels';
 import { resetNavigationStack } from '../../../utils/utils';
 import { styles } from './FavoritesScreen.styles';
-
-interface FavoritesScreenValues {
-	0: AdoptionPublication[];
-	1: number;
-}
 
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedMoreOptionsModal = memo(MoreOptionsModal);
@@ -67,35 +49,13 @@ export function FavoritesScreen() {
 	});
 	const pageSize = 2;
 	useScrollToTop(ref);
-
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		useInfiniteQuery({
-			queryKey: ['Favorites'],
-			queryFn: async ({ pageParam = 1 }) => {
-				const response = await post<FavoritesScreenValues>(
-					getListFavoritesAdoptionsEndpoint({ pageParam, pageSize }),
-					user.favorite_adoption_publications
-				);
-
-				return response.data;
-			},
-			getNextPageParam: (lastPage) => {
-				if (lastPage[0].length !== 0) {
-					return lastPage[1];
-				}
-				return undefined;
-			},
-			refetchOnWindowFocus: true,
-			refetchIntervalInBackground: true,
-			refetchOnMount: 'always'
-		});
-
+		useQueryFavorite(user.favorite_adoption_publications, pageSize);
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
 			fetchNextPage();
 		}
 	};
-
 	useFocusEffect(
 		useCallback(() => {
 			const handleBackPress = () => {
@@ -109,68 +69,14 @@ export function FavoritesScreen() {
 			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
 		}, [])
 	);
-
 	useFocusEffect(
 		useCallback(() => {
 			refetch();
 		}, [user.favorite_adoption_publications])
 	);
-
-	const addLikeMutation = useMutation({
-		mutationFn: (data: AddOrRemoveLikeProps) => {
-			return post(
-				getAddLikeEndpoint({
-					userId: data.user_id,
-					pubId: data.pub_id,
-					isAdoption: data.is_adoption
-				})
-			).then((response) => response.data);
-		},
-		onSuccess: () => {
-			refetch();
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-
-	const removeLikeMutation = useMutation({
-		mutationFn: (data: AddOrRemoveLikeProps) => {
-			return del(
-				getRemoveLikeEndpoint({
-					userId: data.user_id,
-					pubId: data.pub_id,
-					isAdoption: data.is_adoption
-				})
-			).then((response) => response.data);
-		},
-		onSuccess: () => {
-			refetch();
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-
-	const addCommentMutation = useMutation({
-		mutationFn: (data: AddCommentProps) => {
-			return post(getAddCommentEndpoint(), data).then((response) => response.data);
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-
-	const removePublicationFromFavoritesMutation = useMutation({
-		mutationFn: (data: SaveOrRemoveFavoriteProps) =>
-			del(getRemoveFavoriteAdoptionEndpoint(), { data: data }).then((response) => response.data),
-		onSuccess: () => {
-			setvisibleSnackBar(true);
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
+	const { addLikeMutation, removeLikeMutation } = useLike('Favorites');
+	const { addCommentMutation } = useMutationComment();
+	const { removePublicationFromFavoritesMutation } = useFavorite(undefined, setvisibleSnackBar);
 
 	const handleOpenModal = (publication: AdoptionPublication) => {
 		setPublicationSelected(publication);

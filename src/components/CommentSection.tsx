@@ -1,30 +1,24 @@
 /* eslint-disable no-unused-vars */
-import { StyleSheet, Modal, View, FlatList, RefreshControl } from 'react-native';
-import {
-	Text,
-	MD3Theme,
-	TextInput,
-	useTheme,
-	ActivityIndicator,
-	Snackbar,
-	IconButton,
-	HelperText
-} from 'react-native-paper';
-import { CommentComponent } from './CommentComponent';
-import React, { useContext, useState } from 'react';
-import { AddCommentProps, Comment, CommentText } from '../models/InterfacesModels';
-import { MutateOptions, useInfiniteQuery } from '@tanstack/react-query';
-import { getListCommentsEndpoint } from '../services/endpoints';
-import { get } from '../services/api';
-import { UserContext, UserContextParams } from '../auth/userContext';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CommentTextSchema } from '../models/Schemas';
+import { MutateOptions } from '@tanstack/react-query';
+import React, { memo, useContext, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-
-interface CommentsResults {
-	0: Comment[];
-	1: number;
-}
+import { FlatList, Modal, RefreshControl, StyleSheet, View } from 'react-native';
+import {
+	ActivityIndicator,
+	HelperText,
+	IconButton,
+	MD3Theme,
+	Snackbar,
+	Text,
+	TextInput,
+	useTheme
+} from 'react-native-paper';
+import { UserContext, UserContextParams } from '../auth/userContext';
+import { useQueryComment } from '../hooks';
+import { AddCommentProps, Comment, CommentText } from '../models/InterfacesModels';
+import { CommentTextSchema } from '../models/Schemas';
+import { CommentComponent } from './CommentComponent';
 
 interface CommentSectionProps {
 	visible: boolean;
@@ -36,6 +30,8 @@ interface CommentSectionProps {
 	pubId: string;
 	isAdoption: boolean;
 }
+
+const MemoizedCommentComponent = memo(CommentComponent);
 export function CommentSection({
 	onDismiss,
 	visible,
@@ -62,22 +58,7 @@ export function CommentSection({
 
 	const pageSize = 6;
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isLoading, remove } =
-		useInfiniteQuery({
-			queryKey: ['Comments'],
-			queryFn: async ({ pageParam = 1 }) => {
-				const response = await get<CommentsResults>(
-					getListCommentsEndpoint({ pubId, pageParam, pageSize, isAdoption })
-				);
-				return response.data;
-			},
-			getNextPageParam: (lastPage) => {
-				if (lastPage[0].length !== 0) {
-					return lastPage[1];
-				}
-				return undefined;
-			},
-			enabled: visible
-		});
+		useQueryComment(visible, pubId, pageSize, isAdoption);
 
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
@@ -90,7 +71,7 @@ export function CommentSection({
 
 		const addCommentRequest = {
 			pub_id: pubId,
-			user_id: user?._id ? user._id : '',
+			user_id: user?._id ?? '',
 			comment_text: data.comment_text,
 			is_adoption: isAdoption
 		};
@@ -121,10 +102,12 @@ export function CommentSection({
 					<Text style={styles.modalText}>Comentarios</Text>
 					<FlatList
 						style={styles.flatList}
-						keyExtractor={(item) => item._id}
+						keyExtractor={(item) => (item as unknown as Comment)._id}
 						onEndReached={handleLoadMore}
 						data={data?.pages.flatMap((page) => page[0])}
-						renderItem={({ item }) => <CommentComponent {...item} />}
+						renderItem={({ item }) => (
+							<MemoizedCommentComponent {...(item as unknown as Comment)} />
+						)}
 						initialNumToRender={pageSize}
 						onEndReachedThreshold={0.5}
 						ListEmptyComponent={

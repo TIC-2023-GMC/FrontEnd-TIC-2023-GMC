@@ -1,21 +1,19 @@
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useContext, useState } from 'react';
-import { BackHandler, Text, View } from 'react-native';
-import { TextInput, Divider, RadioButton, useTheme, Button, HelperText } from 'react-native-paper';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { styles } from './ExperienceScreenForm.styles';
-import PhotoSelection from '../../components/PhotoSelection';
-import { ExperiencePublication, Photo } from '../../models/InterfacesModels';
-import { useMutation } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { ExperiencePublicationSchema } from '../../models/Schemas';
-import { SnackBarError } from '../../components/SnackBarError';
-import { resetNavigationStack, uploadImg } from '../../utils/utils';
-import { post } from '../../services/api';
+import React, { useCallback, useContext, useState } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { BackHandler, Text, View } from 'react-native';
+import { Button, Divider, HelperText, RadioButton, TextInput, useTheme } from 'react-native-paper';
 import { UserContext, UserContextParams } from '../../auth/userContext';
-import { getAddExperienceEndpoint } from '../../services/endpoints';
+import PhotoSelection from '../../components/PhotoSelection';
+import { SnackBarError } from '../../components/SnackBarError';
+import { useMutationExperiencePublication } from '../../hooks';
+import { ExperiencePublication, Photo } from '../../models/InterfacesModels';
+import { ExperiencePublicationSchema } from '../../models/Schemas';
+import { resetNavigationStack, uploadImg } from '../../utils/utils';
+import { styles } from './ExperienceScreenForm.styles';
 
 export function ExperienceScreenForm() {
 	const theme = useTheme();
@@ -23,7 +21,6 @@ export function ExperienceScreenForm() {
 	const { user } = useContext<UserContextParams>(UserContext);
 	const tabBarHeight = useBottomTabBarHeight();
 	const [image, setImage] = useState<string>();
-	const [loading, setLoading] = useState<boolean>(false);
 	const [failUpload, setFailUpload] = useState<string>('');
 
 	useFocusEffect(
@@ -60,17 +57,14 @@ export function ExperienceScreenForm() {
 			species: ''
 		}
 	});
+	const resetForm = () => {
+		reset();
+		resetNavigationStack(navigation, 'Experiencias');
+		setImage(undefined);
+	};
 
-	const createPublicationMutation = useMutation({
-		mutationFn: (data: ExperiencePublication) =>
-			post(getAddExperienceEndpoint(), data).then((response) => response.data),
-		onSuccess: () => {
-			setLoading(false);
-			reset();
-			resetNavigationStack(navigation, 'Experiencias');
-			setImage(undefined);
-		}
-	});
+	const { createPublicationMutation, loading, setLoading } =
+		useMutationExperiencePublication(resetForm);
 
 	const onSubmit: SubmitHandler<ExperiencePublication> = async (data) => {
 		if (image) {

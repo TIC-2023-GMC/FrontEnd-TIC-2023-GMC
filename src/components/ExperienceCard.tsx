@@ -71,7 +71,7 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 	const { userAccount, onAddLike, onRemoveLike, onAddComment, ...experience } = props;
 
 	const addOrRemoveLikeRequest = {
-		user_id: userAccount._id ? userAccount._id : '',
+		user_id: userAccount._id ?? '',
 		pub_id: experience._id,
 		is_adoption: false
 	};
