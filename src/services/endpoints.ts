@@ -36,12 +36,14 @@ export function getListExperiencesEnpoint({
 
 export function getListFavoritesAdoptionsEndpoint({
 	pageParam,
-	pageSize
+	pageSize,
+	user_id
 }: {
 	pageParam: number;
 	pageSize: number;
+	user_id: string;
 }) {
-	return `/user/list_favorite_adoptions?page_number=${pageParam}&page_size=${pageSize}`;
+	return `/user/list_favorite_adoptions?page_number=${pageParam}&page_size=${pageSize}&user_id=${user_id}`;
 }
 
 export function getAddLikeEndpoint({

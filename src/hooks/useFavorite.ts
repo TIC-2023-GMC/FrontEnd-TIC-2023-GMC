@@ -1,7 +1,7 @@
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
 import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../models/InterfacesModels';
-import { del, post } from '../services/api';
+import { del, get, post } from '../services/api';
 import {
 	getAddFavoriteAdoptionEndpoint,
 	getListFavoritesAdoptionsEndpoint,
@@ -17,6 +17,7 @@ export function useFavorite(
 	setVisibleSnackBar?: (value: [boolean, boolean]) => void,
 	setVisibleSingleSnackBar?: Dispatch<SetStateAction<boolean>>
 ) {
+	const queryClient = useQueryClient();
 	const savePublicationAsFavoriteMutation = useMutation({
 		mutationFn: (data: SaveOrRemoveFavoriteProps) => {
 			return post(getAddFavoriteAdoptionEndpoint(), data).then((response) => response.data);
@@ -27,6 +28,7 @@ export function useFavorite(
 			} else if (setVisibleSingleSnackBar !== undefined) {
 				setVisibleSingleSnackBar(true);
 			}
+			queryClient.invalidateQueries({ queryKey: ['Favorites'] });
 		},
 		onError: (error) => {
 			console.log(error);
@@ -42,21 +44,22 @@ export function useFavorite(
 			} else if (setVisibleSingleSnackBar !== undefined) {
 				setVisibleSingleSnackBar(true);
 			}
+			queryClient.invalidateQueries({ queryKey: ['Favorites'] });
 		},
 		onError: (error) => {
 			console.log(error);
 		}
 	});
+
 	return { savePublicationAsFavoriteMutation, removePublicationFromFavoritesMutation };
 }
 
-export function useQueryFavorite(favoriteAdoptionPublications: string[], pageSize: number) {
+export function useQueryFavorite(pageSize: number, user_id: string) {
 	return useInfiniteQuery({
 		queryKey: ['Favorites'],
 		queryFn: async ({ pageParam = 1 }) => {
-			const response = await post<FavoritesScreenValues>(
-				getListFavoritesAdoptionsEndpoint({ pageParam, pageSize }),
-				favoriteAdoptionPublications
+			const response = await get<FavoritesScreenValues>(
+				getListFavoritesAdoptionsEndpoint({ pageParam, pageSize, user_id })
 			);
 
 			return response.data;

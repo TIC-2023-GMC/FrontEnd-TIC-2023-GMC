@@ -50,7 +50,7 @@ export function FavoritesScreen() {
 	const pageSize = 2;
 	useScrollToTop(ref);
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		useQueryFavorite(user.favorite_adoption_publications, pageSize);
+		useQueryFavorite(pageSize, user._id ?? '');
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
 			fetchNextPage();
@@ -74,6 +74,7 @@ export function FavoritesScreen() {
 			refetch();
 		}, [user.favorite_adoption_publications])
 	);
+
 	const { addLikeMutation, removeLikeMutation } = useLike('Favorites');
 	const { addCommentMutation } = useMutationComment();
 	const { removePublicationFromFavoritesMutation } = useFavorite(undefined, setvisibleSnackBar);
