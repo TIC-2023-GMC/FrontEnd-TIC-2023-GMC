@@ -105,7 +105,9 @@ export function AdoptionScreenForm() {
 				...response
 			};
 
-			const currentDateLocal = new Date();
+			const currentDateUTC = new Date();
+			const timezoneOffset = currentDateUTC.getTimezoneOffset() * 60000;
+			const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);
 			const new_publication: AdoptionPublication = {
 				...data,
 				publication_date: currentDateLocal,

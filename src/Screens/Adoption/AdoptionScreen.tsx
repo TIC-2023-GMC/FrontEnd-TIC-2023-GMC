@@ -1,7 +1,7 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import React, { memo, useCallback, useContext, useRef, useState } from 'react';
+import React, { memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
 import { UserContext, UserContextParams } from '../../auth/userContext';
@@ -54,6 +54,9 @@ export function AdoptionScreen({
 			refetch();
 		}, [])
 	);
+	useEffect(() => {
+		refetch();
+	}, [filter]);
 
 	const handleOpenModal = (publication: AdoptionPublication) => {
 		setPublicationSelected(publication);

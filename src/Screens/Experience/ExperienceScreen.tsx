@@ -1,7 +1,7 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useFocusEffect, useScrollToTop } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import React, { memo, useCallback, useContext, useRef, useState } from 'react';
+import React, { memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { UserContext, UserContextParams } from '../../auth/userContext';
@@ -43,6 +43,9 @@ export function ExperienceScreen({
 			refetch();
 		}, [])
 	);
+	useEffect(() => {
+		refetch();
+	}, [filter]);
 
 	const { addLikeMutation, removeLikeMutation } = useLike('Experience');
 	const { addCommentMutation } = useMutationComment();
