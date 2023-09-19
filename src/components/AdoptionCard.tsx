@@ -128,11 +128,14 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 			onRemoveFromFavorites !== undefined
 		) {
 			onRemoveFromFavorites(addOrRemoveFavoriteRequest);
-			setUserAccount({
-				...userAccount,
-				favorite_adoption_publications: userAccount.favorite_adoption_publications.filter(
-					(id) => id !== adoption._id
-				)
+			setUserAccount((prevData) => {
+				const newValue = {
+					...prevData,
+					favorite_adoption_publications: prevData.favorite_adoption_publications.filter(
+						(id) => id !== adoption._id
+					)
+				};
+				return newValue;
 			});
 		}
 	};
