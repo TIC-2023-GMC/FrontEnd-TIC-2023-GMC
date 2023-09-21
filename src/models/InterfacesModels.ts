@@ -108,7 +108,6 @@ export interface AddCommentProps {
 	pub_id: string;
 	user_id: string;
 	comment_text: string;
-	is_adoption: boolean;
 }
 
 //Game Section

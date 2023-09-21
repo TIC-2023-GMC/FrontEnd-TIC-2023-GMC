@@ -155,7 +155,6 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 				onDismiss={() => setComment(!comment)}
 				onAddComment={onAddComment}
 				pubId={adoption._id}
-				isAdoption={true}
 			/>
 			<View ref={ref} collapsable={false}>
 				<Card style={styles.card}>

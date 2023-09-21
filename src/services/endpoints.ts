@@ -126,15 +126,13 @@ export function getGamesEndpoint() {
 export function getListCommentsEndpoint({
 	pubId,
 	pageParam,
-	pageSize,
-	isAdoption
+	pageSize
 }: {
 	pubId: string;
 	pageParam: number;
 	pageSize: number;
-	isAdoption: boolean;
 }) {
-	return `comments/list_comments?page_number=${pageParam}&page_size=${pageSize}&pub_id=${pubId}&is_adoption=${isAdoption}`;
+	return `comments/list_comments?page_number=${pageParam}&page_size=${pageSize}&pub_id=${pubId}`;
 }
 
 export function getAddCommentEndpoint() {
