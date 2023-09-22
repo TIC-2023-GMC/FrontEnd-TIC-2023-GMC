@@ -28,17 +28,10 @@ interface CommentSectionProps {
 		options?: MutateOptions<AddCommentProps> | undefined
 	) => void;
 	pubId: string;
-	isAdoption: boolean;
 }
 
 const MemoizedCommentComponent = memo(CommentComponent);
-export function CommentSection({
-	onDismiss,
-	visible,
-	onAddComment,
-	pubId,
-	isAdoption
-}: CommentSectionProps) {
+export function CommentSection({ onDismiss, visible, onAddComment, pubId }: CommentSectionProps) {
 	const { user } = useContext<UserContextParams>(UserContext);
 	const theme = useTheme();
 	const styles = createStyles(theme);
@@ -58,7 +51,7 @@ export function CommentSection({
 
 	const pageSize = 6;
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isLoading, remove } =
-		useQueryComment(visible, pubId, pageSize, isAdoption);
+		useQueryComment(visible, pubId, pageSize);
 
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
@@ -69,11 +62,15 @@ export function CommentSection({
 	const onSubmitComment: SubmitHandler<CommentText> = async (data) => {
 		setLoading(true);
 
+		const currentDateUTC = new Date();
+		const timezoneOffset = currentDateUTC.getTimezoneOffset() * 60000;
+		const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);
+
 		const addCommentRequest = {
 			pub_id: pubId,
 			user_id: user?._id ?? '',
 			comment_text: data.comment_text,
-			is_adoption: isAdoption
+			comment_date: currentDateLocal
 		};
 
 		if (onAddComment !== undefined) {

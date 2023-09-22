@@ -92,7 +92,6 @@ const ExperienceCard = (props: ExperiencePublication & CardProps) => {
 				onDismiss={() => setComment(!comment)}
 				onAddComment={onAddComment}
 				pubId={experience._id}
-				isAdoption={false}
 			/>
 			<View ref={ref}>
 				<Card style={styles.card}>

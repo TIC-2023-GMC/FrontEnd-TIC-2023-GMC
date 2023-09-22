@@ -19,17 +19,12 @@ export function useMutationComment() {
 	return { addCommentMutation };
 }
 
-export function useQueryComment(
-	visible: boolean,
-	pubId: string,
-	pageSize: number,
-	isAdoption: boolean
-) {
+export function useQueryComment(visible: boolean, pubId: string, pageSize: number) {
 	return useInfiniteQuery({
 		queryKey: ['Comments'],
 		queryFn: async ({ pageParam = 1 }) => {
 			const response = await get<CommentsResults>(
-				getListCommentsEndpoint({ pubId, pageParam, pageSize, isAdoption })
+				getListCommentsEndpoint({ pubId, pageParam, pageSize })
 			);
 			return response.data;
 		},
