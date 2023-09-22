@@ -62,10 +62,15 @@ export function CommentSection({ onDismiss, visible, onAddComment, pubId }: Comm
 	const onSubmitComment: SubmitHandler<CommentText> = async (data) => {
 		setLoading(true);
 
+		const currentDateUTC = new Date();
+		const timezoneOffset = currentDateUTC.getTimezoneOffset() * 60000;
+		const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);
+
 		const addCommentRequest = {
 			pub_id: pubId,
 			user_id: user?._id ?? '',
-			comment_text: data.comment_text
+			comment_text: data.comment_text,
+			comment_date: currentDateLocal
 		};
 
 		if (onAddComment !== undefined) {

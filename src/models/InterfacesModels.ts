@@ -108,6 +108,7 @@ export interface AddCommentProps {
 	pub_id: string;
 	user_id: string;
 	comment_text: string;
+	comment_date: Date;
 }
 
 //Game Section
