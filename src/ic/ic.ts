@@ -1,5 +1,5 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
-import { AxiosRepository } from '../infrastructure/repositories/AxiosRepository';
+import { AxiosUserRepository } from '../infrastructure/repositories/AxiosUserRepository';
 
-container.register('UserRepository', { useClass: AxiosRepository });
+container.register('UserRepository', { useClass: AxiosUserRepository });
