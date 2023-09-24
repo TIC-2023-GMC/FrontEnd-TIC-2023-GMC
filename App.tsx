@@ -5,9 +5,10 @@ import es from 'javascript-time-ago/locale/es-EC.json';
 import React, { useState } from 'react';
 import { DefaultTheme, MD3Theme, Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AuthProvider } from './src/auth/userContext';
-import { GameNavigationStack } from './src/navigation/GameNavigator';
-import { TabsNavigation } from './src/navigation/SocialNavigator';
+import { AuthProvider } from './src/application/auth/userContext';
+import './src/ic/ic';
+import { GameNavigationStack } from './src/infrastructure/react-native/navigation/GameNavigator';
+import { TabsNavigation } from './src/infrastructure/react-native/navigation/SocialNavigator';
 TimeAgo.addDefaultLocale(es);
 export default function App() {
 	const [visible, setVisible] = useState<boolean>(true);

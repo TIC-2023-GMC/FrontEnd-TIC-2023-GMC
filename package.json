@@ -22,6 +22,7 @@
 		"@react-navigation/stack": "^6.3.17",
 		"@tanstack/react-query": "^4.29.12",
 		"axios": "^1.4.0",
+		"babel-plugin-transform-typescript-metadata": "^0.3.2",
 		"dotenv": "^16.1.4",
 		"expo": "^49.0.0",
 		"expo-image-picker": "~14.3.2",
@@ -43,6 +44,8 @@
 		"react-native-view-shot": "3.7.0",
 		"react-time-ago": "^7.2.1",
 		"react-timer-hook": "^3.0.7",
+		"reflect-metadata": "^0.1.13",
+		"tsyringe": "^4.8.0",
 		"zod": "^3.21.4"
 	},
 	"devDependencies": {

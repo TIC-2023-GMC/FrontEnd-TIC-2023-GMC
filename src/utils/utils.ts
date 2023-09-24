@@ -1,10 +1,10 @@
-import { uploadAsync, FileSystemUploadType } from 'expo-file-system';
-import { baseUrl } from '../services/api';
-import React, { RefObject } from 'react';
 import { CommonActions, NavigationProp } from '@react-navigation/native';
-import { captureRef } from 'react-native-view-shot';
-import { View } from 'react-native';
+import { FileSystemUploadType, uploadAsync } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import React, { RefObject } from 'react';
+import { View } from 'react-native';
+import { captureRef } from 'react-native-view-shot';
+import { baseUrl } from '../infrastructure/services/api';
 
 export function parseNumber(value: string) {
 	const valueNumber = parseInt(value);
