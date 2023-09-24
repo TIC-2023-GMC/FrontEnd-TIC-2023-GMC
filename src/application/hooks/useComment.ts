@@ -1,6 +1,9 @@
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { AddCommentProps } from '../../domain/models/InterfacesModels';
-import { getAddCommentEndpoint, getListCommentsEndpoint } from '../../infrastructure/services/endpoints';
+import {
+	getAddCommentEndpoint,
+	getListCommentsEndpoint
+} from '../../infrastructure/services/endpoints';
 import { get, post } from '../../infrastructure/services/api';
 interface CommentsResults {
 	0: Comment[];

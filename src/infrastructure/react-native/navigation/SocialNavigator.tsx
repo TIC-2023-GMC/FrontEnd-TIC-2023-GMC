@@ -18,7 +18,6 @@ import { ExperienceScreen } from '../Screens/Experience/ExperienceScreen';
 import AddTabBarButton from '../components/AddTabBarButton';
 import { OrganizationScreen } from '../Screens/Organization/OrganizationScreen';
 
-
 interface TabsNavigationProps {
 	visible: boolean;
 	setVisible: React.Dispatch<React.SetStateAction<boolean>>;

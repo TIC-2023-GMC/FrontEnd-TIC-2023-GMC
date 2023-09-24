@@ -12,7 +12,12 @@ import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
 import { UserContext, UserContextParams } from '../../../../../application/auth/userContext';
 import AdoptionCard from '../../../components/AdoptionCard';
 import MoreOptionsModal from '../../../components/MoreOptionsModal';
-import { useFavorite, useLike, useMutationComment, useQueryFavorite } from '../../../../../application/hooks';
+import {
+	useFavorite,
+	useLike,
+	useMutationComment,
+	useQueryFavorite
+} from '../../../../../application/hooks';
 import { AdoptionPublication } from '../../../../../domain/models/InterfacesModels';
 import { resetNavigationStack } from '../../../../../utils/utils';
 import { styles } from './FavoritesScreen.styles';

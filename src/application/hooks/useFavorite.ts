@@ -1,7 +1,14 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
-import { AdoptionPublication, SaveOrRemoveFavoriteProps } from '../../domain/models/InterfacesModels';
-import { getAddFavoriteAdoptionEndpoint, getListFavoritesAdoptionsEndpoint, getRemoveFavoriteAdoptionEndpoint } from '../../infrastructure/services/endpoints';
+import {
+	AdoptionPublication,
+	SaveOrRemoveFavoriteProps
+} from '../../domain/models/InterfacesModels';
+import {
+	getAddFavoriteAdoptionEndpoint,
+	getListFavoritesAdoptionsEndpoint,
+	getRemoveFavoriteAdoptionEndpoint
+} from '../../infrastructure/services/endpoints';
 import { del, get, post } from '../../infrastructure/services/api';
 
 interface FavoritesScreenValues {

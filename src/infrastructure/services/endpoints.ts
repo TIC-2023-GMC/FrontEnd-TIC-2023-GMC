@@ -1,4 +1,4 @@
-import { AdoptionFilter, ExperienceFilter, User } from '../models/InterfacesModels';
+import { AdoptionFilter, ExperienceFilter, User } from '../../domain/models/InterfacesModels';
 
 export function getListAdoptionsEndpoint({
 	pageParam,
