@@ -50,5 +50,14 @@ export const styles = StyleSheet.create({
 	},
 	errorText: {
 		marginBottom: 10
+	},
+	comboItem: {
+		backgroundColor: 'transparent',
+		borderStartWidth: 0,
+		borderEndWidth: 0,
+		borderTopWidth: 0,
+		borderRadius: 0,
+		width: '100%',
+		height: 60
 	}
 });

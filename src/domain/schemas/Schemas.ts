@@ -103,6 +103,16 @@ export const UserAptitudeSchema = UserSchema.pick({
 	motivation: true
 });
 
+export const UserPersonalDataSchema = UserSchema.pick({
+	first_name: true,
+	last_name: true,
+	mobile_phone: true,
+	neighborhood: true,
+	email: true,
+	password: true,
+	photo: true
+});
+
 export const CommentTextSchema = z.object({
 	comment_text: z
 		.string()
