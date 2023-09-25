@@ -1,16 +1,28 @@
-import { AxiosResponse } from 'axios';
-import { injectable } from 'tsyringe';
-import { User } from '../../domain/models/InterfacesModels';
+import { PublicationScreen, User } from '../../domain/models/InterfacesModels';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { get, put } from '../services/api';
-import { getUpdateUserEndpoint, getUserByIdEndpoint } from '../services/endpoints';
-@injectable()
+import {
+	getMyPublicationsEndpoint,
+	getUpdateUserEndpoint,
+	getUserByIdEndpoint
+} from '../services/endpoints';
 export class AxiosUserRepository implements IUserRepository {
+	async findMyPublications(
+		_id: string,
+		_pageParam: number,
+		_pageSize: number
+	): Promise<PublicationScreen> {
+		const response = await get<PublicationScreen>(
+			getMyPublicationsEndpoint({ pageParam: _pageParam, pageSize: _pageSize, user_id: _id })
+		);
+
+		return response.data;
+	}
 	create(_user: User): Promise<User> {
 		throw new Error('Method not implemented.');
 	}
-	async findById(_id: string): Promise<AxiosResponse<User>> {
-		const response = await get<AxiosResponse<User>>(getUserByIdEndpoint(_id ?? ''));
+	async findById(_id: string): Promise<User> {
+		const response = await get<User>(getUserByIdEndpoint(_id ?? ''));
 		return response.data;
 	}
 	findByEmail(_email: string): Promise<User> {

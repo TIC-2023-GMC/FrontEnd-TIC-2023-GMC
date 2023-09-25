@@ -66,7 +66,6 @@ export const AdoptionPublicationSchema = z.object({
 	publication_date: z.date(),
 	photo: PhotoSchema,
 	likes: z.optional(z.array(Like)),
-	comments: z.optional(z.array(Comment)),
 	species: z.string().nonempty('La especie del animal es requerida'),
 	pet_size: z.string().nonempty('El tamaño del animal es requerido'),
 	pet_breed: z.string().nonempty('La raza del animal es requerida'),
@@ -88,7 +87,6 @@ export const ExperiencePublicationSchema = z.object({
 	publication_date: z.date(),
 	photo: PhotoSchema,
 	likes: z.optional(z.array(Like)),
-	comments: z.optional(z.array(Comment)),
 	species: z.string().nonempty('La especie del animal es requerida')
 });
 

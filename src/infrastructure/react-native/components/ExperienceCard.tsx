@@ -9,12 +9,12 @@ import ReactTimeAgo from 'react-time-ago';
 import {
 	AddCommentProps,
 	AddOrRemoveLikeProps,
-	ExperiencePublication,
+	Publication,
 	User
 } from '../../../domain/models/InterfacesModels';
-import { CommentSection } from './CommentSection';
 import { TabNavigationParamsList } from '../../../domain/types/types';
 import { snapShotAndShare } from '../../../utils/utils';
+import { CommentSection } from './CommentSection';
 
 interface CardProps {
 	userAccount: User;
@@ -47,7 +47,7 @@ const LeftContent = (props: { size: number; photo: string }) => (
 	/>
 );
 
-const ExperienceCard = (props: ExperiencePublication & CardProps) => {
+const ExperienceCard = (props: Publication & CardProps) => {
 	const theme = useTheme();
 	const ref = useRef(null);
 	const navigation = useNavigation<NativeStackNavigationProp<TabNavigationParamsList>>();

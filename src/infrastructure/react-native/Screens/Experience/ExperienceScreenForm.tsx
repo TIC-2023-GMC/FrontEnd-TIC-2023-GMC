@@ -9,13 +9,14 @@ import { Button, Divider, HelperText, RadioButton, TextInput, useTheme } from 'r
 import PhotoSelection from '../../components/PhotoSelection';
 import { SnackBarError } from '../../components/SnackBarError';
 
+import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
-import { useMutationExperiencePublication } from '../../../../application/hooks';
-import { ExperiencePublication, Photo } from '../../../../domain/models/InterfacesModels';
+import { CreateExperienceUseCase } from '../../../../application/hooks';
+import { Photo, Publication } from '../../../../domain/models/InterfacesModels';
 import { ExperiencePublicationSchema } from '../../../../domain/schemas/Schemas';
 import { resetNavigationStack, uploadImg } from '../../../../utils/utils';
 import { styles } from './ExperienceScreenForm.styles';
-
+const createExperience = container.resolve(CreateExperienceUseCase);
 export function ExperienceScreenForm() {
 	const theme = useTheme();
 	const navigation = useNavigation();
@@ -54,7 +55,6 @@ export function ExperienceScreenForm() {
 				img_path: ''
 			},
 			likes: [],
-			comments: [],
 			species: ''
 		}
 	});
@@ -65,9 +65,9 @@ export function ExperienceScreenForm() {
 	};
 
 	const { createPublicationMutation, loading, setLoading } =
-		useMutationExperiencePublication(resetForm);
+		createExperience.useMutationExperiencePublication(resetForm);
 
-	const onSubmit: SubmitHandler<ExperiencePublication> = async (data) => {
+	const onSubmit: SubmitHandler<Publication> = async (data) => {
 		if (image) {
 			setLoading(true);
 			const response_body = await uploadImg(image, setFailUpload);
@@ -78,7 +78,7 @@ export function ExperienceScreenForm() {
 			const currentDateUTC = new Date();
 			const timezoneOffset = currentDateUTC.getTimezoneOffset() * 60000;
 			const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);
-			const new_publication: ExperiencePublication = {
+			const new_publication: Publication = {
 				...data,
 				publication_date: currentDateLocal,
 				photo: new_photo

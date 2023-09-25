@@ -42,7 +42,6 @@ export function FavoritesScreen() {
 			img_path: ''
 		},
 		likes: [],
-		comments: [],
 		species: '',
 		pet_size: '',
 		pet_breed: '',

@@ -7,14 +7,15 @@ import { ActivityIndicator, useTheme } from 'react-native-paper';
 import ExperienceCard from '../../components/ExperienceCard';
 import FilterModal from '../../components/ExperiencesFilterModal';
 
+import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
-import { useLike, useMutationComment, useQueryExperience } from '../../../../application/hooks';
+import { ListExperiencesUseCase, useLike, useMutationComment } from '../../../../application/hooks';
 import { ExperienceFilter } from '../../../../domain/models/InterfacesModels';
 import { styles } from './ExperienceScreen.styles';
 
 const MemoizedExperienceCard = memo(ExperienceCard);
 const MemoizedFilterModal = memo(FilterModal);
-
+const listExperience = container.resolve(ListExperiencesUseCase);
 export function ExperienceScreen({
 	visibleFilter,
 	setVisibleFilter
@@ -32,7 +33,7 @@ export function ExperienceScreen({
 	useScrollToTop(ref);
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		useQueryExperience(filter, pageSize);
+		listExperience.useQueryExperience(filter, pageSize);
 
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
