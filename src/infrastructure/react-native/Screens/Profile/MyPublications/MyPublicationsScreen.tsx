@@ -9,16 +9,17 @@ import { StatusBar } from 'expo-status-bar';
 import React, { memo, useCallback, useContext, useRef } from 'react';
 import { BackHandler, FlatList, RefreshControl, Text, View } from 'react-native';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
+import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../../application/auth/userContext';
 import {
+	ListMyPublicationUseCase,
 	useLike,
-	useMutationComment,
-	userQueryMyPublications
+	useMutationComment
 } from '../../../../../application/hooks';
 import { resetNavigationStack } from '../../../../../utils/utils';
 import AdoptionCard from '../../../components/AdoptionCard';
 import { styles } from './MyPublicationsScreen.styles';
-
+const listMyPublications = container.resolve(ListMyPublicationUseCase);
 const MemoizedAdoptionCard = memo(AdoptionCard);
 export function MyPublicationsScreen() {
 	const theme = useTheme();
@@ -31,7 +32,7 @@ export function MyPublicationsScreen() {
 	useScrollToTop(ref);
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		userQueryMyPublications(pageSize, user._id ?? '');
+		listMyPublications.userQueryMyPublications(pageSize, user._id ?? '');
 
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {

@@ -15,15 +15,16 @@ import {
 	TextInput,
 	useTheme
 } from 'react-native-paper';
+import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
-import { useMutationAdoptionPublication, useParish } from '../../../../application/hooks';
+import { CreateAdoptionUseCase, useParish } from '../../../../application/hooks';
 import { AdoptionPublication, Photo } from '../../../../domain/models/InterfacesModels';
 import { AdoptionPublicationSchema } from '../../../../domain/schemas/Schemas';
 import { parseNumber, resetNavigationStack, uploadImg } from '../../../../utils/utils';
 import PhotoSelection from '../../components/PhotoSelection';
 import { SnackBarError } from '../../components/SnackBarError';
 import { styles } from './AdoptionScreenForm.styles';
-
+const createAdoption = container.resolve(CreateAdoptionUseCase);
 export function AdoptionScreenForm() {
 	const theme = useTheme();
 	const { user } = useContext<UserContextParams>(UserContext);
@@ -62,7 +63,6 @@ export function AdoptionScreenForm() {
 				img_path: ''
 			},
 			likes: [],
-			comments: [],
 			species: '',
 			pet_size: '',
 			pet_breed: '',
@@ -94,7 +94,7 @@ export function AdoptionScreenForm() {
 		setImage(undefined);
 	};
 	const { createPublicationMutation, loading, setLoading } =
-		useMutationAdoptionPublication(resetForm);
+		createAdoption.useMutationAdoptionPublication(resetForm);
 
 	const onSubmit: SubmitHandler<AdoptionPublication> = async (data) => {
 		if (image) {

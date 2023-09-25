@@ -4,12 +4,13 @@ import { StatusBar } from 'expo-status-bar';
 import React, { memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
+import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
 import {
+	ListAdoptionsUseCase,
 	useFavorite,
 	useLike,
-	useMutationComment,
-	useQueryAdoption
+	useMutationComment
 } from '../../../../application/hooks';
 import { AdoptionFilter, AdoptionPublication } from '../../../../domain/models/InterfacesModels';
 import AdoptionCard from '../../components/AdoptionCard';
@@ -17,6 +18,7 @@ import FilterModal from '../../components/AdoptionsFilterModal';
 import MoreOptionsModal from '../../components/MoreOptionsModal';
 import { styles } from './AdoptionScreen.styles';
 
+const listAdoption = container.resolve(ListAdoptionsUseCase);
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedFilterModal = memo(FilterModal);
 const MemoizedMoreOptionsModal = memo(MoreOptionsModal);
@@ -42,7 +44,7 @@ export function AdoptionScreen({
 		undefined
 	);
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		useQueryAdoption(filter, pageSize);
+		listAdoption.useQueryAdoption(filter, pageSize);
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
 	const { savePublicationAsFavoriteMutation, removePublicationFromFavoritesMutation } =
 		useFavorite(setVisibleSnackBar);
