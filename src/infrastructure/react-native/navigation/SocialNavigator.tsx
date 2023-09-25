@@ -17,6 +17,7 @@ import { AdoptionScreen } from '../Screens/Adoption/AdoptionScreen';
 import { ExperienceScreen } from '../Screens/Experience/ExperienceScreen';
 import AddTabBarButton from '../components/AddTabBarButton';
 import { OrganizationScreen } from '../Screens/Organization/OrganizationScreen';
+import { UserPersonalDataScreenForm } from '../Screens/User/UserPersonalDataScreenForm';
 
 interface TabsNavigationProps {
 	visible: boolean;
@@ -94,8 +95,15 @@ export function ProfileNavigationStack() {
 			<Stack.Screen name="Favoritos" component={FavoritesScreen} />
 			<Stack.Screen
 				name="Editar Perfil"
-				component={UserAptitudeScreenForm}
+				component={UserPersonalDataScreenForm}
 				options={{ headerLeft: () => null }}
+			/>
+			<Stack.Screen
+				name="Editar Aptitud"
+				component={UserAptitudeScreenForm}
+				options={{
+					headerLeft: () => null
+				}}
 			/>
 			<Stack.Screen
 				options={{

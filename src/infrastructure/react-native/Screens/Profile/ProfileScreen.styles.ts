@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
 	},
 	profileContainer: {
 		width: '90%',
-		height: 350,
+		height: 420,
 		marginTop: 25,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
