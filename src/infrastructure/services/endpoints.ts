@@ -135,6 +135,13 @@ export function getListCommentsEndpoint({
 	return `comments/list_comments?page_number=${pageParam}&page_size=${pageSize}&pub_id=${pubId}`;
 }
 
+export function getUserMeEndpoint() {
+	return `user/user_me`;
+}
+export function getLoginEndpoint() {
+	return `user/token`;
+}
+
 export function getAddCommentEndpoint() {
 	return `comments/add_comment`;
 }

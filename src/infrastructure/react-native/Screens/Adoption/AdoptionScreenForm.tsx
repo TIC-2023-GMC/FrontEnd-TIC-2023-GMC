@@ -16,15 +16,20 @@ import {
 	useTheme
 } from 'react-native-paper';
 import { container } from 'tsyringe';
-import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
-import { CreateAdoptionUseCase, useParish } from '../../../../application/hooks';
+import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
+import {
+	CreateAdoptionUseCase,
+	UploadImageUseCase,
+	useParish
+} from '../../../../application/hooks';
 import { AdoptionPublication, Photo } from '../../../../domain/models/InterfacesModels';
 import { AdoptionPublicationSchema } from '../../../../domain/schemas/Schemas';
-import { parseNumber, resetNavigationStack, uploadImg } from '../../../../utils/utils';
+import { parseNumber, resetNavigationStack } from '../../../../utils/utils';
 import PhotoSelection from '../../components/PhotoSelection';
 import { SnackBarError } from '../../components/SnackBarError';
 import { styles } from './AdoptionScreenForm.styles';
 const createAdoption = container.resolve(CreateAdoptionUseCase);
+const uploadImg = container.resolve(UploadImageUseCase);
 export function AdoptionScreenForm() {
 	const theme = useTheme();
 	const { user } = useContext<UserContextParams>(UserContext);
@@ -99,12 +104,7 @@ export function AdoptionScreenForm() {
 	const onSubmit: SubmitHandler<AdoptionPublication> = async (data) => {
 		if (image) {
 			setLoading(true);
-			const response_body = await uploadImg(image, setFailUpload);
-			const response = JSON.parse(response_body ? response_body : '{}');
-			const new_photo: Photo = {
-				...response
-			};
-
+			const new_photo: Photo = (await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);
 			const currentDateUTC = new Date();
 			const timezoneOffset = currentDateUTC.getTimezoneOffset() * 60000;
 			const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);

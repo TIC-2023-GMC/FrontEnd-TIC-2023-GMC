@@ -1,12 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { inject, injectable } from 'tsyringe';
+import { Token, User } from '../../domain/models/InterfacesModels';
+import { IInternalStoreRepository } from '../../domain/repositories/IInternalStoreRepository';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 @injectable()
 export class UpdateUserUseCase {
-	constructor(@inject('UserRepository') private _userRepository: IUserRepository) {
-		this._userRepository = _userRepository;
-	}
+	constructor(@inject('UserRepository') private _userRepository: IUserRepository) {}
 	useMutationUser(resetForm: () => void) {
 		const [loading, setLoading] = useState(false);
 		const updateUserMutation = useMutation({
@@ -21,15 +21,91 @@ export class UpdateUserUseCase {
 }
 @injectable()
 export class GetUserUseCase {
-	constructor(@inject('UserRepository') private _userRepository: IUserRepository) {
-		this._userRepository = _userRepository;
-	}
+	constructor(@inject('UserRepository') private _userRepository: IUserRepository) {}
 
 	useQueryUser(userId: string | undefined) {
 		return useQuery({
-			queryKey: ['userProfileData'],
+			queryKey: ['userProfileData', userId],
 			queryFn: () => this._userRepository?.findById(userId ?? ''),
 			enabled: !!userId
 		});
+	}
+}
+
+@injectable()
+export class GetAuthUserUseCase {
+	constructor(
+		@inject('UserRepository') private _userRepository: IUserRepository,
+		@inject('GetStoragedToken') private _getTokenUseCase: GetStoragedTokenUseCase
+	) {}
+
+	useQueryAuthUser() {
+		return useQuery({
+			queryKey: ['UserAuth'],
+			queryFn: async () => {
+				const token = await this._getTokenUseCase.getTokenUser();
+				if (token) {
+					const tokenObject: Token = JSON.parse(token);
+					return this._userRepository.findByToken(tokenObject);
+				}
+				return {};
+			}
+		});
+	}
+}
+@injectable()
+export class GetStoragedTokenUseCase {
+	constructor(
+		@inject('InternalStoreRepository') private _internalStoreRepository: IInternalStoreRepository
+	) {}
+	async getTokenUser() {
+		const token = await this._internalStoreRepository.get('userToken');
+		return token;
+	}
+}
+@injectable()
+export class SetTokenInStorageUseCase {
+	constructor(
+		@inject('InternalStoreRepository') private _internalStoreRepository: IInternalStoreRepository
+	) {}
+	async setTokenInStorage(token: Token) {
+		await this._internalStoreRepository.set('userToken', token);
+	}
+}
+@injectable()
+export class LogoutUserUseCase {
+	constructor(
+		@inject('InternalStoreRepository') private _internalStoreRepository: IInternalStoreRepository
+	) {}
+	logoutUser(setUser: React.Dispatch<React.SetStateAction<User>>) {
+		setUser({} as User);
+		this._internalStoreRepository.remove('userToken');
+	}
+}
+
+@injectable()
+export class LoginUserUseCase {
+	constructor(
+		@inject('SetTokenInStorage') private _setTokenInStorageUseCase: SetTokenInStorageUseCase,
+		@inject('UserRepository') private _userRepository: IUserRepository
+	) {}
+	loginUser(loginUser: () => void) {
+		const [loading, setLoading] = useState(false);
+		const userLoginMutation = useMutation({
+			mutationFn: this._userRepository?.find,
+			onSuccess: async (data: Token) => {
+				await this.setAuthUser(data);
+				setLoading(false);
+				loginUser();
+			},
+			onError: () => {
+				setLoading(false);
+			}
+		});
+		return { userLoginMutation, loading, setLoading };
+	}
+
+	async setAuthUser(token: Token) {
+		await this._setTokenInStorageUseCase.setTokenInStorage(token);
 	}
 }

@@ -9,6 +9,10 @@ export type TabNavigationParamsList = {
 	ExperienceScreenForm: undefined;
 	Perfil: NavigatorScreenParams<ProfileStackParamsList>;
 };
+export type AuthStackParamsList = {
+	Login: undefined;
+	Register: undefined;
+};
 
 export type ProfileStackParamsList = {
 	'Perfil de Usuarios': { userId: string };
