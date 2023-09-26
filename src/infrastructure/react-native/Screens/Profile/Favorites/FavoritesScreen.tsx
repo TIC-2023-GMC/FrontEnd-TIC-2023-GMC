@@ -13,15 +13,18 @@ import { UserContext, UserContextParams } from '../../../../../application/auth/
 import AdoptionCard from '../../../components/AdoptionCard';
 import MoreOptionsModal from '../../../components/MoreOptionsModal';
 import {
-	useFavorite,
+	ListFavoritesUseCase,
+	RemoveFromFavoritesUseCase,
 	useLike,
-	useMutationComment,
-	useQueryFavorite
+	useMutationComment
 } from '../../../../../application/hooks';
 import { AdoptionPublication } from '../../../../../domain/models/InterfacesModels';
 import { resetNavigationStack } from '../../../../../utils/utils';
 import { styles } from './FavoritesScreen.styles';
+import { container } from 'tsyringe';
 
+const listFavorites = container.resolve(ListFavoritesUseCase);
+const removeFromFavorites = container.resolve(RemoveFromFavoritesUseCase);
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedMoreOptionsModal = memo(MoreOptionsModal);
 
@@ -31,7 +34,7 @@ export function FavoritesScreen() {
 	const navigation = useNavigation<NavigationProp<ReactNavigation.RootParamList>>();
 	const tabBarHeight = useBottomTabBarHeight();
 	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
-	const [visibleSnackBar, setvisibleSnackBar] = useState(false);
+	const [visibleSnackBar, setVisibleSnackBar] = useState(false);
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
 	const [publicationSelected, setPublicationSelected] = useState<AdoptionPublication>({
 		_id: '',
@@ -53,8 +56,10 @@ export function FavoritesScreen() {
 	});
 	const pageSize = 2;
 	useScrollToTop(ref);
+
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		useQueryFavorite(pageSize, user._id ?? '');
+		listFavorites.useQueryFavorites(pageSize, user._id ?? '');
+
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
 			fetchNextPage();
@@ -81,7 +86,8 @@ export function FavoritesScreen() {
 
 	const { addLikeMutation, removeLikeMutation } = useLike('Favorites');
 	const { addCommentMutation } = useMutationComment();
-	const { removePublicationFromFavoritesMutation } = useFavorite(undefined, setvisibleSnackBar);
+	const { removePublicationFromFavoritesMutation } =
+		removeFromFavorites.useMutationRemoveFromFavorites(undefined, setVisibleSnackBar);
 
 	const handleOpenModal = (publication: AdoptionPublication) => {
 		setPublicationSelected(publication);
@@ -153,7 +159,7 @@ export function FavoritesScreen() {
 			<Snackbar
 				theme={theme}
 				visible={visibleSnackBar}
-				onDismiss={() => setvisibleSnackBar(false)}
+				onDismiss={() => setVisibleSnackBar(false)}
 				duration={2000}
 				style={{ marginBottom: tabBarHeight + 10 }}
 			>

@@ -8,7 +8,8 @@ import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
 import {
 	ListAdoptionsUseCase,
-	useFavorite,
+	RemoveFromFavoritesUseCase,
+	SaveAsFavoriteUseCase,
 	useLike,
 	useMutationComment
 } from '../../../../application/hooks';
@@ -19,6 +20,8 @@ import MoreOptionsModal from '../../components/MoreOptionsModal';
 import { styles } from './AdoptionScreen.styles';
 
 const listAdoption = container.resolve(ListAdoptionsUseCase);
+const saveAsFavorite = container.resolve(SaveAsFavoriteUseCase);
+const removeFromFavorites = container.resolve(RemoveFromFavoritesUseCase);
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedFilterModal = memo(FilterModal);
 const MemoizedMoreOptionsModal = memo(MoreOptionsModal);
@@ -46,8 +49,13 @@ export function AdoptionScreen({
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
 		listAdoption.useQueryAdoption(filter, pageSize);
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
-	const { savePublicationAsFavoriteMutation, removePublicationFromFavoritesMutation } =
-		useFavorite(setVisibleSnackBar);
+
+	const { savePublicationAsFavoriteMutation } =
+		saveAsFavorite.useMutationSaveAsFavorite(setVisibleSnackBar);
+
+	const { removePublicationFromFavoritesMutation } =
+		removeFromFavorites.useMutationRemoveFromFavorites(setVisibleSnackBar);
+
 	const { addLikeMutation, removeLikeMutation } = useLike('Adoption');
 	useScrollToTop(ref);
 
