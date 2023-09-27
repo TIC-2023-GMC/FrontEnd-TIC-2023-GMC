@@ -7,10 +7,11 @@ import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
 import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
 import {
+	AddLikeUseCase,
 	ListAdoptionsUseCase,
 	RemoveFromFavoritesUseCase,
+	RemoveLikeUseCase,
 	SaveAsFavoriteUseCase,
-	useLike,
 	useMutationComment
 } from '../../../../application/hooks';
 import { AdoptionFilter, AdoptionPublication } from '../../../../domain/models/InterfacesModels';
@@ -22,6 +23,9 @@ import { styles } from './AdoptionScreen.styles';
 const listAdoption = container.resolve(ListAdoptionsUseCase);
 const saveAsFavorite = container.resolve(SaveAsFavoriteUseCase);
 const removeFromFavorites = container.resolve(RemoveFromFavoritesUseCase);
+const addLike = container.resolve(AddLikeUseCase);
+const removeLike = container.resolve(RemoveLikeUseCase);
+
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedFilterModal = memo(FilterModal);
 const MemoizedMoreOptionsModal = memo(MoreOptionsModal);
@@ -56,7 +60,10 @@ export function AdoptionScreen({
 	const { removePublicationFromFavoritesMutation } =
 		removeFromFavorites.useMutationRemoveFromFavorites(setVisibleSnackBar);
 
-	const { addLikeMutation, removeLikeMutation } = useLike('Adoption');
+	const { addLikeMutation } = addLike.useMutationAddLike('Adoption');
+	const { removeLikeMutation } = removeLike.useMutationRemoveLike('Adoption');
+
+	//const { addLikeMutation, removeLikeMutation } = useLike('Adoption');
 	useScrollToTop(ref);
 
 	const handleLoadMore = () => {

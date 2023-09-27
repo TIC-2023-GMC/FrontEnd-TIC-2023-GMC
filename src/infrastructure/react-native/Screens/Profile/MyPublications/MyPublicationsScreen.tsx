@@ -12,15 +12,21 @@ import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../../application/auth/userContext';
 import {
+	AddLikeUseCase,
 	ListMyPublicationUseCase,
-	useLike,
+	RemoveLikeUseCase,
 	useMutationComment
 } from '../../../../../application/hooks';
 import { resetNavigationStack } from '../../../../../utils/utils';
 import AdoptionCard from '../../../components/AdoptionCard';
 import { styles } from './MyPublicationsScreen.styles';
+
 const listMyPublications = container.resolve(ListMyPublicationUseCase);
+const addLike = container.resolve(AddLikeUseCase);
+const removeLike = container.resolve(RemoveLikeUseCase);
+
 const MemoizedAdoptionCard = memo(AdoptionCard);
+
 export function MyPublicationsScreen() {
 	const theme = useTheme();
 	const ref = useRef<FlatList>(null);
@@ -53,7 +59,10 @@ export function MyPublicationsScreen() {
 			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
 		}, [])
 	);
-	const { addLikeMutation, removeLikeMutation } = useLike('MyPublications');
+
+	const { addLikeMutation } = addLike.useMutationAddLike('MyPublications');
+	const { removeLikeMutation } = removeLike.useMutationRemoveLike('MyPublications');
+	//const { addLikeMutation, removeLikeMutation } = useLike('MyPublications');
 	const { addCommentMutation } = useMutationComment();
 
 	return (

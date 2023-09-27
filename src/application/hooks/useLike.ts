@@ -4,11 +4,74 @@ import {
 	AdoptionPublication,
 	Like
 } from '../../domain/models/InterfacesModels';
-import { del, post } from '../../infrastructure/services/api';
-import { getAddLikeEndpoint, getRemoveLikeEndpoint } from '../../infrastructure/services/endpoints';
+import { inject, injectable } from 'tsyringe';
+import { ILikeRepository } from '../../domain/repositories/ILikeRepository';
 
 const publicationTypes = ['Adoption', 'Favorites', 'MyPublications'];
-export function useLike(publicationType: string) {
+
+@injectable()
+export class AddLikeUseCase {
+	constructor(@inject('LikeRepository') private repository: ILikeRepository) {
+		this.repository = repository;
+	}
+
+	useMutationAddLike(publicationType: string) {
+		const queryClient = useQueryClient();
+
+		const addLikeMutation = useMutation({
+			mutationFn: (data: AddOrRemoveLikeProps) => this.repository.addLike(data),
+			onMutate: async (data) => {
+				publicationTypes
+					.filter((type) => type !== publicationType)
+					.forEach((type) => {
+						addLikeCache(type, data, queryClient);
+					});
+
+				return addLikeCache(publicationType, data, queryClient);
+			},
+
+			onError: (error, newData, context) => {
+				queryClient.setQueryData([publicationType], context?.previousValue);
+			}
+		});
+
+		return {
+			addLikeMutation
+		};
+	}
+}
+
+@injectable()
+export class RemoveLikeUseCase {
+	constructor(@inject('LikeRepository') private repository: ILikeRepository) {
+		this.repository = repository;
+	}
+
+	useMutationRemoveLike(publicationType: string) {
+		const queryClient = useQueryClient();
+
+		const removeLikeMutation = useMutation({
+			mutationFn: (data: AddOrRemoveLikeProps) => this.repository.removeLike(data),
+			onMutate: async (data) => {
+				publicationTypes
+					.filter((type) => type !== publicationType)
+					.forEach((type) => {
+						removeLikeCache(type, data, queryClient);
+					});
+				return removeLikeCache(publicationType, data, queryClient);
+			},
+			onError: (error, newData, context) => {
+				queryClient.setQueryData([publicationType], context?.previousValue);
+			}
+		});
+
+		return {
+			removeLikeMutation
+		};
+	}
+}
+
+/* export function useLike(publicationType: string) {
 	const queryClient = useQueryClient();
 	const addLikeMutation = useMutation({
 		mutationFn: (data: AddOrRemoveLikeProps) => {
@@ -59,7 +122,7 @@ export function useLike(publicationType: string) {
 	});
 
 	return { addLikeMutation, removeLikeMutation };
-}
+} */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function addLikeCache(publicationType: string, data: AddOrRemoveLikeProps, queryClient: any) {
