@@ -13,11 +13,11 @@ import { UserContext, UserContextParams } from '../../../../../application/auth/
 import AdoptionCard from '../../../components/AdoptionCard';
 import MoreOptionsModal from '../../../components/MoreOptionsModal';
 import {
+	AddCommentUseCase,
 	AddLikeUseCase,
 	ListFavoritesUseCase,
 	RemoveFromFavoritesUseCase,
-	RemoveLikeUseCase,
-	useMutationComment
+	RemoveLikeUseCase
 } from '../../../../../application/hooks';
 import { AdoptionPublication } from '../../../../../domain/models/InterfacesModels';
 import { resetNavigationStack } from '../../../../../utils/utils';
@@ -27,6 +27,7 @@ import { container } from 'tsyringe';
 const listFavorites = container.resolve(ListFavoritesUseCase);
 const addLike = container.resolve(AddLikeUseCase);
 const removeLike = container.resolve(RemoveLikeUseCase);
+const addComment = container.resolve(AddCommentUseCase);
 
 const removeFromFavorites = container.resolve(RemoveFromFavoritesUseCase);
 const MemoizedAdoptionCard = memo(AdoptionCard);
@@ -90,8 +91,9 @@ export function FavoritesScreen() {
 
 	const { addLikeMutation } = addLike.useMutationAddLike('Favorites');
 	const { removeLikeMutation } = removeLike.useMutationRemoveLike('Favorites');
-	//const { addLikeMutation, removeLikeMutation } = useLike('Favorites');
-	const { addCommentMutation } = useMutationComment();
+
+	const { addCommentMutation } = addComment.useMutationAddComment();
+
 	const { removePublicationFromFavoritesMutation } =
 		removeFromFavorites.useMutationRemoveFromFavorites(undefined, setVisibleSnackBar);
 

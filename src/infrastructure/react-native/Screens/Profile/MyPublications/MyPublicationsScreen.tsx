@@ -12,10 +12,10 @@ import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../../application/auth/userContext';
 import {
+	AddCommentUseCase,
 	AddLikeUseCase,
 	ListMyPublicationUseCase,
-	RemoveLikeUseCase,
-	useMutationComment
+	RemoveLikeUseCase
 } from '../../../../../application/hooks';
 import { resetNavigationStack } from '../../../../../utils/utils';
 import AdoptionCard from '../../../components/AdoptionCard';
@@ -24,6 +24,7 @@ import { styles } from './MyPublicationsScreen.styles';
 const listMyPublications = container.resolve(ListMyPublicationUseCase);
 const addLike = container.resolve(AddLikeUseCase);
 const removeLike = container.resolve(RemoveLikeUseCase);
+const addComment = container.resolve(AddCommentUseCase);
 
 const MemoizedAdoptionCard = memo(AdoptionCard);
 
@@ -62,8 +63,8 @@ export function MyPublicationsScreen() {
 
 	const { addLikeMutation } = addLike.useMutationAddLike('MyPublications');
 	const { removeLikeMutation } = removeLike.useMutationRemoveLike('MyPublications');
-	//const { addLikeMutation, removeLikeMutation } = useLike('MyPublications');
-	const { addCommentMutation } = useMutationComment();
+
+	const { addCommentMutation } = addComment.useMutationAddComment();
 
 	return (
 		<>

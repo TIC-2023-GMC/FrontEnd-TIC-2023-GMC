@@ -51,6 +51,12 @@ export interface Interaction {
 export interface Photo {
 	img_path: string;
 }
+
+export interface CommentsResults {
+	0: Comment[];
+	1: number;
+}
+
 export interface Comment extends Interaction {
 	_id: string;
 	user_photo: Photo;

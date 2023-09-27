@@ -10,10 +10,10 @@ import FilterModal from '../../components/ExperiencesFilterModal';
 import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
 import {
+	AddCommentUseCase,
 	AddLikeUseCase,
 	ListExperiencesUseCase,
-	RemoveLikeUseCase,
-	useMutationComment
+	RemoveLikeUseCase
 } from '../../../../application/hooks';
 import { ExperienceFilter } from '../../../../domain/models/InterfacesModels';
 import { styles } from './ExperienceScreen.styles';
@@ -21,6 +21,7 @@ import { styles } from './ExperienceScreen.styles';
 const listExperience = container.resolve(ListExperiencesUseCase);
 const addLike = container.resolve(AddLikeUseCase);
 const removeLike = container.resolve(RemoveLikeUseCase);
+const addComment = container.resolve(AddCommentUseCase);
 
 const MemoizedExperienceCard = memo(ExperienceCard);
 const MemoizedFilterModal = memo(FilterModal);
@@ -60,8 +61,8 @@ export function ExperienceScreen({
 
 	const { addLikeMutation } = addLike.useMutationAddLike('Experience');
 	const { removeLikeMutation } = removeLike.useMutationRemoveLike('Experience');
-	//const { addLikeMutation, removeLikeMutation } = useLike('Experience');
-	const { addCommentMutation } = useMutationComment();
+
+	const { addCommentMutation } = addComment.useMutationAddComment();
 
 	return (
 		<>
