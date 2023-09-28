@@ -4,7 +4,7 @@ import { post, del } from '../services/api';
 import { getAddLikeEndpoint, getRemoveLikeEndpoint } from '../services/endpoints';
 
 export class AxiosLikeRepository implements ILikeRepository {
-	addLike(_data: AddOrRemoveLikeProps): Promise<void> {
+	create(_data: AddOrRemoveLikeProps): Promise<void> {
 		return post(
 			getAddLikeEndpoint({
 				userId: _data.user_id,
@@ -13,7 +13,7 @@ export class AxiosLikeRepository implements ILikeRepository {
 			})
 		);
 	}
-	removeLike(_data: AddOrRemoveLikeProps): Promise<void> {
+	delete(_data: AddOrRemoveLikeProps): Promise<void> {
 		return del(
 			getRemoveLikeEndpoint({
 				userId: _data.user_id,

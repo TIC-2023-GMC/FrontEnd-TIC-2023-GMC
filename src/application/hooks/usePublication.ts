@@ -1,6 +1,5 @@
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-
 import { inject, injectable } from 'tsyringe';
 import { GetStoragedTokenUseCase } from './useUser';
 import {

@@ -6,9 +6,7 @@ import { IFavoritesRepository } from '../../domain/repositories/IFavoritesReposi
 
 @injectable()
 export class SaveAsFavoriteUseCase {
-	constructor(@inject('FavoritesRepository') private repository: IFavoritesRepository) {
-		this.repository = repository;
-	}
+	constructor(@inject('FavoritesRepository') private _repository: IFavoritesRepository) {}
 
 	useMutationSaveAsFavorite(
 		setVisibleSnackBar?: (_value: [boolean, boolean]) => void,
@@ -18,7 +16,7 @@ export class SaveAsFavoriteUseCase {
 
 		const savePublicationAsFavoriteMutation = useMutation({
 			mutationFn: (data: SaveOrRemoveFavoriteProps) =>
-				this.repository.saveAsFavorite(data).then((response) => response.data),
+				this._repository.create(data).then((response) => response.data),
 			onSuccess: () => {
 				if (setVisibleSnackBar !== undefined) {
 					setVisibleSnackBar([true, false]);
@@ -39,9 +37,7 @@ export class SaveAsFavoriteUseCase {
 
 @injectable()
 export class RemoveFromFavoritesUseCase {
-	constructor(@inject('FavoritesRepository') private repository: IFavoritesRepository) {
-		this.repository = repository;
-	}
+	constructor(@inject('FavoritesRepository') private _repository: IFavoritesRepository) {}
 
 	useMutationRemoveFromFavorites(
 		setVisibleSnackBar?: (_value: [boolean, boolean]) => void,
@@ -51,7 +47,7 @@ export class RemoveFromFavoritesUseCase {
 
 		const removePublicationFromFavoritesMutation = useMutation({
 			mutationFn: (data: SaveOrRemoveFavoriteProps) =>
-				this.repository.removeFromFavorites(data).then((response) => response.data),
+				this._repository.delete(data).then((response) => response.data),
 			onSuccess: () => {
 				if (setVisibleSnackBar !== undefined) {
 					setVisibleSnackBar([false, true]);
@@ -72,15 +68,13 @@ export class RemoveFromFavoritesUseCase {
 
 @injectable()
 export class ListFavoritesUseCase {
-	constructor(@inject('FavoritesRepository') private repository: IFavoritesRepository) {
-		this.repository = repository;
-	}
+	constructor(@inject('FavoritesRepository') private _repository: IFavoritesRepository) {}
 
 	useQueryFavorites(pageSize: number, userId: string) {
 		return useInfiniteQuery({
 			queryKey: ['Favorites'],
 			queryFn: async ({ pageParam = 1 }) => {
-				return this.repository.listFavorites(pageParam, pageSize, userId);
+				return this._repository.find(pageParam, pageSize, userId);
 			},
 			getNextPageParam: (lastPage) => {
 				if (lastPage[0].length !== 0) {

@@ -5,14 +5,12 @@ import { ICommentsRepository } from '../../domain/repositories/ICommentsReposito
 
 @injectable()
 export class AddCommentUseCase {
-	constructor(@inject('CommentsRepository') private repository: ICommentsRepository) {
-		this.repository = repository;
-	}
+	constructor(@inject('CommentsRepository') private _repository: ICommentsRepository) {}
 
 	useMutationAddComment() {
 		const addCommentMutation = useMutation({
 			mutationFn: (data: AddCommentProps) =>
-				this.repository.addComment(data).then((response) => response.data),
+				this._repository.create(data).then((response) => response.data),
 			onError: (error) => {
 				console.log(error);
 			}
@@ -23,15 +21,13 @@ export class AddCommentUseCase {
 
 @injectable()
 export class ListCommentsUseCase {
-	constructor(@inject('CommentsRepository') private repository: ICommentsRepository) {
-		this.repository = repository;
-	}
+	constructor(@inject('CommentsRepository') private _repository: ICommentsRepository) {}
 
 	useQueryComments(visible: boolean, pubId: string, pageSize: number) {
 		return useInfiniteQuery({
 			queryKey: ['Comments'],
 			queryFn: async ({ pageParam = 1 }) => {
-				return this.repository.listComments(pageParam, pageSize, pubId);
+				return this._repository.find(pageParam, pageSize, pubId);
 			},
 			getNextPageParam: (lastPage) => {
 				if (lastPage[0].length !== 0) {
@@ -43,36 +39,3 @@ export class ListCommentsUseCase {
 		});
 	}
 }
-
-/* export function useMutationComment() {
-	const addCommentMutation = useMutation({
-		mutationFn: (data: AddCommentProps) => {
-			return post(getAddCommentEndpoint(), data).then((response) => response.data);
-		},
-		onError: (error) => {
-			console.log(error);
-		}
-	});
-	return { addCommentMutation };
-} 
-
-export function useQueryComment(visible: boolean, pubId: string, pageSize: number) {
-	return useInfiniteQuery({
-		queryKey: ['Comments'],
-		queryFn: async ({ pageParam = 1 }) => {
-			const response = await get<CommentsResults>(
-				getListCommentsEndpoint({ pubId, pageParam, pageSize })
-			);
-			return response.data;
-		},
-		getNextPageParam: (lastPage) => {
-			if (lastPage[0].length !== 0) {
-				return lastPage[1];
-			}
-			return undefined;
-		},
-		enabled: visible
-	});
-}
-
-*/

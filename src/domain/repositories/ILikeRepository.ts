@@ -2,6 +2,6 @@
 import { AddOrRemoveLikeProps } from '../models/InterfacesModels';
 
 export interface ILikeRepository {
-	addLike(_data: AddOrRemoveLikeProps): Promise<void | any>;
-	removeLike(_data: AddOrRemoveLikeProps): Promise<void | any>;
+	create(_data: AddOrRemoveLikeProps): Promise<void | any>;
+	delete(_data: AddOrRemoveLikeProps): Promise<void | any>;
 }

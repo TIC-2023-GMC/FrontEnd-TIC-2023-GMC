@@ -11,15 +11,13 @@ const publicationTypes = ['Adoption', 'Favorites', 'MyPublications'];
 
 @injectable()
 export class AddLikeUseCase {
-	constructor(@inject('LikeRepository') private repository: ILikeRepository) {
-		this.repository = repository;
-	}
+	constructor(@inject('LikeRepository') private _repository: ILikeRepository) {}
 
 	useMutationAddLike(publicationType: string) {
 		const queryClient = useQueryClient();
 
 		const addLikeMutation = useMutation({
-			mutationFn: (data: AddOrRemoveLikeProps) => this.repository.addLike(data),
+			mutationFn: (data: AddOrRemoveLikeProps) => this._repository.create(data),
 			onMutate: async (data) => {
 				publicationTypes
 					.filter((type) => type !== publicationType)
@@ -43,15 +41,13 @@ export class AddLikeUseCase {
 
 @injectable()
 export class RemoveLikeUseCase {
-	constructor(@inject('LikeRepository') private repository: ILikeRepository) {
-		this.repository = repository;
-	}
+	constructor(@inject('LikeRepository') private _repository: ILikeRepository) {}
 
 	useMutationRemoveLike(publicationType: string) {
 		const queryClient = useQueryClient();
 
 		const removeLikeMutation = useMutation({
-			mutationFn: (data: AddOrRemoveLikeProps) => this.repository.removeLike(data),
+			mutationFn: (data: AddOrRemoveLikeProps) => this._repository.delete(data),
 			onMutate: async (data) => {
 				publicationTypes
 					.filter((type) => type !== publicationType)
@@ -70,59 +66,6 @@ export class RemoveLikeUseCase {
 		};
 	}
 }
-
-/* export function useLike(publicationType: string) {
-	const queryClient = useQueryClient();
-	const addLikeMutation = useMutation({
-		mutationFn: (data: AddOrRemoveLikeProps) => {
-			return post(
-				getAddLikeEndpoint({
-					userId: data.user_id,
-					pubId: data.pub_id,
-					isAdoption: data.is_adoption
-				})
-			).then((response) => response.data);
-		},
-		onMutate: async (data) => {
-			publicationTypes
-				.filter((type) => type !== publicationType)
-				.forEach((type) => {
-					addLikeCache(type, data, queryClient);
-				});
-
-			return addLikeCache(publicationType, data, queryClient);
-		},
-
-		onError: (error, newData, context) => {
-			queryClient.setQueryData([publicationType], context?.previousValue);
-		}
-	});
-
-	const removeLikeMutation = useMutation({
-		mutationFn: (data: AddOrRemoveLikeProps) => {
-			return del(
-				getRemoveLikeEndpoint({
-					userId: data.user_id,
-					pubId: data.pub_id,
-					isAdoption: data.is_adoption
-				})
-			).then((response) => response.data);
-		},
-		onMutate: async (data) => {
-			publicationTypes
-				.filter((type) => type !== publicationType)
-				.forEach((type) => {
-					removeLikeCache(type, data, queryClient);
-				});
-			return removeLikeCache(publicationType, data, queryClient);
-		},
-		onError: (error, newData, context) => {
-			queryClient.setQueryData([publicationType], context?.previousValue);
-		}
-	});
-
-	return { addLikeMutation, removeLikeMutation };
-} */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function addLikeCache(publicationType: string, data: AddOrRemoveLikeProps, queryClient: any) {
