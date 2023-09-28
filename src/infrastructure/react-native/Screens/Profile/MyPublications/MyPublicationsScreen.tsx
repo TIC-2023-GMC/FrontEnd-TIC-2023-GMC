@@ -10,7 +10,7 @@ import React, { memo, useCallback, useContext, useRef } from 'react';
 import { BackHandler, FlatList, RefreshControl, Text, View } from 'react-native';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { container } from 'tsyringe';
-import { UserContext, UserContextParams } from '../../../../../application/auth/userContext';
+import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
 import {
 	AddCommentUseCase,
 	AddLikeUseCase,

@@ -14,7 +14,7 @@ import {
 	TextInput,
 	useTheme
 } from 'react-native-paper';
-import { UserContext, UserContextParams } from '../../../application/auth/userContext';
+import { UserContext, UserContextParams } from '../../../application/auth/user.auth';
 import { ListCommentsUseCase } from '../../../application/hooks';
 import { AddCommentProps, Comment, CommentText } from '../../../domain/models/InterfacesModels';
 import { CommentTextSchema } from '../../../domain/schemas/Schemas';

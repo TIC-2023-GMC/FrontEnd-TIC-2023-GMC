@@ -7,7 +7,7 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { BackHandler, ScrollView, Text, View } from 'react-native';
 import { Button, Divider, HelperText, RadioButton, TextInput, useTheme } from 'react-native-paper';
 import { container } from 'tsyringe';
-import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
+import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
 import { UpdateUserUseCase } from '../../../../application/hooks';
 import { User, UserAptitude } from '../../../../domain/models/InterfacesModels';
 import { UserAptitudeSchema } from '../../../../domain/schemas/Schemas';

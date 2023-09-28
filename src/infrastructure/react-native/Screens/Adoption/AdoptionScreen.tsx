@@ -5,7 +5,7 @@ import React, { memo, useCallback, useContext, useEffect, useRef, useState } fro
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
 import { container } from 'tsyringe';
-import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
+import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
 import {
 	AddCommentUseCase,
 	AddLikeUseCase,

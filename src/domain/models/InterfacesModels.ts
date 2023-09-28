@@ -45,6 +45,15 @@ export type UserAptitude = Pick<
 	| 'motivation'
 >;
 
+export interface LoginCredentials {
+	email: string;
+	password: string;
+}
+export interface Token {
+	access_token: string;
+	token_type: string;
+}
+
 export interface Interaction {
 	user_id: string;
 }

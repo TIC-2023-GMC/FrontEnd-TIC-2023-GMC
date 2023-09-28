@@ -17,7 +17,7 @@ import {
 	useTheme
 } from 'react-native-paper';
 import { container } from 'tsyringe';
-import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
+import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
 import { GetUserUseCase } from '../../../../application/hooks';
 import { User } from '../../../../domain/models/InterfacesModels';
 import { TabNavigationParamsList } from '../../../../domain/types/types';
@@ -31,7 +31,7 @@ export function ProfileScreen({ route }: any) {
 	const tabBarHeight = useBottomTabBarHeight();
 	const userId = route.params?.userId;
 	const navigation = useNavigation<NavigationProp<TabNavigationParamsList>>();
-	const { user } = useContext<UserContextParams>(UserContext);
+	const { user, logOut } = useContext<UserContextParams>(UserContext);
 	const [profileUser, setProfileUser] = React.useState<User>(user);
 	const [snackbarVisible, setSnackbarVisible] = useState(false);
 
@@ -258,6 +258,18 @@ export function ProfileScreen({ route }: any) {
 										}}
 									>
 										Editar Perfil
+									</Button>
+									<Button
+										style={styles.button}
+										mode="elevated"
+										buttonColor={theme.colors.tertiary}
+										textColor={theme.colors.secondary}
+										icon={'logout'}
+										onPress={() => {
+											logOut();
+										}}
+									>
+										Cerrar Sesión
 									</Button>
 								</View>
 							)}
