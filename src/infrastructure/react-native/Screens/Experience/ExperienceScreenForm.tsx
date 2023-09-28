@@ -10,13 +10,14 @@ import PhotoSelection from '../../components/PhotoSelection';
 import { SnackBarError } from '../../components/SnackBarError';
 
 import { container } from 'tsyringe';
-import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
-import { CreateExperienceUseCase } from '../../../../application/hooks';
+import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
+import { CreateExperienceUseCase, UploadImageUseCase } from '../../../../application/hooks';
 import { Photo, Publication } from '../../../../domain/models/InterfacesModels';
 import { ExperiencePublicationSchema } from '../../../../domain/schemas/Schemas';
-import { resetNavigationStack, uploadImg } from '../../../../utils/utils';
+import { resetNavigationStack } from '../../../../utils/utils';
 import { styles } from './ExperienceScreenForm.styles';
 const createExperience = container.resolve(CreateExperienceUseCase);
+const uploadImg = container.resolve(UploadImageUseCase);
 export function ExperienceScreenForm() {
 	const theme = useTheme();
 	const navigation = useNavigation();
@@ -70,11 +71,7 @@ export function ExperienceScreenForm() {
 	const onSubmit: SubmitHandler<Publication> = async (data) => {
 		if (image) {
 			setLoading(true);
-			const response_body = await uploadImg(image, setFailUpload);
-			const response = JSON.parse(response_body ? response_body : '{}');
-			const new_photo: Photo = {
-				...response
-			};
+			const new_photo: Photo = (await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);
 			const currentDateUTC = new Date();
 			const timezoneOffset = currentDateUTC.getTimezoneOffset() * 60000;
 			const currentDateLocal = new Date(currentDateUTC.getTime() - timezoneOffset);

@@ -101,6 +101,14 @@ export const UserAptitudeSchema = UserSchema.pick({
 	motivation: true
 });
 
+export const LoginSchema = z.object({
+	email: z
+		.string()
+		.email('Por favor, ingrese un correo electrónico válido')
+		.nonempty('Por favor, ingrese su correo electrónico'),
+	password: z.string().nonempty('Por favor, ingrese su contraseña')
+});
+
 export const CommentTextSchema = z.object({
 	comment_text: z
 		.string()

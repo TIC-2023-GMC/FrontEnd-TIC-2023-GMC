@@ -8,7 +8,7 @@ import ExperienceCard from '../../components/ExperienceCard';
 import FilterModal from '../../components/ExperiencesFilterModal';
 
 import { container } from 'tsyringe';
-import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
+import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
 import { ListExperiencesUseCase, useLike, useMutationComment } from '../../../../application/hooks';
 import { ExperienceFilter } from '../../../../domain/models/InterfacesModels';
 import { styles } from './ExperienceScreen.styles';

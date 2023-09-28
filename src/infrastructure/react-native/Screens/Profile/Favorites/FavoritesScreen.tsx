@@ -9,9 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { memo, useCallback, useContext, useRef, useState } from 'react';
 import { BackHandler, FlatList, RefreshControl, Text, View } from 'react-native';
 import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
-import { UserContext, UserContextParams } from '../../../../../application/auth/userContext';
-import AdoptionCard from '../../../components/AdoptionCard';
-import MoreOptionsModal from '../../../components/MoreOptionsModal';
+import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
 import {
 	useFavorite,
 	useLike,
@@ -20,6 +18,8 @@ import {
 } from '../../../../../application/hooks';
 import { AdoptionPublication } from '../../../../../domain/models/InterfacesModels';
 import { resetNavigationStack } from '../../../../../utils/utils';
+import AdoptionCard from '../../../components/AdoptionCard';
+import MoreOptionsModal from '../../../components/MoreOptionsModal';
 import { styles } from './FavoritesScreen.styles';
 
 const MemoizedAdoptionCard = memo(AdoptionCard);
