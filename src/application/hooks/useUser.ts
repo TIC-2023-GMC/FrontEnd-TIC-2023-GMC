@@ -44,11 +44,11 @@ export class GetAuthUserUseCase {
 			queryKey: ['UserAuth'],
 			queryFn: async () => {
 				const token = await this._getTokenUseCase.getTokenUser();
-				if (token) {
-					const tokenObject: Token = JSON.parse(token);
-					return this._userRepository.findByToken(tokenObject);
+				if (!token) {
+					throw new Error('No se encontró un token de usuario.');
 				}
-				return {};
+				const tokenObject: Token = JSON.parse(token);
+				return this._userRepository.findByToken(tokenObject);
 			}
 		});
 	}

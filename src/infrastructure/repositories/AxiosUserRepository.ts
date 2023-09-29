@@ -31,11 +31,11 @@ export class AxiosUserRepository implements IUserRepository {
 		if (response.data.access_token) this.configAxiosAuth(response.data);
 		return response.data;
 	};
-	async findByToken(_token: Token): Promise<User> {
+	findByToken = async (_token: Token): Promise<User> => {
 		this.configAxiosAuth(_token);
 		const response = await get<User>(getUserMeEndpoint());
 		return response.data;
-	}
+	};
 	async findMyPublications(
 		_id: string,
 		_pageParam: number,

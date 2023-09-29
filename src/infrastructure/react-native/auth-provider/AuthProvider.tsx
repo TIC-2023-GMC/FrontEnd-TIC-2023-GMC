@@ -10,8 +10,7 @@ const logout = container.resolve(LogoutUserUseCase);
 const getUserByToken = container.resolve(GetAuthUserUseCase);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [initializing, setInitializing] = useState(true);
-	const { data, isLoading, isError, refetch, isSuccess, remove } =
-		getUserByToken.useQueryAuthUser();
+	const { data, isLoading, isError, refetch, isSuccess } = getUserByToken.useQueryAuthUser();
 	const [error, setError] = useState<string>('');
 	const [user, setUser] = useState<User>({} as User);
 	useEffect(() => {
@@ -21,11 +20,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				birth_date: new Date(data?.birth_date)
 			};
 			setUser(user);
-			setInitializing(!user);
+			setInitializing(false);
 		}
 		if (isError) {
 			setError('La sesión ha expirado, por favor inicie sesión nuevamente.');
-			remove();
+			setInitializing(false);
 		}
 	}, [data, isError, isSuccess]);
 

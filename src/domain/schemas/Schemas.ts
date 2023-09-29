@@ -45,7 +45,6 @@ export const UserSchema = z.object({
 				message: 'Este campo no puede estar vacío'
 			}
 		),
-	favorite_adoption_publications: z.array(z.string()),
 	photo: PhotoSchema
 });
 
@@ -77,7 +76,8 @@ export const AdoptionPublicationSchema = z.object({
 	}),
 	pet_location: z.string().nonempty('La ubicación del animal es requerida'),
 	sterilized: z.boolean({ required_error: 'Selecciona si se encuentra esterilizado' }),
-	vaccination_card: z.boolean({ required_error: 'Selecciona si posee carnet de vacunación' })
+	vaccination_card: z.boolean({ required_error: 'Selecciona si posee carnet de vacunación' }),
+	is_favorite: z.boolean().default(false)
 });
 
 export const ExperiencePublicationSchema = z.object({
