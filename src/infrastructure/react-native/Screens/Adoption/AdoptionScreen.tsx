@@ -7,10 +7,12 @@ import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
 import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
 import {
+	AddCommentUseCase,
+	AddLikeUseCase,
 	ListAdoptionsUseCase,
-	useFavorite,
-	useLike,
-	useMutationComment
+	RemoveFromFavoritesUseCase,
+	RemoveLikeUseCase,
+	SaveAsFavoriteUseCase
 } from '../../../../application/hooks';
 import { AdoptionFilter, AdoptionPublication } from '../../../../domain/models/InterfacesModels';
 import AdoptionCard from '../../components/AdoptionCard';
@@ -19,6 +21,12 @@ import MoreOptionsModal from '../../components/MoreOptionsModal';
 import { styles } from './AdoptionScreen.styles';
 
 const listAdoption = container.resolve(ListAdoptionsUseCase);
+const saveAsFavorite = container.resolve(SaveAsFavoriteUseCase);
+const removeFromFavorites = container.resolve(RemoveFromFavoritesUseCase);
+const addLike = container.resolve(AddLikeUseCase);
+const removeLike = container.resolve(RemoveLikeUseCase);
+const addComment = container.resolve(AddCommentUseCase);
+
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedFilterModal = memo(FilterModal);
 const MemoizedMoreOptionsModal = memo(MoreOptionsModal);
@@ -34,7 +42,6 @@ export function AdoptionScreen({
 	const pageSize = 2;
 	const theme = useTheme();
 
-	const { addCommentMutation } = useMutationComment();
 	const [visibleSnackBar, setVisibleSnackBar] = useState([false, false]);
 	const ref = useRef<FlatList>(null);
 	const tabBarHeight = useBottomTabBarHeight();
@@ -46,9 +53,17 @@ export function AdoptionScreen({
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
 		listAdoption.useQueryAdoption(filter, pageSize);
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
-	const { savePublicationAsFavoriteMutation, removePublicationFromFavoritesMutation } =
-		useFavorite(setVisibleSnackBar);
-	const { addLikeMutation, removeLikeMutation } = useLike('Adoption');
+
+	const { savePublicationAsFavoriteMutation } =
+		saveAsFavorite.useMutationSaveAsFavorite(setVisibleSnackBar);
+	const { removePublicationFromFavoritesMutation } =
+		removeFromFavorites.useMutationRemoveFromFavorites(setVisibleSnackBar);
+
+	const { addLikeMutation } = addLike.useMutationAddLike('Adoption');
+	const { removeLikeMutation } = removeLike.useMutationRemoveLike('Adoption');
+
+	const { addCommentMutation } = addComment.useMutationAddComment();
+
 	useScrollToTop(ref);
 
 	const handleLoadMore = () => {

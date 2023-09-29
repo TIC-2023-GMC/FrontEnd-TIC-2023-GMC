@@ -4,61 +4,67 @@ import {
 	AdoptionPublication,
 	Like
 } from '../../domain/models/InterfacesModels';
-import { del, post } from '../../infrastructure/services/api';
-import { getAddLikeEndpoint, getRemoveLikeEndpoint } from '../../infrastructure/services/endpoints';
+import { inject, injectable } from 'tsyringe';
+import { ILikeRepository } from '../../domain/repositories/ILikeRepository';
 
 const publicationTypes = ['Adoption', 'Favorites', 'MyPublications'];
-export function useLike(publicationType: string) {
-	const queryClient = useQueryClient();
-	const addLikeMutation = useMutation({
-		mutationFn: (data: AddOrRemoveLikeProps) => {
-			return post(
-				getAddLikeEndpoint({
-					userId: data.user_id,
-					pubId: data.pub_id,
-					isAdoption: data.is_adoption
-				})
-			).then((response) => response.data);
-		},
-		onMutate: async (data) => {
-			publicationTypes
-				.filter((type) => type !== publicationType)
-				.forEach((type) => {
-					addLikeCache(type, data, queryClient);
-				});
 
-			return addLikeCache(publicationType, data, queryClient);
-		},
+@injectable()
+export class AddLikeUseCase {
+	constructor(@inject('LikeRepository') private _repository: ILikeRepository) {}
 
-		onError: (error, newData, context) => {
-			queryClient.setQueryData([publicationType], context?.previousValue);
-		}
-	});
+	useMutationAddLike(publicationType: string) {
+		const queryClient = useQueryClient();
 
-	const removeLikeMutation = useMutation({
-		mutationFn: (data: AddOrRemoveLikeProps) => {
-			return del(
-				getRemoveLikeEndpoint({
-					userId: data.user_id,
-					pubId: data.pub_id,
-					isAdoption: data.is_adoption
-				})
-			).then((response) => response.data);
-		},
-		onMutate: async (data) => {
-			publicationTypes
-				.filter((type) => type !== publicationType)
-				.forEach((type) => {
-					removeLikeCache(type, data, queryClient);
-				});
-			return removeLikeCache(publicationType, data, queryClient);
-		},
-		onError: (error, newData, context) => {
-			queryClient.setQueryData([publicationType], context?.previousValue);
-		}
-	});
+		const addLikeMutation = useMutation({
+			mutationFn: (data: AddOrRemoveLikeProps) => this._repository.create(data),
+			onMutate: async (data) => {
+				publicationTypes
+					.filter((type) => type !== publicationType)
+					.forEach((type) => {
+						addLikeCache(type, data, queryClient);
+					});
 
-	return { addLikeMutation, removeLikeMutation };
+				return addLikeCache(publicationType, data, queryClient);
+			},
+
+			onError: (error, newData, context) => {
+				queryClient.setQueryData([publicationType], context?.previousValue);
+			}
+		});
+
+		return {
+			addLikeMutation
+		};
+	}
+}
+
+@injectable()
+export class RemoveLikeUseCase {
+	constructor(@inject('LikeRepository') private _repository: ILikeRepository) {}
+
+	useMutationRemoveLike(publicationType: string) {
+		const queryClient = useQueryClient();
+
+		const removeLikeMutation = useMutation({
+			mutationFn: (data: AddOrRemoveLikeProps) => this._repository.delete(data),
+			onMutate: async (data) => {
+				publicationTypes
+					.filter((type) => type !== publicationType)
+					.forEach((type) => {
+						removeLikeCache(type, data, queryClient);
+					});
+				return removeLikeCache(publicationType, data, queryClient);
+			},
+			onError: (error, newData, context) => {
+				queryClient.setQueryData([publicationType], context?.previousValue);
+			}
+		});
+
+		return {
+			removeLikeMutation
+		};
+	}
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
