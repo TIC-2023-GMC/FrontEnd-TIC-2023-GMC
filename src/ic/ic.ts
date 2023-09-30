@@ -13,6 +13,8 @@ import { AxiosLikeRepository } from '../infrastructure/repositories/AxiosLikeRep
 import { AxiosCommentsRepository } from '../infrastructure/repositories/AxiosCommentsRepository';
 import { ExpoFileSystemPhotoRepository } from '../infrastructure/repositories/ExpoFileSystemPhotoRepository';
 import { ExpoStoreRepository } from '../infrastructure/repositories/ExpoStoreRepository';
+import { AxiosGameRepository } from '../infrastructure/repositories/AxiosGameRepository';
+import { AxiosMatchRepository } from '../infrastructure/repositories/AxiosMatchRepository';
 
 container.register('UserRepository', { useClass: AxiosUserRepository });
 container.register('ExperienceRepository', { useClass: AxiosExperienceRepository });
@@ -25,3 +27,6 @@ container.register('PhotoRepository', { useClass: ExpoFileSystemPhotoRepository 
 container.register('GetStoragedToken', { useClass: GetStoragedTokenUseCase });
 container.register('SetTokenInStorage', { useClass: SetTokenInStorageUseCase });
 container.register('LogoutUser', { useClass: LogoutUserUseCase });
+//Game Section
+container.register('GameRepository', { useClass: AxiosGameRepository });
+container.register('MatchRepository', { useClass: AxiosMatchRepository });
