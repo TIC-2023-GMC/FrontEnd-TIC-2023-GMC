@@ -2,5 +2,5 @@
 import { Game } from '../models/InterfacesModels';
 
 export interface IGameRepository {
-	get(): Promise<Game[]>;
+	find(): Promise<Game[]>;
 }

@@ -127,7 +127,7 @@ export class GetGamesUseCase {
 		const { isLoading, isFetching } = useQuery({
 			queryKey: ['listGames'],
 			queryFn: async () => {
-				return this._repository.get();
+				return this._repository.find();
 			},
 			onSuccess: (data: Game[]) => {
 				setGames(data);

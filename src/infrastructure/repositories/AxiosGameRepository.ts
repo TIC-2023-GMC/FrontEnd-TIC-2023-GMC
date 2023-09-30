@@ -4,7 +4,7 @@ import { get } from '../services/api';
 import { getGamesEndpoint } from '../services/endpoints';
 
 export class AxiosGameRepository implements IGameRepository {
-	get = async (): Promise<Game[]> => {
+	find = async (): Promise<Game[]> => {
 		const response = await get<Game[]>(getGamesEndpoint());
 		return response.data;
 	};
