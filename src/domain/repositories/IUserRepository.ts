@@ -10,7 +10,7 @@ export interface IUserRepository {
 	create(_user: User): Promise<User | any>;
 	findById(_id: string): Promise<User | any>;
 	findByEmail(_email: string): Promise<User | any>;
-	findByToken(_token: Token): Promise<User | any>;
+	findByToken(): Promise<User | any>;
 	find(_credentials: LoginCredentials): Promise<Token | any>;
 	findMyPublications(
 		_id: string,
@@ -19,4 +19,5 @@ export interface IUserRepository {
 	): Promise<PublicationScreen | any>;
 	update(_user: User): Promise<User | any>;
 	delete(_id: string): Promise<void>;
+	configAuth(_token: Token): void;
 }

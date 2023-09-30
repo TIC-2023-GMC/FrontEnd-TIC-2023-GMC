@@ -12,6 +12,7 @@ import { TabsNavigation } from './src/infrastructure/react-native/navigation/Soc
 TimeAgo.addDefaultLocale(es);
 export default function App() {
 	const [socialActive, setSocialActive] = useState<boolean>(true);
+
 	return (
 		<QueryClientProvider client={new QueryClient()}>
 			<PaperProvider theme={theme}>

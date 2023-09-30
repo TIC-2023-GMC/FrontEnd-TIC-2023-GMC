@@ -27,12 +27,9 @@ export class AxiosUserRepository implements IUserRepository {
 		};
 		const formData = new URLSearchParams(dataLogin).toString();
 		const response = await post<Token>(getLoginEndpoint(), formData, config);
-
-		if (response.data.access_token) this.configAxiosAuth(response.data);
 		return response.data;
 	};
-	findByToken = async (_token: Token): Promise<User> => {
-		this.configAxiosAuth(_token);
+	findByToken = async (): Promise<User> => {
 		const response = await get<User>(getUserMeEndpoint());
 		return response.data;
 	};
@@ -66,9 +63,9 @@ export class AxiosUserRepository implements IUserRepository {
 		throw new Error('Method not implemented.');
 	}
 
-	configAxiosAuth(token: Token) {
+	configAuth(_token: Token) {
 		axios.interceptors.request.use((request) => {
-			request.headers.Authorization = `${token.token_type} ${token.access_token}`;
+			request.headers.Authorization = `${_token.token_type} ${_token.access_token}`;
 			return request;
 		});
 	}

@@ -43,16 +43,30 @@ export class GetAuthUserUseCase {
 		return useQuery({
 			queryKey: ['UserAuth'],
 			queryFn: async () => {
-				const token = await this._getTokenUseCase.getTokenUser();
-				if (!token) {
-					throw new Error('No se encontró un token de usuario.');
-				}
-				const tokenObject: Token = JSON.parse(token);
-				return this._userRepository.findByToken(tokenObject);
-			}
+				return this._userRepository.findByToken();
+			},
+			staleTime: 1000 * 60 * 30
 		});
 	}
 }
+@injectable()
+export class ConfigAuthUseCase {
+	constructor(
+		@inject('UserRepository') private _userRepository: IUserRepository,
+		@inject('GetStoragedToken') private _getTokenUseCase: GetStoragedTokenUseCase
+	) {}
+
+	async config() {
+		const token = await this._getTokenUseCase.getTokenUser();
+		if (!token) {
+			throw new Error('No se encontró un token de usuario.');
+		}
+
+		const tokenObject: Token = JSON.parse(token);
+		this._userRepository.configAuth(tokenObject);
+	}
+}
+
 @injectable()
 export class GetStoragedTokenUseCase {
 	constructor(

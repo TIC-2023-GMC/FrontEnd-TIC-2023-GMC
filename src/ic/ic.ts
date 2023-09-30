@@ -6,11 +6,11 @@ import {
 	SetTokenInStorageUseCase
 } from '../application/hooks';
 import { AxiosAdoptionRepository } from '../infrastructure/repositories/AxiosAdoptionRepository';
+import { AxiosCommentsRepository } from '../infrastructure/repositories/AxiosCommentsRepository';
 import { AxiosExperienceRepository } from '../infrastructure/repositories/AxiosExperienceRepository';
-import { AxiosUserRepository } from '../infrastructure/repositories/AxiosUserRepository';
 import { AxiosFavoritesRepository } from '../infrastructure/repositories/AxiosFavoritesRepository';
 import { AxiosLikeRepository } from '../infrastructure/repositories/AxiosLikeRepository';
-import { AxiosCommentsRepository } from '../infrastructure/repositories/AxiosCommentsRepository';
+import { AxiosUserRepository } from '../infrastructure/repositories/AxiosUserRepository';
 import { ExpoFileSystemPhotoRepository } from '../infrastructure/repositories/ExpoFileSystemPhotoRepository';
 import { ExpoStoreRepository } from '../infrastructure/repositories/ExpoStoreRepository';
 
