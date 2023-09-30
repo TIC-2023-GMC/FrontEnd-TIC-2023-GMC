@@ -66,7 +66,6 @@ export function getMyPublicationsEndpoint({
 }: {
 	pageParam: number;
 	pageSize: number;
-	user_id: string;
 }) {
 	return `/user/list_my_publications?page_number=${pageParam}&page_size=${pageSize}`;
 }

@@ -39,7 +39,7 @@ export class AxiosUserRepository implements IUserRepository {
 		_pageSize: number
 	): Promise<PublicationScreen> {
 		const response = await get<PublicationScreen>(
-			getMyPublicationsEndpoint({ pageParam: _pageParam, pageSize: _pageSize, user_id: _id })
+			getMyPublicationsEndpoint({ pageParam: _pageParam, pageSize: _pageSize })
 		);
 
 		return response.data;
