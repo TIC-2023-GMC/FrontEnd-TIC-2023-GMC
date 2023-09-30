@@ -3,7 +3,11 @@ import { StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { container } from 'tsyringe';
 import { UserContext } from '../../../application/auth/user.auth';
-import { ConfigAuthUseCase, GetAuthUserUseCase, LogoutUserUseCase } from '../../../application/hooks';
+import {
+	ConfigAuthUseCase,
+	GetAuthUserUseCase,
+	LogoutUserUseCase
+} from '../../../application/hooks';
 import { User } from '../../../domain/models/InterfacesModels';
 import AuthNavigator from '../navigation/AuthNavigator';
 const logout = container.resolve(LogoutUserUseCase);
