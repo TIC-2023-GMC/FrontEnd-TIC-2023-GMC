@@ -34,10 +34,7 @@ export class GetUserUseCase {
 
 @injectable()
 export class GetAuthUserUseCase {
-	constructor(
-		@inject('UserRepository') private _userRepository: IUserRepository,
-		@inject('GetStoragedToken') private _getTokenUseCase: GetStoragedTokenUseCase
-	) {}
+	constructor(@inject('UserRepository') private _userRepository: IUserRepository) {}
 
 	useQueryAuthUser() {
 		return useQuery({
@@ -109,6 +106,7 @@ export class LoginUserUseCase {
 			mutationFn: this._userRepository?.find,
 			onSuccess: async (data: Token) => {
 				await this.setAuthUser(data);
+				this._userRepository.configAuth(data);
 				setLoading(false);
 				loginUser();
 			},

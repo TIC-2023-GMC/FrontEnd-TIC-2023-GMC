@@ -1,4 +1,5 @@
 import './src/ic/ic';
+import './src/infrastructure/services/api';
 import { NavigationContainer } from '@react-navigation/native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import TimeAgo from 'javascript-time-ago';
@@ -9,6 +10,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/infrastructure/react-native/auth-provider/AuthProvider';
 import { GameNavigationStack } from './src/infrastructure/react-native/navigation/GameNavigator';
 import { TabsNavigation } from './src/infrastructure/react-native/navigation/SocialNavigator';
+
 TimeAgo.addDefaultLocale(es);
 export default function App() {
 	const [socialActive, setSocialActive] = useState<boolean>(true);
