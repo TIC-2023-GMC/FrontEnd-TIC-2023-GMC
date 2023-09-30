@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GameScreen } from '../models/InterfacesModels';
+import { Game } from '../models/InterfacesModels';
 
 export interface IGameRepository {
-	get(): Promise<GameScreen>;
+	get(): Promise<Game[]>;
 }

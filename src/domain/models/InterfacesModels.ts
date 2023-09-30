@@ -166,7 +166,3 @@ export interface LeaderBoard {
 	0: UserPosition[];
 	1: number;
 }
-
-export interface GameScreen {
-	game_list: Game[];
-}

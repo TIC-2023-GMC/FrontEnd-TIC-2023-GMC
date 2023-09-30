@@ -20,7 +20,7 @@ export function MenuGameScreen() {
 	) : (
 		<View style={styles.container}>
 			<Image source={imgLogo} resizeMode="contain" style={styles.imgLogo} />
-			{games?.game_list?.map((opcion, index) => (
+			{games?.map((opcion, index) => (
 				<View key={index} style={styles.cardContainer}>
 					<Image source={{ uri: opcion.game_image.img_path }} style={styles.gameIcon} />
 					<View style={styles.sectionText}>

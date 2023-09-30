@@ -116,20 +116,20 @@
 import { inject, injectable } from 'tsyringe';
 import { IGameRepository } from '../../domain/repositories/IGameRepository';
 import { useState } from 'react';
-import { GameScreen } from '../../domain/models/InterfacesModels';
+import { Game } from '../../domain/models/InterfacesModels';
 import { useQuery } from '@tanstack/react-query';
 
 @injectable()
 export class GetGamesUseCase {
 	constructor(@inject('GameRepository') private _repository: IGameRepository) {}
 	useQueryGames() {
-		const [games, setGames] = useState<GameScreen>();
+		const [games, setGames] = useState<Game[]>();
 		const { isLoading, isFetching } = useQuery({
 			queryKey: ['listGames'],
 			queryFn: async () => {
 				return this._repository.get();
 			},
-			onSuccess: (data: GameScreen) => {
+			onSuccess: (data: Game[]) => {
 				setGames(data);
 			}
 		});
