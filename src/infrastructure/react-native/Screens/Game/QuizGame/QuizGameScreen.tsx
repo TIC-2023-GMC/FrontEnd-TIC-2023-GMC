@@ -4,13 +4,6 @@ import { Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'reac
 import { ActivityIndicator, Button, Card, Modal, Portal, Snackbar, Text } from 'react-native-paper';
 import { useStopwatch } from 'react-timer-hook';
 import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
-// import {
-// 	useQueryLeaderboard,
-// 	useQueryQuizGame,
-// 	useQuestion,
-// 	useQuizGame,
-// 	useSendScoreQuizzGame
-// } from '../../../../../application/hooks';
 import { UserPosition, UserScore } from '../../../../../domain/models/InterfacesModels';
 import { GameTabNavigation } from '../../../../../domain/types/types';
 import {
@@ -49,12 +42,6 @@ export function QuizGameScreen() {
 		user,
 		sendScoreQuizzGame.isSuccess
 	);
-
-	// useQueryLeaderboard(
-	// 	user,
-	// 	sendScoreQuizzGame.isSuccess
-	// );
-
 	useEffect(() => {
 		if (question === 0) {
 			sendScoreQuizzGame.mutate(quizzGame);
@@ -177,7 +164,7 @@ export function QuizGameScreen() {
 										<Text style={[styles.leaderboardHeader, styles.playerNameWidth]}>Jugador</Text>
 									</View>
 
-									{isSuccess &&
+									{isSuccess && data[0].map((entry: UserPosition, index: number) => console.log(entry)) &&
 										data[0]?.map((entry: UserPosition, index: number) => (
 											<View key={index} style={styles.leaderboardHeaderGroup}>
 												<Text style={[styles.leaderboardScoreText, styles.positionWidth]}>
