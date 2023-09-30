@@ -64,11 +64,6 @@ export class AxiosUserRepository implements IUserRepository {
 	}
 
 	configAuth(_token: Token) {
-		console.log('configAuth', _token);
-
-		axios.interceptors.request.use((request) => {
-			request.headers.Authorization = `${_token.token_type} ${_token.access_token}`;
-			return request;
-		});
+		axios.defaults.headers.common['Authorization'] = `${_token.token_type} ${_token.access_token}`;
 	}
 }

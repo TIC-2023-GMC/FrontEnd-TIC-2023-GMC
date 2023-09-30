@@ -3,11 +3,16 @@ import { StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { container } from 'tsyringe';
 import { UserContext } from '../../../application/auth/user.auth';
-import { GetAuthUserUseCase, LogoutUserUseCase } from '../../../application/hooks';
+import {
+	ConfigAuthUseCase,
+	GetAuthUserUseCase,
+	LogoutUserUseCase
+} from '../../../application/hooks';
 import { User } from '../../../domain/models/InterfacesModels';
 import AuthNavigator from '../navigation/AuthNavigator';
 const logout = container.resolve(LogoutUserUseCase);
 const getUserByToken = container.resolve(GetAuthUserUseCase);
+const configAuth = container.resolve(ConfigAuthUseCase);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [initializing, setInitializing] = useState(true);
@@ -29,6 +34,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			setInitializing(false);
 		}
 	}, [data, isError, isSuccess]);
+	useEffect(() => {
+		configAuth.config().catch((err) => {
+			console.log(err);
+		});
+	}, []);
 
 	return isLoading || initializing ? (
 		<ActivityIndicator animating={true} size={'large'} style={styles.activityIndicator} />
