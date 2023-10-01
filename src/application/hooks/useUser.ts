@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { inject, injectable } from 'tsyringe';
 import { Token, User } from '../../domain/models/InterfacesModels';
@@ -88,9 +88,13 @@ export class LogoutUserUseCase {
 	constructor(
 		@inject('InternalStoreRepository') private _internalStoreRepository: IInternalStoreRepository
 	) {}
-	logoutUser(setUser: React.Dispatch<React.SetStateAction<User>>) {
+	logoutUser(setUser: React.Dispatch<React.SetStateAction<User>>, queryClient: QueryClient) {
 		setUser({} as User);
 		this._internalStoreRepository.remove('userToken');
+
+		queryClient.setQueryData(['UserAuth'], () => {
+			return {} as User;
+		});
 	}
 }
 

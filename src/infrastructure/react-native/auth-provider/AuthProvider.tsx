@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
@@ -19,6 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const { data, isLoading, isError, refetch, isSuccess } = getUserByToken.useQueryAuthUser();
 	const [error, setError] = useState<string>('');
 	const [user, setUser] = useState<User>({} as User);
+	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		if (data && Object.keys(data).length !== 0 && isSuccess) {
@@ -34,6 +36,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			setInitializing(false);
 		}
 	}, [data, isError, isSuccess]);
+
+
 	useEffect(() => {
 		configAuth.config().catch((err) => {
 			console.log(err);
@@ -48,8 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				user: user,
 				setUser: setUser,
 				logOut: () => {
-					logout.logoutUser(setUser);
-					refetch();
+					logout.logoutUser(setUser, queryClient);
 				}
 			}}
 		>
