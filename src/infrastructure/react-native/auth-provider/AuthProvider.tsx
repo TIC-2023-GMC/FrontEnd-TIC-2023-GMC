@@ -10,6 +10,7 @@ import {
 	LogoutUserUseCase
 } from '../../../application/hooks';
 import { User } from '../../../domain/models/InterfacesModels';
+import { ExpireToken } from '../../../utils/utils';
 import AuthNavigator from '../navigation/AuthNavigator';
 const logout = container.resolve(LogoutUserUseCase);
 const getUserByToken = container.resolve(GetAuthUserUseCase);
@@ -37,11 +38,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		}
 	}, [data, isError, isSuccess]);
 
-
 	useEffect(() => {
 		configAuth.config().catch((err) => {
 			console.log(err);
 		});
+		ExpireToken(() => logout.logoutUser(setUser, queryClient));
 	}, []);
 
 	return isLoading || initializing ? (

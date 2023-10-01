@@ -1,8 +1,10 @@
 import { CommonActions, NavigationProp } from '@react-navigation/native';
+import axios from 'axios';
 import * as Sharing from 'expo-sharing';
 import { RefObject } from 'react';
 import { View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
+
 
 export function parseNumber(value: string) {
 	const valueNumber = parseInt(value);
@@ -10,6 +12,17 @@ export function parseNumber(value: string) {
 		return '';
 	}
 	return valueNumber;
+}
+export function ExpireToken(logout: () => void) {
+	axios.interceptors.response.use(
+		(response) => response,
+		(error) => {
+			if (error.response.status === 401) {
+				logout();
+			}
+			return Promise.reject(error);
+		}
+	);
 }
 
 const snapShot = async (ref: RefObject<View>) => {
