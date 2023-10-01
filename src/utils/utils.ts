@@ -5,7 +5,6 @@ import { RefObject } from 'react';
 import { View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 
-
 export function parseNumber(value: string) {
 	const valueNumber = parseInt(value);
 	if (isNaN(valueNumber)) {
