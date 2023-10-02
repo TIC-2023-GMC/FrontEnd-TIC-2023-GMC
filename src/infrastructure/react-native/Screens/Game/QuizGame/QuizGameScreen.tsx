@@ -164,7 +164,7 @@ export function QuizGameScreen() {
 										<Text style={[styles.leaderboardHeader, styles.playerNameWidth]}>Jugador</Text>
 									</View>
 
-									{isSuccess && data[0].map((entry: UserPosition, index: number) => console.log(entry)) &&
+									{isSuccess && 
 										data[0]?.map((entry: UserPosition, index: number) => (
 											<View key={index} style={styles.leaderboardHeaderGroup}>
 												<Text style={[styles.leaderboardScoreText, styles.positionWidth]}>
