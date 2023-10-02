@@ -70,6 +70,7 @@ export function AdoptionScreenForm() {
 				img_path: ''
 			},
 			likes: [],
+			is_favorite: false,
 			species: '',
 			pet_size: '',
 			pet_breed: '',

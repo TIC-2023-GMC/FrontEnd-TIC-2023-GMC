@@ -50,10 +50,10 @@ const LeftContent = (props: { size: number; photo: string }) => (
 const ExperienceCard = (props: Publication & CardProps) => {
 	const theme = useTheme();
 	const ref = useRef(null);
+	const { user, description, publication_date: publicationDate, photo, likes } = props;
 	const navigation = useNavigation<NativeStackNavigationProp<TabNavigationParamsList>>();
 
 	const [comment, setComment] = useState<boolean>(false);
-	const { user, description, publication_date: publicationDate, photo, likes } = props;
 	const [expanded, setExpanded] = useState<boolean>();
 	const [isTruncated, setIsTruncated] = useState<boolean>(false);
 
@@ -61,10 +61,10 @@ const ExperienceCard = (props: Publication & CardProps) => {
 		setExpanded(!expanded);
 	};
 	const handleLike = () => {
-		const like = likes.some((like) => like.user_id === userAccount._id);
-		if (!like && onAddLike !== undefined) {
+		const liked = likes[1];
+		if (!liked && onAddLike !== undefined) {
 			onAddLike(addOrRemoveLikeRequest);
-		} else if (like && onRemoveLike !== undefined) {
+		} else if (liked && onRemoveLike !== undefined) {
 			onRemoveLike(addOrRemoveLikeRequest);
 		}
 	};
@@ -93,7 +93,7 @@ const ExperienceCard = (props: Publication & CardProps) => {
 				onAddComment={onAddComment}
 				pubId={experience._id}
 			/>
-			<View ref={ref}>
+			<View ref={ref} collapsable={false}>
 				<Card style={styles.card}>
 					<Card.Title
 						title={
@@ -155,22 +155,20 @@ const ExperienceCard = (props: Publication & CardProps) => {
 								<Text
 									style={{
 										...styles.likeCountText,
-										color: likes.some((like) => like.user_id === userAccount._id)
-											? theme.colors.primary
-											: theme.colors.tertiary
+										color: likes[1] ? theme.colors.primary : theme.colors.tertiary
 									}}
 								>
-									{likes.length >= 1000
-										? likes.length >= 10000
-											? (likes.length / 1000).toFixed(0) + 'K'
-											: (likes.length / 1000).toFixed(1) + 'K'
-										: likes.length}
+									{(likes[0] as number) >= 1000
+										? (likes[0] as number) >= 10000
+											? ((likes[0] as number) / 1000).toFixed(0) + 'K'
+											: ((likes[0] as number) / 1000).toFixed(1) + 'K'
+										: (likes[0] as number)}
 								</Text>
 							</View>
 							<View style={styles.actions}>
 								<IconButton
 									animated={true}
-									selected={likes.some((like) => like.user_id === userAccount._id)}
+									selected={likes[1] as boolean}
 									size={28}
 									icon="heart"
 									onPress={handleLike}

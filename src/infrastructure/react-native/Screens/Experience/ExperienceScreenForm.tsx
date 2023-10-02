@@ -52,10 +52,10 @@ export function ExperienceScreenForm() {
 			user: user,
 			description: '',
 			publication_date: new Date(),
+			likes: [],
 			photo: {
 				img_path: ''
 			},
-			likes: [],
 			species: ''
 		}
 	});

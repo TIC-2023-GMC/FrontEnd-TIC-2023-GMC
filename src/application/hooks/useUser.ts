@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { inject, injectable } from 'tsyringe';
 import { Token, User } from '../../domain/models/InterfacesModels';
@@ -34,25 +34,36 @@ export class GetUserUseCase {
 
 @injectable()
 export class GetAuthUserUseCase {
-	constructor(
-		@inject('UserRepository') private _userRepository: IUserRepository,
-		@inject('GetStoragedToken') private _getTokenUseCase: GetStoragedTokenUseCase
-	) {}
+	constructor(@inject('UserRepository') private _userRepository: IUserRepository) {}
 
 	useQueryAuthUser() {
 		return useQuery({
 			queryKey: ['UserAuth'],
 			queryFn: async () => {
-				const token = await this._getTokenUseCase.getTokenUser();
-				if (token) {
-					const tokenObject: Token = JSON.parse(token);
-					return this._userRepository.findByToken(tokenObject);
-				}
-				return {};
-			}
+				return this._userRepository.findByToken();
+			},
+			staleTime: 1000 * 60 * 30
 		});
 	}
 }
+@injectable()
+export class ConfigAuthUseCase {
+	constructor(
+		@inject('UserRepository') private _userRepository: IUserRepository,
+		@inject('GetStoragedToken') private _getTokenUseCase: GetStoragedTokenUseCase
+	) {}
+
+	async config() {
+		const token = await this._getTokenUseCase.getTokenUser();
+		if (!token) {
+			throw new Error('No se encontró un token de usuario.');
+		}
+
+		const tokenObject: Token = JSON.parse(token);
+		this._userRepository.configAuth(tokenObject);
+	}
+}
+
 @injectable()
 export class GetStoragedTokenUseCase {
 	constructor(
@@ -77,9 +88,13 @@ export class LogoutUserUseCase {
 	constructor(
 		@inject('InternalStoreRepository') private _internalStoreRepository: IInternalStoreRepository
 	) {}
-	logoutUser(setUser: React.Dispatch<React.SetStateAction<User>>) {
+	logoutUser(setUser: React.Dispatch<React.SetStateAction<User>>, queryClient: QueryClient) {
 		setUser({} as User);
 		this._internalStoreRepository.remove('userToken');
+
+		queryClient.setQueryData(['UserAuth'], () => {
+			return {} as User;
+		});
 	}
 }
 
@@ -95,6 +110,7 @@ export class LoginUserUseCase {
 			mutationFn: this._userRepository?.find,
 			onSuccess: async (data: Token) => {
 				await this.setAuthUser(data);
+				this._userRepository.configAuth(data);
 				setLoading(false);
 				loginUser();
 			},

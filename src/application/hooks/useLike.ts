@@ -1,13 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-	AddOrRemoveLikeProps,
-	AdoptionPublication,
-	Like
-} from '../../domain/models/InterfacesModels';
 import { inject, injectable } from 'tsyringe';
+import { AddOrRemoveLikeProps, AdoptionPublication } from '../../domain/models/InterfacesModels';
 import { ILikeRepository } from '../../domain/repositories/ILikeRepository';
 
-const publicationTypes = ['Adoption', 'Favorites', 'MyPublications'];
+export const publicationTypes = ['Adoption', 'Favorites', 'MyPublications'];
 
 @injectable()
 export class AddLikeUseCase {
@@ -30,6 +26,9 @@ export class AddLikeUseCase {
 
 			onError: (error, newData, context) => {
 				queryClient.setQueryData([publicationType], context?.previousValue);
+			},
+			onSettled: () => {
+				queryClient.invalidateQueries({ queryKey: [publicationType] });
 			}
 		});
 
@@ -58,6 +57,9 @@ export class RemoveLikeUseCase {
 			},
 			onError: (error, newData, context) => {
 				queryClient.setQueryData([publicationType], context?.previousValue);
+			},
+			onSettled: () => {
+				queryClient.invalidateQueries({ queryKey: [publicationType] });
 			}
 		});
 
@@ -71,6 +73,7 @@ export class RemoveLikeUseCase {
 async function addLikeCache(publicationType: string, data: AddOrRemoveLikeProps, queryClient: any) {
 	await queryClient.cancelQueries({ queryKey: [publicationType] });
 	const previousValue = queryClient.getQueryData([publicationType]);
+
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	previousValue &&
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,10 +84,11 @@ async function addLikeCache(publicationType: string, data: AddOrRemoveLikeProps,
 					return [
 						page[0].map((pub: AdoptionPublication) => {
 							if (pub._id === data.pub_id) {
-								const updatedLikes = [...pub.likes];
-								const existingLike = updatedLikes.find((like) => like.user_id === data.user_id);
+								let updatedLikes = pub.likes;
+								const existingLike = updatedLikes[1];
+
 								if (!existingLike) {
-									updatedLikes.push({ user_id: data.user_id });
+									updatedLikes = [(updatedLikes[0] as number) + 1, true];
 								}
 								return {
 									...pub,
@@ -109,6 +113,7 @@ async function removeLikeCache(
 ) {
 	await queryClient.cancelQueries({ queryKey: [publicationType] });
 	const previousValue = queryClient.getQueryData([publicationType]);
+
 	previousValue &&
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		queryClient.setQueryData([publicationType], (old: any) => {
@@ -118,9 +123,16 @@ async function removeLikeCache(
 					return [
 						page[0].map((pub: AdoptionPublication) => {
 							if (pub._id === data.pub_id) {
+								let updatedLikes = pub.likes;
+								const existingLike = updatedLikes[1];
+
+								if (existingLike) {
+									updatedLikes = [(updatedLikes[0] as number) - 1, false];
+								}
+
 								return {
 									...pub,
-									likes: pub.likes.filter((like: Like) => like.user_id !== data.user_id)
+									likes: updatedLikes
 								};
 							}
 							return pub;
