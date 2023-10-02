@@ -12,6 +12,7 @@ import {
 import { User } from '../../../domain/models/InterfacesModels';
 import { ExpireToken } from '../../../utils/utils';
 import AuthNavigator from '../navigation/AuthNavigator';
+
 const logout = container.resolve(LogoutUserUseCase);
 const getUserByToken = container.resolve(GetAuthUserUseCase);
 const configAuth = container.resolve(ConfigAuthUseCase);
