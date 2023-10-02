@@ -15,7 +15,6 @@ export interface User {
 	main_pet_food: string;
 	pet_expenses: number;
 	motivation: string;
-	favorite_adoption_publications: string[];
 	photo: Photo;
 }
 
@@ -87,6 +86,7 @@ export interface AdoptionPublication extends Publication {
 	pet_location: string;
 	sterilized: boolean;
 	vaccination_card: boolean;
+	is_favorite: boolean;
 }
 
 export interface Publication {
@@ -95,7 +95,7 @@ export interface Publication {
 	description: string;
 	publication_date: Date;
 	photo: Photo;
-	likes: Like[];
+	likes: [number, boolean] | Like[];
 	species: string;
 }
 export type ExperiencePublication = Publication;
@@ -104,13 +104,8 @@ export interface Location {
 	name: string;
 	value: string;
 }
-export interface SaveOrRemoveFavoriteProps {
-	user_id: string;
-	pub_id: string;
-}
 
 export interface AddOrRemoveLikeProps {
-	user_id: string;
 	pub_id: string;
 	is_adoption: boolean;
 }

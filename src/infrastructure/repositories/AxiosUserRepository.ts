@@ -27,22 +27,19 @@ export class AxiosUserRepository implements IUserRepository {
 		};
 		const formData = new URLSearchParams(dataLogin).toString();
 		const response = await post<Token>(getLoginEndpoint(), formData, config);
-
-		if (response.data.access_token) this.configAxiosAuth(response.data);
 		return response.data;
 	};
-	async findByToken(_token: Token): Promise<User> {
-		this.configAxiosAuth(_token);
+	findByToken = async (): Promise<User> => {
 		const response = await get<User>(getUserMeEndpoint());
 		return response.data;
-	}
+	};
 	async findMyPublications(
 		_id: string,
 		_pageParam: number,
 		_pageSize: number
 	): Promise<PublicationScreen> {
 		const response = await get<PublicationScreen>(
-			getMyPublicationsEndpoint({ pageParam: _pageParam, pageSize: _pageSize, user_id: _id })
+			getMyPublicationsEndpoint({ pageParam: _pageParam, pageSize: _pageSize })
 		);
 
 		return response.data;
@@ -66,10 +63,7 @@ export class AxiosUserRepository implements IUserRepository {
 		throw new Error('Method not implemented.');
 	}
 
-	configAxiosAuth(token: Token) {
-		axios.interceptors.request.use((request) => {
-			request.headers.Authorization = `${token.token_type} ${token.access_token}`;
-			return request;
-		});
+	configAuth(_token: Token) {
+		axios.defaults.headers.common['Authorization'] = `${_token.token_type} ${_token.access_token}`;
 	}
 }

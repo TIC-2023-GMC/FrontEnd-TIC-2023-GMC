@@ -32,7 +32,7 @@ export function QuizGameScreen() {
 	const { question, changeQuestion, updateQuestion } = useQuestion();
 	const { sendScoreQuizzGame } = useSendScoreQuizzGame();
 
-	const { loading } = useQueryQuizGame(user, setQuizzGame, updateQuestion);
+	const { loading } = useQueryQuizGame(setQuizzGame, updateQuestion);
 
 	const { data, isSuccess, isLoading, isFetching } = useQueryLeaderboard(
 		user,

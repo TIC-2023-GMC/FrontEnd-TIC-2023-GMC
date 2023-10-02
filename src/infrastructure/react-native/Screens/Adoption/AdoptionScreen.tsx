@@ -54,10 +54,12 @@ export function AdoptionScreen({
 		listAdoption.useQueryAdoption(filter, pageSize);
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
 
-	const { savePublicationAsFavoriteMutation } =
-		saveAsFavorite.useMutationSaveAsFavorite(setVisibleSnackBar);
+	const { savePublicationAsFavoriteMutation } = saveAsFavorite.useMutationSaveAsFavorite(
+		'Adoption',
+		setVisibleSnackBar
+	);
 	const { removePublicationFromFavoritesMutation } =
-		removeFromFavorites.useMutationRemoveFromFavorites(setVisibleSnackBar);
+		removeFromFavorites.useMutationRemoveFromFavorites('Adoption', setVisibleSnackBar);
 
 	const { addLikeMutation } = addLike.useMutationAddLike('Adoption');
 	const { removeLikeMutation } = removeLike.useMutationRemoveLike('Adoption');

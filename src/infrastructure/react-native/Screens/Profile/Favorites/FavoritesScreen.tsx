@@ -9,6 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { memo, useCallback, useContext, useRef, useState } from 'react';
 import { BackHandler, FlatList, RefreshControl, Text, View } from 'react-native';
 import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
+import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
 import {
 	AddCommentUseCase,
@@ -22,7 +23,6 @@ import { resetNavigationStack } from '../../../../../utils/utils';
 import AdoptionCard from '../../../components/AdoptionCard';
 import MoreOptionsModal from '../../../components/MoreOptionsModal';
 import { styles } from './FavoritesScreen.styles';
-import { container } from 'tsyringe';
 
 const listFavorites = container.resolve(ListFavoritesUseCase);
 const addLike = container.resolve(AddLikeUseCase);
@@ -49,7 +49,7 @@ export function FavoritesScreen() {
 		photo: {
 			img_path: ''
 		},
-		likes: [],
+		likes: [0, false] as [number, boolean],
 		species: '',
 		pet_size: '',
 		pet_breed: '',
@@ -57,13 +57,14 @@ export function FavoritesScreen() {
 		pet_sex: undefined,
 		pet_location: '',
 		sterilized: false,
-		vaccination_card: false
+		vaccination_card: false,
+		is_favorite: false
 	});
 	const pageSize = 2;
 	useScrollToTop(ref);
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		listFavorites.useQueryFavorites(pageSize, user._id ?? '');
+		listFavorites.useQueryFavorites(pageSize);
 
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
@@ -86,7 +87,7 @@ export function FavoritesScreen() {
 	useFocusEffect(
 		useCallback(() => {
 			refetch();
-		}, [user.favorite_adoption_publications])
+		}, [])
 	);
 
 	const { addLikeMutation } = addLike.useMutationAddLike('Favorites');
@@ -95,7 +96,7 @@ export function FavoritesScreen() {
 	const { addCommentMutation } = addComment.useMutationAddComment();
 
 	const { removePublicationFromFavoritesMutation } =
-		removeFromFavorites.useMutationRemoveFromFavorites(undefined, setVisibleSnackBar);
+		removeFromFavorites.useMutationRemoveFromFavorites('Favorites', undefined, setVisibleSnackBar);
 
 	const handleOpenModal = (publication: AdoptionPublication) => {
 		setPublicationSelected(publication);
