@@ -1,7 +1,11 @@
-import { User, QuizGameMatch, LeaderBoard } from '../../domain/models/InterfacesModels';
+import { QuizGameMatch, LeaderBoard } from '../../domain/models/InterfacesModels';
 import { IMatchRespository } from '../../domain/repositories/IMatchRepository';
 import { get, put } from '../services/api';
-import { getQuizGameByUserEndpoint, getQuizGameEndpoint } from '../services/endpoints';
+import {
+	getLeaderBoardEndpoint,
+	getQuizGameByUserEndpoint,
+	getQuizGameEndpoint
+} from '../services/endpoints';
 
 export class AxiosMatchRepository implements IMatchRespository {
 	find = async (): Promise<QuizGameMatch> => {
@@ -10,7 +14,7 @@ export class AxiosMatchRepository implements IMatchRespository {
 	};
 
 	findLeaderboard = async (): Promise<LeaderBoard> => {
-		const response = await get<LeaderBoard>(getQuizGameByUserEndpoint());
+		const response = await get<LeaderBoard>(getLeaderBoardEndpoint());
 		return response.data;
 	};
 

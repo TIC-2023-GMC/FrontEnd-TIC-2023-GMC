@@ -8,8 +8,14 @@ import { useState } from 'react';
 export class GetQuizGameMatchUsecase {
 	constructor(@inject('MatchRepository') private _repository: IMatchRespository) {}
 	useQueryQuizGame(
-		setQuizzGame: (value: QuizGameMatch) => void,
-		updateQuestion: (value: QuizGameMatch) => void
+		setQuizzGame: (
+			// eslint-disable-next-line no-unused-vars
+			value: QuizGameMatch
+		) => void,
+		updateQuestion: (
+			// eslint-disable-next-line no-unused-vars
+			value: QuizGameMatch
+		) => void
 	) {
 		const { isLoading, isFetching } = useQuery({
 			queryKey: ['question'],

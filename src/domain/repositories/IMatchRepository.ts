@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { LeaderBoard, QuizGameMatch, User } from '../models/InterfacesModels';
+import { LeaderBoard, QuizGameMatch } from '../models/InterfacesModels';
 
 export interface IMatchRespository {
 	find(): Promise<QuizGameMatch>;

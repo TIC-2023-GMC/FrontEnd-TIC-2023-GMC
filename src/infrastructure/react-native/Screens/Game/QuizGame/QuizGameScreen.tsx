@@ -4,7 +4,7 @@ import { Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'reac
 import { ActivityIndicator, Button, Card, Modal, Portal, Snackbar, Text } from 'react-native-paper';
 import { useStopwatch } from 'react-timer-hook';
 import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
-import { UserPosition, UserScore } from '../../../../../domain/models/InterfacesModels';
+import { UserScore } from '../../../../../domain/models/InterfacesModels';
 import { GameTabNavigation } from '../../../../../domain/types/types';
 import {
 	GetLeaderboardUsecase,
@@ -161,22 +161,20 @@ export function QuizGameScreen() {
 										<Text style={[styles.leaderboardHeader, styles.pointsWidth]}>Puntos</Text>
 										<Text style={[styles.leaderboardHeader, styles.playerNameWidth]}>Jugador</Text>
 									</View>
-
-									{isSuccess && 
-										data[0]?.map((entry: UserPosition, index: number) => (
+									{isSuccess &&
+										data[0]?.map((entry: UserScore, index: number) => (
 											<View key={index} style={styles.leaderboardHeaderGroup}>
 												<Text style={[styles.leaderboardScoreText, styles.positionWidth]}>
 													{index + 1}°
 												</Text>
 												<Text style={[styles.leaderboardScoreText, styles.pointsWidth]}>
-													{entry.user.match_game_score}
+													{entry.match_game_score}
 												</Text>
 												<Text style={[styles.leaderboardScoreText, styles.playerNameWidth]}>
-													{entry.user.user_first_name + '\n' + entry.user.user_last_name}
+													{entry.user_first_name + '\n' + entry.user_last_name}
 												</Text>
 											</View>
 										))}
-
 									<Text style={styles.leaderboardTextTitle}>Tu posición:</Text>
 									<View style={styles.leaderboardHeaderGroup}>
 										<Text style={[styles.leaderboardScoreText, styles.positionWidth]}>
