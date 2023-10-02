@@ -93,8 +93,8 @@ export function getMyPublicationsEndpoint({
 export function getLeaderBoardEndpoint(user: User) {
 	return `/match/leaderboard?user_id=${user._id}`;
 }
-export function getQuizGameByUserEndpoint(user: User) {
-	return `match/quiz_game?user_id=${user._id}`;
+export function getQuizGameByUserEndpoint() {
+	return `match/quiz_game`;
 }
 export function getQuizGameEndpoint() {
 	return `match/quiz_game`;

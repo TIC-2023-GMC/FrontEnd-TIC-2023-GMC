@@ -4,13 +4,13 @@ import { get, put } from '../services/api';
 import { getQuizGameByUserEndpoint, getQuizGameEndpoint } from '../services/endpoints';
 
 export class AxiosMatchRepository implements IMatchRespository {
-	find = async (user: User): Promise<QuizGameMatch> => {
-		const response = await get<QuizGameMatch>(getQuizGameByUserEndpoint(user));
+	find = async (): Promise<QuizGameMatch> => {
+		const response = await get<QuizGameMatch>(getQuizGameByUserEndpoint());
 		return response.data;
 	};
 
-	findLeaderboard = async (user: User): Promise<LeaderBoard> => {
-		const response = await get<LeaderBoard>(getQuizGameByUserEndpoint(user));
+	findLeaderboard = async (): Promise<LeaderBoard> => {
+		const response = await get<LeaderBoard>(getQuizGameByUserEndpoint());
 		return response.data;
 	};
 

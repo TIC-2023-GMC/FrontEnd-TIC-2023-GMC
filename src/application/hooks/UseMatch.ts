@@ -8,14 +8,13 @@ import { useState } from 'react';
 export class GetQuizGameMatchUsecase {
 	constructor(@inject('MatchRepository') private _repository: IMatchRespository) {}
 	useQueryQuizGame(
-		user: User,
 		setQuizzGame: (value: QuizGameMatch) => void,
 		updateQuestion: (value: QuizGameMatch) => void
 	) {
 		const { isLoading, isFetching } = useQuery({
 			queryKey: ['question'],
 			queryFn: async () => {
-				const response = await this._repository.find(user);
+				const response = await this._repository.find();
 				return response;
 			},
 			onSuccess: (data: QuizGameMatch) => {
@@ -33,11 +32,11 @@ export class GetQuizGameMatchUsecase {
 @injectable()
 export class GetLeaderboardUsecase {
 	constructor(@inject('MatchRepository') private _repository: IMatchRespository) {}
-	useQueryLeaderboard(user: User, sendScoreQuizzGameIsSuccess: boolean) {
+	useQueryLeaderboard(sendScoreQuizzGameIsSuccess: boolean) {
 		return useQuery({
 			queryKey: ['leaderboard'],
 			queryFn: async () => {
-				const response = await this._repository.findLeaderboard(user);
+				const response = await this._repository.findLeaderboard();
 				return response;
 			},
 			enabled: sendScoreQuizzGameIsSuccess
@@ -101,5 +100,5 @@ export function useQuestion() {
 	const changeQuestion = () =>
 		setQuestion((prevQuestion) => (prevQuestion === 0 ? 0 : prevQuestion - 1));
 
-	return { question, updateQuestion, changeQuestion };
+	return { question, changeQuestion, updateQuestion };
 }

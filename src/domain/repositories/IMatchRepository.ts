@@ -3,7 +3,7 @@
 import { LeaderBoard, QuizGameMatch, User } from '../models/InterfacesModels';
 
 export interface IMatchRespository {
-	find(user: User): Promise<QuizGameMatch>;
-	findLeaderboard(user: User): Promise<LeaderBoard>;
+	find(): Promise<QuizGameMatch>;
+	findLeaderboard(): Promise<LeaderBoard>;
 	putScore(quizzGame: QuizGameMatch): Promise<void>;
 }

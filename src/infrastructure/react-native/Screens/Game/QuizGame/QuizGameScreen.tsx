@@ -37,9 +37,8 @@ export function QuizGameScreen() {
 	const { question, changeQuestion, updateQuestion } = useQuestion();
 	const { sendScoreQuizzGame } = sendScoreQuizzGameUsecase.useMutationSendScoreQuizzGame();
 
-	const { loading } = getQuizGameMatchUsecase.useQueryQuizGame(user, setQuizzGame, updateQuestion);
+	const { loading } = getQuizGameMatchUsecase.useQueryQuizGame(setQuizzGame, updateQuestion);
 	const { data, isSuccess, isLoading, isFetching } = getLeaderboardUsecase.useQueryLeaderboard(
-		user,
 		sendScoreQuizzGame.isSuccess
 	);
 	useEffect(() => {
