@@ -14,7 +14,6 @@ import {
 	useQuizGame
 } from '../../../../../application/hooks/UseMatch';
 import { container } from 'tsyringe';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 const getQuizGameMatchUsecase = container.resolve(GetQuizGameMatchUsecase);
 const getLeaderboardUsecase = container.resolve(GetLeaderboardUsecase);
 const sendScoreQuizzGameUsecase = container.resolve(SendScoreQuizzGameUsecase);
