@@ -15,11 +15,11 @@ import {
 } from '../../../../../application/hooks/UseMatch';
 import { container } from 'tsyringe';
 const getQuizGameMatchUsecase = container.resolve(GetQuizGameMatchUsecase);
-const getLeaderboardUsecase = container.resolve(GetLeaderboardUsecase);
-const sendScoreQuizzGameUsecase = container.resolve(SendScoreQuizzGameUsecase);
+const leaderboard = container.resolve(GetLeaderboardUsecase);
+const scoreQuizzgame = container.resolve(SendScoreQuizzGameUsecase);
 
 const timeOutAnswer = 2000;
-const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
+const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' };
 const levelImages = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
 
 export function QuizGameScreen() {
@@ -34,10 +34,10 @@ export function QuizGameScreen() {
 	});
 	const { quizzGame, changeScore, changeTime, setQuizzGame } = useQuizGame(user);
 	const { question, changeQuestion, updateQuestion } = useQuestion();
-	const { sendScoreQuizzGame } = sendScoreQuizzGameUsecase.useMutationSendScoreQuizzGame();
+	const { sendScoreQuizzGame } = scoreQuizzgame.useMutationSendScoreQuizzGame();
 
 	const { loading } = getQuizGameMatchUsecase.useQueryQuizGame(setQuizzGame, updateQuestion);
-	const { data, isSuccess, isLoading, isFetching } = getLeaderboardUsecase.useQueryLeaderboard(
+	const { data, isSuccess, isLoading, isFetching } = leaderboard.useQueryLeaderboard(
 		sendScoreQuizzGame.isSuccess
 	);
 	useEffect(() => {
