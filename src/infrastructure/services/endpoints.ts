@@ -17,7 +17,15 @@ export function getListAdoptionsEndpoint({
 		filter?.location ? '&location=' + filter?.location : ''
 	}`;
 }
-//
+export function getListOrganizationsEndpoint({
+	pageParam,
+	pageSize
+}: {
+	pageParam: number;
+	pageSize: number;
+}) {
+	return `organization/list?page_number=${pageParam}&page_size=${pageSize}`;
+}
 export function getListExperiencesEnpoint({
 	pageParam,
 	pageSize,

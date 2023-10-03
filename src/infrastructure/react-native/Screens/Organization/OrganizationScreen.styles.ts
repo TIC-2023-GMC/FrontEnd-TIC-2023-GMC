@@ -7,5 +7,16 @@ export const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		flexDirection: 'column'
-	}
+	},
+	section: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		flexDirection: 'column'
+	},
+	activityIndicator: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center'
+	},
 });

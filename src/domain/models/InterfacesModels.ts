@@ -161,3 +161,11 @@ export interface LeaderBoard {
 	0: UserPosition[];
 	1: number;
 }
+export interface Organization {
+	_id: string;
+	name: string;
+	description: string;
+	website?: string;
+	photo: Photo;
+	social_media: string[];
+}
