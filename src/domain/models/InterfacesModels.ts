@@ -15,19 +15,22 @@ export interface User {
 	main_pet_food: string;
 	pet_expenses: number;
 	motivation: string;
-	favorite_adoption_publications: string[];
 	photo: Photo;
 }
-export interface AdoptionFilter {
-	species: string | undefined;
-	date: Date | undefined;
+
+export interface PublicationScreen {
+	0: Publication[];
+	1: number;
+}
+export interface AdoptionFilter extends Filter {
 	location: string | undefined;
 }
-
-export interface ExperienceFilter {
+export interface Filter {
 	species: string | undefined;
 	date: Date | undefined;
 }
+
+export type ExperienceFilter = Filter;
 
 export type UserPersonalData = Pick<
 	User,
@@ -46,12 +49,27 @@ export type UserAptitude = Pick<
 	| 'motivation'
 >;
 
+export interface LoginCredentials {
+	email: string;
+	password: string;
+}
+export interface Token {
+	access_token: string;
+	token_type: string;
+}
+
 export interface Interaction {
 	user_id: string;
 }
 export interface Photo {
 	img_path: string;
 }
+
+export interface CommentsResults {
+	0: Comment[];
+	1: number;
+}
+
 export interface Comment extends Interaction {
 	_id: string;
 	user_photo: Photo;
@@ -63,18 +81,9 @@ export interface Comment extends Interaction {
 
 export type CommentText = Pick<Comment, 'comment_text'>;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Like extends Interaction {}
+export type Like = Interaction;
 
-export interface AdoptionPublication {
-	_id: string;
-	user: User;
-	description: string;
-	publication_date: Date;
-	photo: Photo;
-	likes: Like[];
-	comments: Comment[];
-	species: string;
+export interface AdoptionPublication extends Publication {
 	pet_size: string;
 	pet_breed: string;
 	pet_age: number;
@@ -82,29 +91,26 @@ export interface AdoptionPublication {
 	pet_location: string;
 	sterilized: boolean;
 	vaccination_card: boolean;
+	is_favorite: boolean;
 }
-export interface ExperiencePublication {
+
+export interface Publication {
 	_id: string;
 	user: User;
 	description: string;
 	publication_date: Date;
 	photo: Photo;
-	likes: Like[];
-	comments: Comment[];
+	likes: [number, boolean] | Like[];
 	species: string;
 }
+export type ExperiencePublication = Publication;
 
 export interface Location {
 	name: string;
 	value: string;
 }
-export interface SaveOrRemoveFavoriteProps {
-	user_id: string;
-	pub_id: string;
-}
 
 export interface AddOrRemoveLikeProps {
-	user_id: string;
 	pub_id: string;
 	is_adoption: boolean;
 }

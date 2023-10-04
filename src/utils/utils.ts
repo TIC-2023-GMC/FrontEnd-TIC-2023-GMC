@@ -1,10 +1,9 @@
 import { CommonActions, NavigationProp } from '@react-navigation/native';
-import { FileSystemUploadType, uploadAsync } from 'expo-file-system';
+import axios from 'axios';
 import * as Sharing from 'expo-sharing';
-import React, { RefObject } from 'react';
+import { RefObject } from 'react';
 import { View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
-import { baseUrl } from '../infrastructure/services/api';
 
 export function parseNumber(value: string) {
 	const valueNumber = parseInt(value);
@@ -13,27 +12,17 @@ export function parseNumber(value: string) {
 	}
 	return valueNumber;
 }
-
-export const uploadImg = async (
-	uri: string,
-	setError: React.Dispatch<React.SetStateAction<string>>
-) => {
-	try {
-		const response = await uploadAsync(`${baseUrl}/photo/upload`, uri, {
-			fieldName: 'photo',
-			httpMethod: 'POST',
-			uploadType: FileSystemUploadType.MULTIPART,
-			headers: {
-				'Content-Type': 'multipart'
+export function ExpireToken(logout: () => void) {
+	axios.interceptors.response.use(
+		(response) => response,
+		(error) => {
+			if (error.response.status === 401) {
+				logout();
 			}
-		});
-		return response.body;
-	} catch (error) {
-		console.log(error);
-
-		setError('Error al subir la imagen');
-	}
-};
+			return Promise.reject(error);
+		}
+	);
+}
 
 const snapShot = async (ref: RefObject<View>) => {
 	try {

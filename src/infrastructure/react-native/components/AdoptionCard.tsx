@@ -10,7 +10,6 @@ import {
 	AddCommentProps,
 	AddOrRemoveLikeProps,
 	AdoptionPublication,
-	SaveOrRemoveFavoriteProps,
 	User
 } from '../../../domain/models/InterfacesModels';
 import { TabNavigationParamsList } from '../../../domain/types/types';
@@ -23,15 +22,15 @@ interface CardProps {
 	setUserAccount: React.Dispatch<React.SetStateAction<User>>;
 	onSaveAsFavorite?: (
 		// eslint-disable-next-line no-unused-vars
-		variables: SaveOrRemoveFavoriteProps,
+		variables: string,
 		// eslint-disable-next-line no-unused-vars
-		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
+		options?: MutateOptions<string> | undefined
 	) => void;
 	onRemoveFromFavorites?: (
 		// eslint-disable-next-line no-unused-vars
-		variables: SaveOrRemoveFavoriteProps,
+		variables: string,
 		// eslint-disable-next-line no-unused-vars
-		options?: MutateOptions<SaveOrRemoveFavoriteProps> | undefined
+		options?: MutateOptions<string> | undefined
 	) => void;
 	onAddLike: (
 		// eslint-disable-next-line no-unused-vars
@@ -66,9 +65,15 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 	const theme = useTheme();
 	const ref = useRef(null);
 	const navigation = useNavigation<NativeStackNavigationProp<TabNavigationParamsList>>();
-
-	const [comment, setComment] = useState<boolean>(false);
-	const [expanded, setExpanded] = useState<boolean>();
+	const {
+		onOpenModal,
+		onSaveAsFavorite,
+		onRemoveFromFavorites,
+		onAddLike,
+		onRemoveLike,
+		onAddComment,
+		...adoption
+	} = props;
 	const {
 		user,
 		pet_age: petAge,
@@ -81,69 +86,32 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 		likes,
 		pet_sex: petSex,
 		vaccination_card: vaccinationCard,
-		sterilized
-	} = props;
+		sterilized,
+		is_favorite
+	} = adoption;
+	const [comment, setComment] = useState<boolean>(false);
+	const [expanded, setExpanded] = useState<boolean>();
 
 	const handleExpand = () => {
 		setExpanded(!expanded);
 	};
 
-	const {
-		setUserAccount,
-		userAccount,
-		onOpenModal,
-		onSaveAsFavorite,
-		onRemoveFromFavorites,
-		onAddLike,
-		onRemoveLike,
-		onAddComment,
-		...adoption
-	} = props;
-
-	const addOrRemoveFavoriteRequest = {
-		user_id: userAccount._id ?? '',
-		pub_id: adoption._id
-	};
-
 	const addOrRemoveLikeRequest = {
-		user_id: userAccount._id ?? '',
 		pub_id: adoption._id,
 		is_adoption: true
 	};
 	const handleFavorite = () => {
-		if (
-			!userAccount.favorite_adoption_publications.includes(adoption._id) &&
-			onSaveAsFavorite !== undefined
-		) {
-			onSaveAsFavorite(addOrRemoveFavoriteRequest);
-			setUserAccount({
-				...userAccount,
-				favorite_adoption_publications: [
-					...userAccount.favorite_adoption_publications,
-					adoption._id
-				]
-			});
-		} else if (
-			userAccount.favorite_adoption_publications.includes(adoption._id) &&
-			onRemoveFromFavorites !== undefined
-		) {
-			onRemoveFromFavorites(addOrRemoveFavoriteRequest);
-			setUserAccount((prevData) => {
-				const newValue = {
-					...prevData,
-					favorite_adoption_publications: prevData.favorite_adoption_publications.filter(
-						(id) => id !== adoption._id
-					)
-				};
-				return newValue;
-			});
+		if (!is_favorite && onSaveAsFavorite !== undefined) {
+			onSaveAsFavorite(adoption._id);
+		} else if (is_favorite && onRemoveFromFavorites !== undefined) {
+			onRemoveFromFavorites(adoption._id);
 		}
 	};
 	const handleLike = () => {
-		const like = likes.some((like) => like.user_id === userAccount._id);
-		if (!like && onAddLike !== undefined) {
+		const liked = likes[1];
+		if (!liked && onAddLike !== undefined) {
 			onAddLike(addOrRemoveLikeRequest);
-		} else if (like && onRemoveLike !== undefined) {
+		} else if (liked && onRemoveLike !== undefined) {
 			onRemoveLike(addOrRemoveLikeRequest);
 		}
 	};
@@ -271,22 +239,20 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 								<Text
 									style={{
 										...styles.likeCountText,
-										color: likes.some((like) => like.user_id === userAccount._id)
-											? theme.colors.primary
-											: theme.colors.tertiary
+										color: likes[1] ? theme.colors.primary : theme.colors.tertiary
 									}}
 								>
-									{likes.length >= 1000
-										? likes.length >= 10000
-											? (likes.length / 1000).toFixed(0) + 'K'
-											: (likes.length / 1000).toFixed(1) + 'K'
-										: likes.length}
+									{(likes[0] as number) >= 1000
+										? (likes[0] as number) >= 10000
+											? ((likes[0] as number) / 1000).toFixed(0) + 'K'
+											: ((likes[0] as number) / 1000).toFixed(1) + 'K'
+										: (likes[0] as number)}
 								</Text>
 							</View>
 							<View style={styles.actions}>
 								<IconButton
 									animated={true}
-									selected={likes.some((like) => like.user_id === userAccount._id)}
+									selected={likes[1] as boolean}
 									size={28}
 									icon="heart"
 									onPress={handleLike}
@@ -307,7 +273,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 										onPress={handleFavorite}
 										icon={`bookmark`}
 										size={28}
-										selected={userAccount.favorite_adoption_publications.includes(adoption._id)}
+										selected={is_favorite}
 									/>
 								</View>
 							)}

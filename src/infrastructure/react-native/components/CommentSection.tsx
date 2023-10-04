@@ -14,11 +14,14 @@ import {
 	TextInput,
 	useTheme
 } from 'react-native-paper';
-import { UserContext, UserContextParams } from '../../../application/auth/userContext';
-import { useQueryComment } from '../../../application/hooks';
+import { UserContext, UserContextParams } from '../../../application/auth/user.auth';
+import { ListCommentsUseCase } from '../../../application/hooks';
 import { AddCommentProps, Comment, CommentText } from '../../../domain/models/InterfacesModels';
 import { CommentTextSchema } from '../../../domain/schemas/Schemas';
 import { CommentComponent } from './CommentComponent';
+import { container } from 'tsyringe';
+
+const listComments = container.resolve(ListCommentsUseCase);
 
 interface CommentSectionProps {
 	visible: boolean;
@@ -50,8 +53,9 @@ export function CommentSection({ onDismiss, visible, onAddComment, pubId }: Comm
 	});
 
 	const pageSize = 6;
+
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isLoading, remove } =
-		useQueryComment(visible, pubId, pageSize);
+		listComments.useQueryComments(visible, pubId, pageSize);
 
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {

@@ -1,4 +1,4 @@
-import { AdoptionFilter, ExperienceFilter, User } from '../../domain/models/InterfacesModels';
+import { AdoptionFilter, ExperienceFilter } from '../../domain/models/InterfacesModels';
 
 export function getListAdoptionsEndpoint({
 	pageParam,
@@ -36,38 +36,20 @@ export function getListExperiencesEnpoint({
 
 export function getListFavoritesAdoptionsEndpoint({
 	pageParam,
-	pageSize,
-	user_id
+	pageSize
 }: {
 	pageParam: number;
 	pageSize: number;
-	user_id: string;
 }) {
-	return `/user/list_favorite_adoptions?page_number=${pageParam}&page_size=${pageSize}&user_id=${user_id}`;
+	return `/user/list_favorite_adoptions?page_number=${pageParam}&page_size=${pageSize}`;
 }
 
-export function getAddLikeEndpoint({
-	userId,
-	pubId,
-	isAdoption
-}: {
-	userId: string;
-	pubId: string;
-	isAdoption: boolean;
-}) {
-	return `/like/add_like?user_id=${userId}&pub_id=${pubId}&is_adoption=${isAdoption}`;
+export function getAddLikeEndpoint() {
+	return `/like/add_like`;
 }
 
-export function getRemoveLikeEndpoint({
-	userId,
-	pubId,
-	isAdoption
-}: {
-	userId: string;
-	pubId: string;
-	isAdoption: boolean;
-}) {
-	return `/like/remove_like?user_id=${userId}&pub_id=${pubId}&is_adoption=${isAdoption}`;
+export function getRemoveLikeEndpoint() {
+	return `/like/remove_like`;
 }
 
 export function getRemoveFavoriteAdoptionEndpoint() {
@@ -80,21 +62,19 @@ export function getAddFavoriteAdoptionEndpoint() {
 
 export function getMyPublicationsEndpoint({
 	pageParam,
-	pageSize,
-	user_id
+	pageSize
 }: {
 	pageParam: number;
 	pageSize: number;
-	user_id: string;
 }) {
-	return `/user/list_my_publications?page_number=${pageParam}&page_size=${pageSize}&user_id=${user_id}`;
+	return `/user/list_my_publications?page_number=${pageParam}&page_size=${pageSize}`;
 }
 
-export function getLeaderBoardEndpoint(user: User) {
-	return `/match/leaderboard?user_id=${user._id}`;
+export function getLeaderBoardEndpoint() {
+	return '/match/leaderboard';
 }
-export function getQuizGameByUserEndpoint(user: User) {
-	return `match/quiz_game?user_id=${user._id}`;
+export function getQuizGameByUserEndpoint() {
+	return 'match/quiz_game';
 }
 export function getQuizGameEndpoint() {
 	return `match/quiz_game`;
@@ -133,6 +113,13 @@ export function getListCommentsEndpoint({
 	pageSize: number;
 }) {
 	return `comments/list_comments?page_number=${pageParam}&page_size=${pageSize}&pub_id=${pubId}`;
+}
+
+export function getUserMeEndpoint() {
+	return `user/user_me`;
+}
+export function getLoginEndpoint() {
+	return `user/token`;
 }
 
 export function getAddCommentEndpoint() {

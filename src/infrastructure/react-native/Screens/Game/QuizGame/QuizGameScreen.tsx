@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator, Button, Card, Modal, Portal, Snackbar, Text } from 'react-native-paper';
 import { useStopwatch } from 'react-timer-hook';
-import { UserContext, UserContextParams } from '../../../../../application/auth/userContext';
+import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
 import {
 	useQueryLeaderboard,
 	useQueryQuizGame,
@@ -11,8 +11,8 @@ import {
 	useQuizGame,
 	useSendScoreQuizzGame
 } from '../../../../../application/hooks';
-import { GameTabNavigation } from '../../../../../domain/types/types';
 import { UserScore } from '../../../../../domain/models/InterfacesModels';
+import { GameTabNavigation } from '../../../../../domain/types/types';
 
 const timeOutAnswer = 2000;
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
@@ -32,7 +32,7 @@ export function QuizGameScreen() {
 	const { question, changeQuestion, updateQuestion } = useQuestion();
 	const { sendScoreQuizzGame } = useSendScoreQuizzGame();
 
-	const { loading } = useQueryQuizGame(user, setQuizzGame, updateQuestion);
+	const { loading } = useQueryQuizGame(setQuizzGame, updateQuestion);
 
 	const { data, isSuccess, isLoading, isFetching } = useQueryLeaderboard(
 		user,

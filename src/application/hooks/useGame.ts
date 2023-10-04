@@ -26,14 +26,13 @@ export function useQueryGames() {
 	return { loading, games };
 }
 export function useQueryQuizGame(
-	user: User,
 	setQuizzGame: (value: QuizGameMatch) => void,
 	updateQuestion: (value: QuizGameMatch) => void
 ) {
 	const { isLoading, isFetching } = useQuery({
 		queryKey: ['question'],
 		queryFn: async () => {
-			const response = await get<QuizGameMatch>(getQuizGameByUserEndpoint(user));
+			const response = await get<QuizGameMatch>(getQuizGameByUserEndpoint());
 			return response.data;
 		},
 		onSuccess: (data: QuizGameMatch) => {
@@ -51,7 +50,7 @@ export function useQueryLeaderboard(user: User, sendScoreQuizzGameIsSuccess: boo
 	return useQuery({
 		queryKey: ['leaderboard'],
 		queryFn: async () => {
-			const response = await get(getLeaderBoardEndpoint(user));
+			const response = await get(getLeaderBoardEndpoint());
 			return response.data;
 		},
 		enabled: sendScoreQuizzGameIsSuccess

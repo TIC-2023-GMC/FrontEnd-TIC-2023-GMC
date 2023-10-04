@@ -45,7 +45,6 @@ export const UserSchema = z.object({
 				message: 'Este campo no puede estar vacío'
 			}
 		),
-	favorite_adoption_publications: z.array(z.string()),
 	photo: PhotoSchema
 });
 
@@ -66,7 +65,6 @@ export const AdoptionPublicationSchema = z.object({
 	publication_date: z.date(),
 	photo: PhotoSchema,
 	likes: z.optional(z.array(Like)),
-	comments: z.optional(z.array(Comment)),
 	species: z.string().nonempty('La especie del animal es requerida'),
 	pet_size: z.string().nonempty('El tamaño del animal es requerido'),
 	pet_breed: z.string().nonempty('La raza del animal es requerida'),
@@ -78,7 +76,8 @@ export const AdoptionPublicationSchema = z.object({
 	}),
 	pet_location: z.string().nonempty('La ubicación del animal es requerida'),
 	sterilized: z.boolean({ required_error: 'Selecciona si se encuentra esterilizado' }),
-	vaccination_card: z.boolean({ required_error: 'Selecciona si posee carnet de vacunación' })
+	vaccination_card: z.boolean({ required_error: 'Selecciona si posee carnet de vacunación' }),
+	is_favorite: z.boolean().default(false)
 });
 
 export const ExperiencePublicationSchema = z.object({
@@ -88,7 +87,6 @@ export const ExperiencePublicationSchema = z.object({
 	publication_date: z.date(),
 	photo: PhotoSchema,
 	likes: z.optional(z.array(Like)),
-	comments: z.optional(z.array(Comment)),
 	species: z.string().nonempty('La especie del animal es requerida')
 });
 
@@ -111,6 +109,14 @@ export const UserPersonalDataSchema = UserSchema.pick({
 	email: true,
 	password: true,
 	photo: true
+});
+
+export const LoginSchema = z.object({
+	email: z
+		.string()
+		.email('Por favor, ingrese un correo electrónico válido')
+		.nonempty('Por favor, ingrese su correo electrónico'),
+	password: z.string().nonempty('Por favor, ingrese su contraseña')
 });
 
 export const CommentTextSchema = z.object({

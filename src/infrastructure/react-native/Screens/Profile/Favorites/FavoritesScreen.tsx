@@ -9,19 +9,27 @@ import { StatusBar } from 'expo-status-bar';
 import React, { memo, useCallback, useContext, useRef, useState } from 'react';
 import { BackHandler, FlatList, RefreshControl, Text, View } from 'react-native';
 import { ActivityIndicator, Snackbar, useTheme } from 'react-native-paper';
-import { UserContext, UserContextParams } from '../../../../../application/auth/userContext';
-import AdoptionCard from '../../../components/AdoptionCard';
-import MoreOptionsModal from '../../../components/MoreOptionsModal';
+import { container } from 'tsyringe';
+import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
 import {
-	useFavorite,
-	useLike,
-	useMutationComment,
-	useQueryFavorite
+	AddCommentUseCase,
+	AddLikeUseCase,
+	ListFavoritesUseCase,
+	RemoveFromFavoritesUseCase,
+	RemoveLikeUseCase
 } from '../../../../../application/hooks';
 import { AdoptionPublication } from '../../../../../domain/models/InterfacesModels';
 import { resetNavigationStack } from '../../../../../utils/utils';
+import AdoptionCard from '../../../components/AdoptionCard';
+import MoreOptionsModal from '../../../components/MoreOptionsModal';
 import { styles } from './FavoritesScreen.styles';
 
+const listFavorites = container.resolve(ListFavoritesUseCase);
+const addLike = container.resolve(AddLikeUseCase);
+const removeLike = container.resolve(RemoveLikeUseCase);
+const addComment = container.resolve(AddCommentUseCase);
+
+const removeFromFavorites = container.resolve(RemoveFromFavoritesUseCase);
 const MemoizedAdoptionCard = memo(AdoptionCard);
 const MemoizedMoreOptionsModal = memo(MoreOptionsModal);
 
@@ -31,7 +39,7 @@ export function FavoritesScreen() {
 	const navigation = useNavigation<NavigationProp<ReactNavigation.RootParamList>>();
 	const tabBarHeight = useBottomTabBarHeight();
 	const [isMoreModalVisible, setIsMoreModalVisible] = useState(false);
-	const [visibleSnackBar, setvisibleSnackBar] = useState(false);
+	const [visibleSnackBar, setVisibleSnackBar] = useState(false);
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
 	const [publicationSelected, setPublicationSelected] = useState<AdoptionPublication>({
 		_id: '',
@@ -41,8 +49,7 @@ export function FavoritesScreen() {
 		photo: {
 			img_path: ''
 		},
-		likes: [],
-		comments: [],
+		likes: [0, false] as [number, boolean],
 		species: '',
 		pet_size: '',
 		pet_breed: '',
@@ -50,12 +57,15 @@ export function FavoritesScreen() {
 		pet_sex: undefined,
 		pet_location: '',
 		sterilized: false,
-		vaccination_card: false
+		vaccination_card: false,
+		is_favorite: false
 	});
 	const pageSize = 2;
 	useScrollToTop(ref);
+
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		useQueryFavorite(pageSize, user._id ?? '');
+		listFavorites.useQueryFavorites(pageSize);
+
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
 			fetchNextPage();
@@ -77,12 +87,16 @@ export function FavoritesScreen() {
 	useFocusEffect(
 		useCallback(() => {
 			refetch();
-		}, [user.favorite_adoption_publications])
+		}, [])
 	);
 
-	const { addLikeMutation, removeLikeMutation } = useLike('Favorites');
-	const { addCommentMutation } = useMutationComment();
-	const { removePublicationFromFavoritesMutation } = useFavorite(undefined, setvisibleSnackBar);
+	const { addLikeMutation } = addLike.useMutationAddLike('Favorites');
+	const { removeLikeMutation } = removeLike.useMutationRemoveLike('Favorites');
+
+	const { addCommentMutation } = addComment.useMutationAddComment();
+
+	const { removePublicationFromFavoritesMutation } =
+		removeFromFavorites.useMutationRemoveFromFavorites('Favorites', undefined, setVisibleSnackBar);
 
 	const handleOpenModal = (publication: AdoptionPublication) => {
 		setPublicationSelected(publication);
@@ -154,7 +168,7 @@ export function FavoritesScreen() {
 			<Snackbar
 				theme={theme}
 				visible={visibleSnackBar}
-				onDismiss={() => setvisibleSnackBar(false)}
+				onDismiss={() => setVisibleSnackBar(false)}
 				duration={2000}
 				style={{ marginBottom: tabBarHeight + 10 }}
 			>

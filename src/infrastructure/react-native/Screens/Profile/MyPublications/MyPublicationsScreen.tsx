@@ -9,17 +9,25 @@ import { StatusBar } from 'expo-status-bar';
 import React, { memo, useCallback, useContext, useRef } from 'react';
 import { BackHandler, FlatList, RefreshControl, Text, View } from 'react-native';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
-import { UserContext, UserContextParams } from '../../../../../application/auth/userContext';
+import { container } from 'tsyringe';
+import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
 import {
-	useLike,
-	useMutationComment,
-	userQueryMyPublications
+	AddCommentUseCase,
+	AddLikeUseCase,
+	ListMyPublicationUseCase,
+	RemoveLikeUseCase
 } from '../../../../../application/hooks';
 import { resetNavigationStack } from '../../../../../utils/utils';
 import AdoptionCard from '../../../components/AdoptionCard';
 import { styles } from './MyPublicationsScreen.styles';
 
+const listMyPublications = container.resolve(ListMyPublicationUseCase);
+const addLike = container.resolve(AddLikeUseCase);
+const removeLike = container.resolve(RemoveLikeUseCase);
+const addComment = container.resolve(AddCommentUseCase);
+
 const MemoizedAdoptionCard = memo(AdoptionCard);
+
 export function MyPublicationsScreen() {
 	const theme = useTheme();
 	const ref = useRef<FlatList>(null);
@@ -31,7 +39,7 @@ export function MyPublicationsScreen() {
 	useScrollToTop(ref);
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		userQueryMyPublications(pageSize, user._id ?? '');
+		listMyPublications.userQueryMyPublications(pageSize, user._id ?? '');
 
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
@@ -52,8 +60,11 @@ export function MyPublicationsScreen() {
 			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
 		}, [])
 	);
-	const { addLikeMutation, removeLikeMutation } = useLike('MyPublications');
-	const { addCommentMutation } = useMutationComment();
+
+	const { addLikeMutation } = addLike.useMutationAddLike('MyPublications');
+	const { removeLikeMutation } = removeLike.useMutationRemoveLike('MyPublications');
+
+	const { addCommentMutation } = addComment.useMutationAddComment();
 
 	return (
 		<>

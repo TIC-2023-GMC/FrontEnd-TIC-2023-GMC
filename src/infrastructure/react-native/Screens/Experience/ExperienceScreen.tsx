@@ -7,10 +7,21 @@ import { ActivityIndicator, useTheme } from 'react-native-paper';
 import ExperienceCard from '../../components/ExperienceCard';
 import FilterModal from '../../components/ExperiencesFilterModal';
 
-import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
-import { useLike, useMutationComment, useQueryExperience } from '../../../../application/hooks';
+import { container } from 'tsyringe';
+import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
+import {
+	AddCommentUseCase,
+	AddLikeUseCase,
+	ListExperiencesUseCase,
+	RemoveLikeUseCase
+} from '../../../../application/hooks';
 import { ExperienceFilter } from '../../../../domain/models/InterfacesModels';
 import { styles } from './ExperienceScreen.styles';
+
+const listExperience = container.resolve(ListExperiencesUseCase);
+const addLike = container.resolve(AddLikeUseCase);
+const removeLike = container.resolve(RemoveLikeUseCase);
+const addComment = container.resolve(AddCommentUseCase);
 
 const MemoizedExperienceCard = memo(ExperienceCard);
 const MemoizedFilterModal = memo(FilterModal);
@@ -32,7 +43,7 @@ export function ExperienceScreen({
 	useScrollToTop(ref);
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch, isFetching } =
-		useQueryExperience(filter, pageSize);
+		listExperience.useQueryExperience(filter, pageSize);
 
 	const handleLoadMore = () => {
 		if (!isFetchingNextPage && hasNextPage && hasNextPage !== undefined) {
@@ -48,8 +59,10 @@ export function ExperienceScreen({
 		refetch();
 	}, [filter]);
 
-	const { addLikeMutation, removeLikeMutation } = useLike('Experience');
-	const { addCommentMutation } = useMutationComment();
+	const { addLikeMutation } = addLike.useMutationAddLike('Experience');
+	const { removeLikeMutation } = removeLike.useMutationRemoveLike('Experience');
+
+	const { addCommentMutation } = addComment.useMutationAddComment();
 
 	return (
 		<>
