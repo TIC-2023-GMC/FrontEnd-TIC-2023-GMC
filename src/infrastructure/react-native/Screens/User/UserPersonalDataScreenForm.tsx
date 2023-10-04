@@ -9,11 +9,17 @@ import { Button, Divider, HelperText, RadioButton, TextInput, useTheme } from 'r
 import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
 import { UpdateUserUseCase, useParish } from '../../../../application/hooks';
-import { User, UserAptitude, UserPersonalData } from '../../../../domain/models/InterfacesModels';
+import {
+	Photo,
+	User,
+	UserAptitude,
+	UserPersonalData
+} from '../../../../domain/models/InterfacesModels';
 import { UserAptitudeSchema, UserPersonalDataSchema } from '../../../../domain/schemas/Schemas';
-import { parseNumber, resetNavigationStack } from '../../../../utils/utils';
+import { parseNumber, resetNavigationStack, uploadImg } from '../../../../utils/utils';
 import { styles } from './UserPersonalDataScreenForm.styles';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
+import PhotoSelection from '../../components/PhotoSelection';
 
 const updateUser = container.resolve(UpdateUserUseCase);
 export function UserPersonalDataScreenForm() {
@@ -23,8 +29,24 @@ export function UserPersonalDataScreenForm() {
 	const tabBarHeight = useBottomTabBarHeight();
 	const [openLocation, setOpenLocation] = useState(false);
 	const [location, setLocation] = useState<string>('');
+	const [image, setImage] = useState<string>();
+	const [failUpload, setFailUpload] = useState<string>('');
 
 	const { isLoading, itemsLocation, setItemsLocation } = useParish();
+
+	useFocusEffect(
+		useCallback(() => {
+			const handleBackPress = () => {
+				if (navigation.isFocused()) {
+					resetNavigationStack(navigation, 'Perfil');
+					return true;
+				}
+				return false;
+			};
+			BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+		}, [])
+	);
 
 	const {
 		control,
@@ -51,31 +73,29 @@ export function UserPersonalDataScreenForm() {
 	const { updateUserMutation, loading, setLoading } = updateUser.useMutationUser(resetForm);
 
 	const onSubmit: SubmitHandler<UserPersonalData> = async (data) => {
-		setLoading(true);
-		const updatedUser: User = {
-			...user,
-			...data
-		};
-		setUser(updatedUser);
-		updateUserMutation.mutate(updatedUser);
-	};
-
-	useFocusEffect(
-		useCallback(() => {
-			const handleBackPress = () => {
-				if (navigation.isFocused()) {
-					resetNavigationStack(navigation, 'Perfil');
-					return true;
-				}
-				return false;
+		if (image) {
+			setLoading(true);
+			const response_body = await uploadImg(image, setFailUpload);
+			const response = JSON.parse(response_body ? response_body : '{}');
+			const new_photo: Photo = {
+				...response
 			};
-			BackHandler.addEventListener('hardwareBackPress', handleBackPress);
-			return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
-		}, [])
-	);
+
+			const updatedUser: User = {
+				...user,
+				...data,
+				photo: new_photo
+			};
+
+			setUser(updatedUser);
+			updateUserMutation.mutate(updatedUser);
+		}
+	};
 
 	return (
 		<ScrollView style={{ marginBottom: tabBarHeight }}>
+			<PhotoSelection image={image} setImage={setImage} />
+			{image === undefined && <HelperText type="error">La foto es requerida</HelperText>}
 			<Text style={styles.instructionText}>
 				Por favor, complete los siguientes campos para guardar la información de su perfil
 			</Text>
