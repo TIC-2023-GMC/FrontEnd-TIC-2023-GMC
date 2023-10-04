@@ -165,7 +165,12 @@ export interface Organization {
 	_id: string;
 	name: string;
 	description: string;
-	website?: string;
 	photo: Photo;
-	social_media: string[];
+	external_links: SocialMedia;
+}
+export interface SocialMedia {
+	facebook: string;
+	instagram: string;
+	twitter: string;
+	website: string;
 }
