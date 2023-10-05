@@ -51,7 +51,7 @@ export class SendScoreQuizzGameUsecase {
 	constructor(@inject('MatchRepository') private _repository: IMatchRespository) { }
 	useMutationSendScoreQuizzGame() {
 		const sendScoreQuizzGame = useMutation({
-			mutationFn: (data: QuizGameMatch) => this._repository.putScore(data)
+			mutationFn: this._repository.putScore
 		});
 		return { sendScoreQuizzGame };
 	}
