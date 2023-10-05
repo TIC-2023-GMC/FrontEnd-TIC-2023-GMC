@@ -1,12 +1,16 @@
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Snackbar, Text } from 'react-native-paper';
 import { container } from 'tsyringe';
 import { ListOrganizationUseCase } from '../../../../application/hooks';
+import OrganizationCard from '../../components/OrganizationCard';
 import { styles } from './OrganizationScreen.styles';
-const listOrganization = container.resolve(ListOrganizationUseCase);
 export function OrganizationScreen() {
+	const listOrganization = container.resolve(ListOrganizationUseCase);
+	const [visible, setVisible] = useState(false);
+	const tabBarHeight = useBottomTabBarHeight();
 	const ref = useRef<FlatList>(null);
 	const pageSize = 2;
 	const { data, hasNextPage, fetchNextPage, refetch, isFetchingNextPage, isLoading, isFetching } =
@@ -16,19 +20,17 @@ export function OrganizationScreen() {
 			fetchNextPage();
 		}
 	};
+
 	return (
 		<>
 			<StatusBar style="light" />
 			<FlatList
+				testID="organization-list"
 				keyExtractor={(item) => item._id}
 				onEndReached={handleLoadMore}
 				ref={ref}
 				data={data?.pages.flatMap((page) => page[0])}
-				renderItem={({ item }) => (
-					<View>
-						<Text>{item.name}</Text>
-					</View>
-				)}
+				renderItem={({ item }) => <OrganizationCard {...item} setError={setVisible} />}
 				initialNumToRender={pageSize}
 				onEndReachedThreshold={0.5}
 				ListEmptyComponent={
@@ -47,6 +49,14 @@ export function OrganizationScreen() {
 					/>
 				}
 			/>
+			<Snackbar
+				visible={visible}
+				onDismiss={() => setVisible(false)}
+				duration={2000}
+				style={{ marginBottom: tabBarHeight + 10 }}
+			>
+				Existió un error al abrir la red social
+			</Snackbar>
 		</>
 	);
 }

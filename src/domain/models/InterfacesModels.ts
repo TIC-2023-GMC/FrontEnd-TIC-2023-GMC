@@ -161,6 +161,10 @@ export interface LeaderBoard {
 	0: UserPosition[];
 	1: number;
 }
+export interface OrganizationResults {
+	0: Organization[];
+	1: number;
+}
 export interface Organization {
 	_id: string;
 	name: string;

@@ -1,7 +1,9 @@
 import { CommonActions, NavigationProp } from '@react-navigation/native';
 import axios from 'axios';
+import * as Linking from 'expo-linking';
 import * as Sharing from 'expo-sharing';
 import { RefObject } from 'react';
+import { set } from 'react-hook-form';
 import { View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 
@@ -23,6 +25,17 @@ export function ExpireToken(logout: () => void) {
 		}
 	);
 }
+export const handleOpenURL = (url: string, setError: (_error: boolean) => void) => {
+	Linking.canOpenURL(url)
+		.then((supported: boolean) => {
+			if (!supported) {
+				setError(true);
+			} else {
+				return Linking.openURL(url);
+			}
+		})
+		.catch((err: Error) => console.log(err));
+};
 
 const snapShot = async (ref: RefObject<View>) => {
 	try {

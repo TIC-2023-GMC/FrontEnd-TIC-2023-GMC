@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Organization } from '../models/InterfacesModels';
+import { OrganizationResults } from '../models/InterfacesModels';
 
 export interface IOrganizationRepository {
-	find(_pageParam: number, _pageSize: number): Promise<Organization|any>;
+	find(_pageParam: number, _pageSize: number): Promise<OrganizationResults | any>;
 }
