@@ -6,15 +6,13 @@ import { useState } from 'react';
 
 @injectable()
 export class GetQuizGameMatchUsecase {
-	constructor(@inject('MatchRepository') private _repository: IMatchRespository) {}
+	constructor(@inject('MatchRepository') private _repository: IMatchRespository) { }
 	useQueryQuizGame(
 		setQuizzGame: (
-			// eslint-disable-next-line no-unused-vars
-			value: QuizGameMatch
+			_value: QuizGameMatch
 		) => void,
 		updateQuestion: (
-			// eslint-disable-next-line no-unused-vars
-			value: QuizGameMatch
+			_value: QuizGameMatch
 		) => void
 	) {
 		const { isLoading, isFetching } = useQuery({
@@ -37,7 +35,7 @@ export class GetQuizGameMatchUsecase {
 
 @injectable()
 export class GetLeaderboardUsecase {
-	constructor(@inject('MatchRepository') private _repository: IMatchRespository) {}
+	constructor(@inject('MatchRepository') private _repository: IMatchRespository) { }
 	useQueryLeaderboard(sendScoreQuizzGameIsSuccess: boolean) {
 		return useQuery({
 			queryKey: ['leaderboard'],
@@ -52,7 +50,7 @@ export class GetLeaderboardUsecase {
 
 @injectable()
 export class SendScoreQuizzGameUsecase {
-	constructor(@inject('MatchRepository') private _repository: IMatchRespository) {}
+	constructor(@inject('MatchRepository') private _repository: IMatchRespository) { }
 	useMutationSendScoreQuizzGame() {
 		const sendScoreQuizzGame = useMutation({
 			mutationFn: (data: QuizGameMatch) => this._repository.putScore(data)
@@ -90,7 +88,7 @@ export function useQuizGame(user: User) {
 
 				match_game_score: Math.round(
 					prevQuizzGame.match_game_score * 10 +
-						(10 * Math.pow(prevQuizzGame.match_game_score, 2)) / totalSeconds
+					(10 * Math.pow(prevQuizzGame.match_game_score, 2)) / totalSeconds
 				)
 			};
 			return object;
