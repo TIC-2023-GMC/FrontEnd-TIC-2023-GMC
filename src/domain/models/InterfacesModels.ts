@@ -158,11 +158,7 @@ export interface UserScore {
 	match_game_time: number;
 }
 
-export interface UserPosition {
-	position: number;
-	user: UserScore;
-}
 export interface LeaderBoard {
-	0: UserPosition[];
+	0: UserScore[];
 	1: number;
 }
