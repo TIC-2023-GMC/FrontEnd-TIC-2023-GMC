@@ -74,10 +74,10 @@ export function getLeaderBoardEndpoint() {
 	return '/match/leaderboard';
 }
 export function getQuizGameByUserEndpoint() {
-	return `match/quiz_game`;
+	return 'match/quiz_game';
 }
 export function getQuizGameEndpoint() {
-	return `match/quiz_game`;
+	return 'match/quiz_game';
 }
 export function getUpdateUserEndpoint() {
 	return '/user/update_user';
@@ -92,7 +92,7 @@ export function getAddExperienceEndpoint() {
 }
 
 export function getParishEndpoint() {
-	return `parish/get_all`;
+	return 'parish/get_all';
 }
 
 export function getUserByIdEndpoint(id: string) {
@@ -100,7 +100,7 @@ export function getUserByIdEndpoint(id: string) {
 }
 
 export function getGamesEndpoint() {
-	return `game/get_games`;
+	return 'game/get_games';
 }
 
 export function getListCommentsEndpoint({
