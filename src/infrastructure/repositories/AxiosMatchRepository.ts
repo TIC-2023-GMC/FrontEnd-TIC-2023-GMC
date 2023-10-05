@@ -18,7 +18,7 @@ export class AxiosMatchRepository implements IMatchRespository {
 		return response.data;
 	};
 
-	putScore(quizzGame: QuizGameMatch): Promise<void> {
+	update(quizzGame: QuizGameMatch): Promise<void> {
 		const response = put<QuizGameMatch>(getQuizGameEndpoint(), quizzGame).then((response) => {
 			response.data;
 		});

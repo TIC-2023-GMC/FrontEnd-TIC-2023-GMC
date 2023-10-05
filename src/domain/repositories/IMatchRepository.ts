@@ -5,5 +5,5 @@ import { LeaderBoard, QuizGameMatch } from '../models/InterfacesModels';
 export interface IMatchRespository {
 	find(): Promise<QuizGameMatch>;
 	findLeaderboard(): Promise<LeaderBoard>;
-	putScore(_quizzGame: QuizGameMatch): Promise<void>;
+	update(_quizzGame: QuizGameMatch): Promise<void>;
 }
