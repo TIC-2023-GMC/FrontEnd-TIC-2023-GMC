@@ -18,8 +18,7 @@ export class GetQuizGameMatchUsecase {
 		const { isLoading, isFetching } = useQuery({
 			queryKey: ['question'],
 			queryFn: async () => {
-				const response = await this._repository.find();
-				return response;
+				return this._repository.find();;
 			},
 			onSuccess: (data: QuizGameMatch) => {
 				data.match_game_score = 0;
@@ -40,8 +39,7 @@ export class GetLeaderboardUsecase {
 		return useQuery({
 			queryKey: ['leaderboard'],
 			queryFn: async () => {
-				const response = await this._repository.findLeaderboard();
-				return response;
+				return this._repository.findLeaderboard();
 			},
 			enabled: sendScoreQuizzGameIsSuccess
 		});
