@@ -8,7 +8,11 @@ import { BackHandler, ScrollView, Text, View } from 'react-native';
 import { Button, HelperText, Snackbar, TextInput, useTheme } from 'react-native-paper';
 import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
-import { UpdateUserUseCase, UploadImageUseCase, useParish } from '../../../../application/hooks';
+import {
+	UpdateUserUseCase,
+	UploadImageUseCase,
+	GetParishUseCase
+} from '../../../../application/hooks';
 import { Photo, User, UserPersonalData } from '../../../../domain/models/InterfacesModels';
 import { UserPersonalDataSchema } from '../../../../domain/schemas/Schemas';
 import { resetNavigationStack } from '../../../../utils/utils';
@@ -19,6 +23,7 @@ import { SnackBarError } from '../../components/SnackBarError';
 
 const updateUser = container.resolve(UpdateUserUseCase);
 const uploadImg = container.resolve(UploadImageUseCase);
+const parish = container.resolve(GetParishUseCase);
 
 export function UserPersonalDataScreenForm() {
 	const theme = useTheme();
@@ -29,7 +34,6 @@ export function UserPersonalDataScreenForm() {
 	const [location, setLocation] = useState<string>(user.neighborhood);
 	const [image, setImage] = useState<string | undefined>(user.photo.img_path);
 	const [failUpload, setFailUpload] = useState<string>('');
-	const { isLoading, itemsLocation, setItemsLocation } = useParish();
 
 	useFocusEffect(
 		useCallback(() => {
@@ -67,6 +71,8 @@ export function UserPersonalDataScreenForm() {
 		resetNavigationStack(navigation, 'Perfil');
 		reset();
 	};
+
+	const { isLoading, itemsLocation, setItemsLocation } = parish.useQueryParish();
 
 	const { updateUserMutation, loading, setLoading, error, setError } =
 		updateUser.useMutationUser(resetForm);
