@@ -12,8 +12,7 @@ export class GetParishUseCase {
 		const { isLoading } = useQuery({
 			queryKey: ['location'],
 			queryFn: async () => {
-				const response = await this._repository.find();
-				return response;
+				return this._repository.find();
 			},
 			onSuccess: (data) => {
 				setItemsLocation(data);
