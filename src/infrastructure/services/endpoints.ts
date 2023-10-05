@@ -45,11 +45,11 @@ export function getListFavoritesAdoptionsEndpoint({
 }
 
 export function getAddLikeEndpoint() {
-	return `/like/add_like`;
+	return '/like/add_like';
 }
 
 export function getRemoveLikeEndpoint() {
-	return `/like/remove_like`;
+	return '/like/remove_like';
 }
 
 export function getRemoveFavoriteAdoptionEndpoint() {
@@ -84,11 +84,11 @@ export function getUpdateUserEndpoint() {
 }
 
 export function getAddAdoptionEndpoint() {
-	return `adoptions/add`;
+	return 'adoptions/add';
 }
 
 export function getAddExperienceEndpoint() {
-	return `experiences/add`;
+	return 'experiences/add';
 }
 
 export function getParishEndpoint() {
@@ -116,12 +116,12 @@ export function getListCommentsEndpoint({
 }
 
 export function getUserMeEndpoint() {
-	return `user/user_me`;
+	return 'user/user_me';
 }
 export function getLoginEndpoint() {
-	return `user/token`;
+	return 'user/token';
 }
 
 export function getAddCommentEndpoint() {
-	return `comments/add_comment`;
+	return 'user/token';
 }
