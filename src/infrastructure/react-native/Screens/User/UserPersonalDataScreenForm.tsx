@@ -74,12 +74,13 @@ export function UserPersonalDataScreenForm() {
 
 	const { isLoading, itemsLocation, setItemsLocation } = parish.useQueryParish();
 
-	const { updateUserMutation, loading, setLoading, error, setError } =
+	const { updateUserMutation, loading, setLoading, error, resetError } =
 		updateUser.useMutationUser(resetForm);
 
 	const onSubmit: SubmitHandler<UserPersonalData> = async (data) => {
 		if (image) {
 			setLoading(true);
+			const userBefore = { ...user };
 			if (image !== user.photo.img_path) {
 				const new_photo: Photo =
 					(await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);
@@ -89,14 +90,14 @@ export function UserPersonalDataScreenForm() {
 					photo: new_photo
 				};
 				setUser(updatedUser);
-				updateUserMutation.mutate(updatedUser);
+				updateUserMutation.mutate(updatedUser, { onError: () => setUser(userBefore) });
 			} else {
 				const updatedUser: User = {
 					...user,
 					...data
 				};
 				setUser(updatedUser);
-				updateUserMutation.mutate(updatedUser);
+				updateUserMutation.mutate(updatedUser, { onError: () => setUser(userBefore) });
 			}
 		}
 	};
@@ -105,7 +106,7 @@ export function UserPersonalDataScreenForm() {
 
 	return (
 		<ScrollView style={{ marginBottom: tabBarHeight }}>
-			<PhotoSelection image={image} setImage={setImage} />
+			<PhotoSelection image={image} setImage={setImage} aspect={[1, 1]} />
 			{image === undefined && <HelperText type="error">La foto es requerida</HelperText>}
 			<Text style={styles.instructionText}>
 				Por favor, complete los siguientes campos para guardar la información de su perfil
@@ -317,12 +318,11 @@ export function UserPersonalDataScreenForm() {
 				</Button>
 			</View>
 			<Snackbar
-				onIconPress={() => setError(false)}
+				onIconPress={resetError}
 				icon="close"
 				visible={error}
-				onDismiss={() => setError(false)}
+				onDismiss={resetError}
 				duration={5000}
-				style={{ width: '90%', alignSelf: 'center' }}
 			>
 				¡Ya existe un usuario con ese email o celular!
 			</Snackbar>

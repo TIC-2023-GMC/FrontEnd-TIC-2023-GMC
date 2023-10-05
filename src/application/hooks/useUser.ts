@@ -10,6 +10,7 @@ export class UpdateUserUseCase {
 	useMutationUser(resetForm: () => void) {
 		const [loading, setLoading] = useState(false);
 		const [error, setError] = useState(false);
+		const resetError = () => setError(false);
 		const updateUserMutation = useMutation({
 			mutationFn: this._userRepository?.update,
 			onSuccess: () => {
@@ -21,7 +22,7 @@ export class UpdateUserUseCase {
 				setError(true);
 			}
 		});
-		return { updateUserMutation, loading, setLoading, error, setError };
+		return { updateUserMutation, loading, setLoading, error, resetError };
 	}
 }
 @injectable()

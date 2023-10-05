@@ -26,6 +26,7 @@ interface TabsNavigationProps {
 
 const noTabBarProfileRoutes = [
 	'Editar Perfil',
+	'Editar Aptitud',
 	'Favoritos',
 	'Mis Publicaciones',
 	'Perfil de Usuarios'
