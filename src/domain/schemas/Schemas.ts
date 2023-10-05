@@ -5,13 +5,25 @@ export const PhotoSchema = z.object({
 
 export const UserSchema = z.object({
 	_id: z.string(),
-	first_name: z.string(),
-	last_name: z.string(),
-	mobile_phone: z.string(),
-	neighborhood: z.string(),
+	first_name: z
+		.string()
+		.nonempty('El nombre es requerido')
+		.regex(
+			/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*(\s+[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*)*$/,
+			'Por favor, ingrese su nombre iniciando con mayúscula (evite caracteres especiales)'
+		),
+	last_name: z
+		.string()
+		.nonempty('El apellido es requerido')
+		.regex(
+			/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*(\s+[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*)*$/,
+			'Por favor, ingrese su apellido iniciando con mayúscula (evite caracteres especiales)'
+		),
+	mobile_phone: z.string().regex(/^09\d{8}$/, 'Por favor, ingrese un número de teléfono válido'),
+	neighborhood: z.string().nonempty('El sector es requerido'),
 	birth_date: z.date(),
-	email: z.string().email(),
-	password: z.string(),
+	email: z.string().email('Por favor, ingrese un correo electrónico válido'),
+	password: z.string().nonempty('La contraseña es requerida'),
 	num_previous_pets: z
 		.number({ invalid_type_error: 'Por favor, ingrese un número entero mayor o igual a 0' })
 		.gte(0, 'El número de mascotas previas debe ser mayor o igual a 0'),

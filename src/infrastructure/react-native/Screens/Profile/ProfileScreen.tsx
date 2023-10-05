@@ -149,6 +149,8 @@ export function ProfileScreen({ route }: any) {
 										Enviar mensaje a {profileUser.first_name}
 									</Button>
 								</View>
+							</Card>
+							{!userId && (
 								<Button
 									style={styles.button}
 									mode="elevated"
@@ -161,7 +163,7 @@ export function ProfileScreen({ route }: any) {
 								>
 									Editar Datos Personales
 								</Button>
-							</Card>
+							)}
 							<Card
 								style={[
 									styles.profileContainer,
@@ -240,6 +242,18 @@ export function ProfileScreen({ route }: any) {
 									<Button
 										style={styles.button}
 										mode="elevated"
+										buttonColor={theme.colors.tertiary}
+										textColor={theme.colors.secondary}
+										icon={'square-edit-outline'}
+										onPress={() => {
+											navigation.navigate('Perfil', { screen: 'Editar Aptitud' });
+										}}
+									>
+										Editar Datos de Aptitud
+									</Button>
+									<Button
+										style={styles.button}
+										mode="elevated"
 										buttonColor={theme.colors.primary}
 										textColor={theme.colors.secondary}
 										onPress={() => {
@@ -258,18 +272,6 @@ export function ProfileScreen({ route }: any) {
 										}}
 									>
 										Mis Favoritos
-									</Button>
-									<Button
-										style={styles.button}
-										mode="elevated"
-										buttonColor={theme.colors.tertiary}
-										textColor={theme.colors.secondary}
-										icon={'square-edit-outline'}
-										onPress={() => {
-											navigation.navigate('Perfil', { screen: 'Editar Aptitud' });
-										}}
-									>
-										Editar Datos de Aptitud
 									</Button>
 									<Button
 										style={styles.button}

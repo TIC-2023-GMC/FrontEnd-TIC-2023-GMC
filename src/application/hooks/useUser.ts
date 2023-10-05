@@ -9,14 +9,19 @@ export class UpdateUserUseCase {
 	constructor(@inject('UserRepository') private _userRepository: IUserRepository) {}
 	useMutationUser(resetForm: () => void) {
 		const [loading, setLoading] = useState(false);
+		const [error, setError] = useState(false);
 		const updateUserMutation = useMutation({
 			mutationFn: this._userRepository?.update,
 			onSuccess: () => {
 				setLoading(false);
 				resetForm();
+			},
+			onError: () => {
+				setLoading(false);
+				setError(true);
 			}
 		});
-		return { updateUserMutation, loading, setLoading };
+		return { updateUserMutation, loading, setLoading, error, setError };
 	}
 }
 @injectable()

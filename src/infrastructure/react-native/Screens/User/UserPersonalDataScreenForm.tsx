@@ -5,33 +5,30 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useContext, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { BackHandler, ScrollView, Text, View } from 'react-native';
-import { Button, Divider, HelperText, RadioButton, TextInput, useTheme } from 'react-native-paper';
+import { Button, HelperText, Snackbar, TextInput, useTheme } from 'react-native-paper';
 import { container } from 'tsyringe';
-import { UserContext, UserContextParams } from '../../../../application/auth/userContext';
-import { UpdateUserUseCase, useParish } from '../../../../application/hooks';
-import {
-	Photo,
-	User,
-	UserAptitude,
-	UserPersonalData
-} from '../../../../domain/models/InterfacesModels';
-import { UserAptitudeSchema, UserPersonalDataSchema } from '../../../../domain/schemas/Schemas';
-import { parseNumber, resetNavigationStack, uploadImg } from '../../../../utils/utils';
+import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
+import { UpdateUserUseCase, UploadImageUseCase, useParish } from '../../../../application/hooks';
+import { Photo, User, UserPersonalData } from '../../../../domain/models/InterfacesModels';
+import { UserPersonalDataSchema } from '../../../../domain/schemas/Schemas';
+import { resetNavigationStack } from '../../../../utils/utils';
 import { styles } from './UserPersonalDataScreenForm.styles';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import PhotoSelection from '../../components/PhotoSelection';
+import { SnackBarError } from '../../components/SnackBarError';
 
 const updateUser = container.resolve(UpdateUserUseCase);
+const uploadImg = container.resolve(UploadImageUseCase);
+
 export function UserPersonalDataScreenForm() {
 	const theme = useTheme();
 	const { user, setUser } = useContext<UserContextParams>(UserContext);
 	const navigation = useNavigation();
 	const tabBarHeight = useBottomTabBarHeight();
 	const [openLocation, setOpenLocation] = useState(false);
-	const [location, setLocation] = useState<string>('');
-	const [image, setImage] = useState<string>();
+	const [location, setLocation] = useState<string>(user.neighborhood);
+	const [image, setImage] = useState<string | undefined>(user.photo.img_path);
 	const [failUpload, setFailUpload] = useState<string>('');
-
 	const { isLoading, itemsLocation, setItemsLocation } = useParish();
 
 	useFocusEffect(
@@ -52,7 +49,8 @@ export function UserPersonalDataScreenForm() {
 		control,
 		formState: { errors },
 		handleSubmit,
-		reset
+		reset,
+		watch
 	} = useForm({
 		resolver: zodResolver(UserPersonalDataSchema),
 		defaultValues: {
@@ -70,27 +68,34 @@ export function UserPersonalDataScreenForm() {
 		reset();
 	};
 
-	const { updateUserMutation, loading, setLoading } = updateUser.useMutationUser(resetForm);
+	const { updateUserMutation, loading, setLoading, error, setError } =
+		updateUser.useMutationUser(resetForm);
 
 	const onSubmit: SubmitHandler<UserPersonalData> = async (data) => {
 		if (image) {
 			setLoading(true);
-			const response_body = await uploadImg(image, setFailUpload);
-			const response = JSON.parse(response_body ? response_body : '{}');
-			const new_photo: Photo = {
-				...response
-			};
-
-			const updatedUser: User = {
-				...user,
-				...data,
-				photo: new_photo
-			};
-
-			setUser(updatedUser);
-			updateUserMutation.mutate(updatedUser);
+			if (image !== user.photo.img_path) {
+				const new_photo: Photo =
+					(await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);
+				const updatedUser: User = {
+					...user,
+					...data,
+					photo: new_photo
+				};
+				setUser(updatedUser);
+				updateUserMutation.mutate(updatedUser);
+			} else {
+				const updatedUser: User = {
+					...user,
+					...data
+				};
+				setUser(updatedUser);
+				updateUserMutation.mutate(updatedUser);
+			}
 		}
 	};
+
+	const formUser = watch();
 
 	return (
 		<ScrollView style={{ marginBottom: tabBarHeight }}>
@@ -176,9 +181,8 @@ export function UserPersonalDataScreenForm() {
 							textColor={theme.colors.shadow}
 							placeholder="Ingrese su número celular"
 							onBlur={onBlur}
-							onChangeText={(newValue) => onChange(parseNumber(newValue))}
+							onChangeText={onChange}
 							keyboardType="numeric"
-							//value={value < 0 ? '' : value?.toString()}
 							value={value}
 							label="Número de celular"
 							style={{ ...styles.input, backgroundColor: theme.colors.secondary }}
@@ -208,7 +212,7 @@ export function UserPersonalDataScreenForm() {
 				render={({ field: { onChange } }) => (
 					<>
 						<DropDownPicker
-							placeholder="Selecciona el sector"
+							placeholder="Seleccione el sector"
 							open={openLocation}
 							value={location}
 							items={itemsLocation as ItemType<string>[]}
@@ -273,41 +277,6 @@ export function UserPersonalDataScreenForm() {
 				)}
 				name="email"
 			/>
-			<Controller
-				control={control}
-				rules={{
-					required: true
-				}}
-				render={({ field: { onChange, onBlur, value } }) => (
-					<>
-						<TextInput
-							textColor={theme.colors.shadow}
-							placeholder="Ingrese su contraseña"
-							onBlur={onBlur}
-							onChangeText={onChange}
-							value={value}
-							label="Contraseña:"
-							style={{ ...styles.input, backgroundColor: theme.colors.secondary }}
-							error={!!errors.password}
-							right={
-								errors.password && (
-									<TextInput.Icon
-										icon={() => <Ionicons name="alert-circle" size={24} color="red" />}
-									/>
-								)
-							}
-						/>
-						{errors.password && (
-							<HelperText type="error" style={styles.errorText}>
-								{errors.password?.message}
-							</HelperText>
-						)}
-					</>
-				)}
-				name="password"
-			/>
-			<Divider bold />
-
 			<View style={styles.buttonView}>
 				<Button
 					style={styles.button}
@@ -328,10 +297,30 @@ export function UserPersonalDataScreenForm() {
 					textColor={theme.colors.secondary}
 					onPress={handleSubmit(onSubmit)}
 					loading={loading}
+					disabled={
+						formUser.first_name === user.first_name &&
+						formUser.last_name === user.last_name &&
+						formUser.mobile_phone === user.mobile_phone &&
+						formUser.neighborhood === user.neighborhood &&
+						formUser.email === user.email &&
+						image === user.photo.img_path &&
+						!loading
+					}
 				>
 					Guardar
 				</Button>
 			</View>
+			<Snackbar
+				onIconPress={() => setError(false)}
+				icon="close"
+				visible={error}
+				onDismiss={() => setError(false)}
+				duration={5000}
+				style={{ width: '90%', alignSelf: 'center' }}
+			>
+				¡Ya existe un usuario con ese email o celular!
+			</Snackbar>
+			<SnackBarError setFailUpload={setFailUpload} failUpload={failUpload} reset={reset} />
 		</ScrollView>
 	);
 }

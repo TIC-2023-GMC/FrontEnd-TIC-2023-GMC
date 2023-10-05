@@ -28,8 +28,10 @@ import { parseNumber, resetNavigationStack } from '../../../../utils/utils';
 import PhotoSelection from '../../components/PhotoSelection';
 import { SnackBarError } from '../../components/SnackBarError';
 import { styles } from './AdoptionScreenForm.styles';
+
 const createAdoption = container.resolve(CreateAdoptionUseCase);
 const uploadImg = container.resolve(UploadImageUseCase);
+
 export function AdoptionScreenForm() {
 	const theme = useTheme();
 	const { user } = useContext<UserContextParams>(UserContext);
