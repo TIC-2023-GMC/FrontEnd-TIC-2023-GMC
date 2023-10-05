@@ -32,6 +32,11 @@ export interface Filter {
 
 export type ExperienceFilter = Filter;
 
+export type UserPersonalData = Pick<
+	User,
+	'first_name' | 'last_name' | 'mobile_phone' | 'neighborhood' | 'email' | 'password'
+>;
+
 export type UserAptitude = Pick<
 	User,
 	| 'num_previous_pets'

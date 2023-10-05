@@ -28,6 +28,7 @@ import { parseNumber, resetNavigationStack } from '../../../../utils/utils';
 import PhotoSelection from '../../components/PhotoSelection';
 import { SnackBarError } from '../../components/SnackBarError';
 import { styles } from './AdoptionScreenForm.styles';
+
 const createAdoption = container.resolve(CreateAdoptionUseCase);
 const uploadImg = container.resolve(UploadImageUseCase);
 const parish = container.resolve(GetParishUseCase);
