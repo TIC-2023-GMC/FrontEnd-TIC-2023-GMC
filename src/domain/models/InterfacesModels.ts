@@ -162,3 +162,12 @@ export interface LeaderBoard {
 	0: UserScore[];
 	1: number;
 }
+
+export interface WordleGame {
+	_id: string;
+	user_id: string;
+	wordle_game_clue: string;
+	wordle_game_description: string;
+	wordle_game_onboarding: string;
+	wordle_game_words: string[];
+}

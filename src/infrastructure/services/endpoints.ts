@@ -125,3 +125,7 @@ export function getLoginEndpoint() {
 export function getAddCommentEndpoint() {
 	return 'user/token';
 }
+
+export function getWordleGameEndpoint() {
+	return 'wordle/get_wordle_game';
+}

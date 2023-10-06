@@ -5,30 +5,33 @@ import {
 	LogoutUserUseCase,
 	SetTokenInStorageUseCase
 } from '../application/hooks';
+import MobXWordleGameStoreService from '../infrastructure/GameStores/Wordle/MobXWordleGameStoreService';
 import { AxiosAdoptionRepository } from '../infrastructure/repositories/AxiosAdoptionRepository';
 import { AxiosCommentsRepository } from '../infrastructure/repositories/AxiosCommentsRepository';
 import { AxiosExperienceRepository } from '../infrastructure/repositories/AxiosExperienceRepository';
 import { AxiosFavoritesRepository } from '../infrastructure/repositories/AxiosFavoritesRepository';
+import { AxiosGameRepository } from '../infrastructure/repositories/AxiosGameRepository';
 import { AxiosLikeRepository } from '../infrastructure/repositories/AxiosLikeRepository';
+import { AxiosMatchRepository } from '../infrastructure/repositories/AxiosMatchRepository';
+import { AxiosParishRepository } from '../infrastructure/repositories/AxiosParishRepository';
 import { AxiosUserRepository } from '../infrastructure/repositories/AxiosUserRepository';
 import { ExpoFileSystemPhotoRepository } from '../infrastructure/repositories/ExpoFileSystemPhotoRepository';
 import { ExpoStoreRepository } from '../infrastructure/repositories/ExpoStoreRepository';
-import { AxiosGameRepository } from '../infrastructure/repositories/AxiosGameRepository';
-import { AxiosMatchRepository } from '../infrastructure/repositories/AxiosMatchRepository';
-import { AxiosParishRepository } from '../infrastructure/repositories/AxiosParishRepository';
 
-container.register('UserRepository', { useClass: AxiosUserRepository });
-container.register('ExperienceRepository', { useClass: AxiosExperienceRepository });
-container.register('AdoptionRepository', { useClass: AxiosAdoptionRepository });
-container.register('FavoritesRepository', { useClass: AxiosFavoritesRepository });
-container.register('LikeRepository', { useClass: AxiosLikeRepository });
-container.register('CommentsRepository', { useClass: AxiosCommentsRepository });
-container.register('InternalStoreRepository', { useClass: ExpoStoreRepository });
-container.register('PhotoRepository', { useClass: ExpoFileSystemPhotoRepository });
-container.register('GetStoragedToken', { useClass: GetStoragedTokenUseCase });
-container.register('SetTokenInStorage', { useClass: SetTokenInStorageUseCase });
-container.register('LogoutUser', { useClass: LogoutUserUseCase });
-container.register('LocationRepository', { useClass: AxiosParishRepository });
+container.registerSingleton('UserRepository', AxiosUserRepository);
+container.registerSingleton('ExperienceRepository', AxiosExperienceRepository);
+container.registerSingleton('AdoptionRepository', AxiosAdoptionRepository);
+container.registerSingleton('FavoritesRepository', AxiosFavoritesRepository);
+container.registerSingleton('LikeRepository', AxiosLikeRepository);
+container.registerSingleton('CommentsRepository', AxiosCommentsRepository);
+container.registerSingleton('InternalStoreRepository', ExpoStoreRepository);
+container.registerSingleton('PhotoRepository', ExpoFileSystemPhotoRepository);
+container.registerSingleton('GetStoragedToken', GetStoragedTokenUseCase);
+container.registerSingleton('SetTokenInStorage', SetTokenInStorageUseCase);
+container.registerSingleton('LogoutUser', LogoutUserUseCase);
+container.registerSingleton('LocationRepository', AxiosParishRepository);
 //Game Section
-container.register('GameRepository', { useClass: AxiosGameRepository });
-container.register('MatchRepository', { useClass: AxiosMatchRepository });
+container.registerSingleton('GameRepository', AxiosGameRepository);
+container.registerSingleton('MatchRepository', AxiosMatchRepository);
+container.registerSingleton('WordleGameStore', MobXWordleGameStoreService);
+// container.registerSingleton('WordleGameRepository', AxiosWordleGameRepository);

@@ -32,7 +32,7 @@ export class GetUserUseCase {
 	useQueryUser(userId: string | undefined) {
 		return useQuery({
 			queryKey: ['userProfileData', userId],
-			queryFn: () => this._userRepository?.findById(userId ?? ''),
+			queryFn: () => this._userRepository.findById(userId ?? ''),
 			enabled: !!userId
 		});
 	}
