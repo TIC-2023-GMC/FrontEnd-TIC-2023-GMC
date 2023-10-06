@@ -53,6 +53,26 @@ export interface Token {
 	token_type: string;
 }
 
+
+export interface userRegister {
+	first_name: string;
+	last_name: string;
+	mobile_phone: string;
+	neighborhood: string;
+	birth_date: Date;
+	email: string;
+	password: string;
+	photo: Photo;
+}
+
+//Response
+export interface UserRegisterResult {
+	user: User,
+	access_token: string;
+	token_type: string;
+}
+
+
 export interface Interaction {
 	user_id: string;
 }
