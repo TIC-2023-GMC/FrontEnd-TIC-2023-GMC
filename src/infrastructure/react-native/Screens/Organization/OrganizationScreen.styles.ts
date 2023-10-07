@@ -10,13 +10,12 @@ export const styles = StyleSheet.create({
 	},
 	section: {
 		flex: 1,
-		alignItems: 'center',
-		justifyContent: 'center',
-		flexDirection: 'column'
+		flexDirection: 'column',
+		marginBottom: 65
 	},
 	activityIndicator: {
-		flex: 1,
-		alignItems: 'center',
-		justifyContent: 'center'
-	},
+		margin: 15,
+		justifyContent: 'center',
+		alignItems: 'center'
+	}
 });

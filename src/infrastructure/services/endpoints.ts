@@ -24,7 +24,7 @@ export function getListOrganizationsEndpoint({
 	pageParam: number;
 	pageSize: number;
 }) {
-	return `organization/list?page_number=${pageParam}&page_size=${pageSize}`;
+	return `organization/get_organizations?page_number=${pageParam}&page_size=${pageSize}`;
 }
 export function getListExperiencesEnpoint({
 	pageParam,

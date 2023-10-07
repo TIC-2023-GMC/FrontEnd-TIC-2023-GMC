@@ -10,7 +10,7 @@ export class ListOrganizationUseCase {
 			queryFn: async ({ pageParam = 1 }) => this._repository.find(pageParam, pageSize),
 			getNextPageParam: (lastPage) => {
 				if (lastPage[0].length !== 0) {
-					return lastPage[1];
+					return lastPage[1] + 1;
 				}
 				return undefined;
 			}

@@ -27,4 +27,4 @@ container.register('PhotoRepository', { useClass: ExpoFileSystemPhotoRepository 
 container.register('GetStoragedToken', { useClass: GetStoragedTokenUseCase });
 container.register('SetTokenInStorage', { useClass: SetTokenInStorageUseCase });
 container.register('LogoutUser', { useClass: LogoutUserUseCase });
-container.register('OrganizationRepository', { useClass: AxiosOrganizationRepository });
+container.registerSingleton('OrganizationRepository', AxiosOrganizationRepository);

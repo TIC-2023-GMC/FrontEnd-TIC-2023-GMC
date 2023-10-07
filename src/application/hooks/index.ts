@@ -5,4 +5,4 @@ export * from './useLike';
 export * from './useParish';
 export * from './usePublication';
 export * from './useUser';
-export * from './useOrganization'
+export * from './useOrganization';

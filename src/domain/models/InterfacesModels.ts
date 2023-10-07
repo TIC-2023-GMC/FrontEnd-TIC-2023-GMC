@@ -167,9 +167,9 @@ export interface OrganizationResults {
 }
 export interface Organization {
 	_id: string;
-	name: string;
-	description: string;
-	photo: Photo;
+	organization_name: string;
+	organization_description: string;
+	organization_photo: Photo;
 	external_links: SocialMedia;
 }
 export interface SocialMedia {

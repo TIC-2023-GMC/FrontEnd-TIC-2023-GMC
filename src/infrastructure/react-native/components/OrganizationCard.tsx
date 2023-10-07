@@ -5,7 +5,13 @@ import { Organization } from '../../../domain/models/InterfacesModels';
 import { handleOpenURL } from '../../../utils/utils';
 
 function OrganizationCard(organization: Organization & { setError: (_error: boolean) => void }) {
-	const { photo, name, description, external_links, setError } = organization;
+	const {
+		organization_photo: photo,
+		organization_name: name,
+		organization_description: description,
+		external_links,
+		setError
+	} = organization;
 	const iconSize = 28;
 	return (
 		<Card style={styles.card}>
@@ -23,6 +29,7 @@ function OrganizationCard(organization: Organization & { setError: (_error: bool
 				<List.Item
 					style={styles.list}
 					title={name}
+					titleNumberOfLines={2}
 					titleStyle={styles.title}
 					left={({ color }) => <List.Icon color={color} icon="dog-service" />}
 				/>
@@ -78,7 +85,8 @@ const styles = StyleSheet.create({
 	content: {
 		marginTop: 10,
 		paddingHorizontal: 15,
-		justifyContent: 'space-between'
+		justifyContent: 'center',
+		alignItems: 'center'
 	},
 	title: {
 		fontSize: 16,
@@ -86,14 +94,16 @@ const styles = StyleSheet.create({
 	},
 	description: {
 		fontSize: 15,
-		textAlign: 'justify'
+		textAlign: 'justify',
+		justifyContent: 'center'
 	},
 	socialButtons: {
 		flexDirection: 'row',
 		justifyContent: 'space-evenly',
 		alignItems: 'center',
 		paddingVertical: 0,
-		paddingHorizontal: 0
+		paddingHorizontal: 0,
+		gap: 10
 	}
 });
 
