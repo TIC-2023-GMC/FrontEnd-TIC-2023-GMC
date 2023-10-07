@@ -162,3 +162,20 @@ export interface LeaderBoard {
 	0: UserScore[];
 	1: number;
 }
+export interface OrganizationResults {
+	0: Organization[];
+	1: number;
+}
+export interface Organization {
+	_id: string;
+	organization_name: string;
+	organization_description: string;
+	organization_photo: Photo;
+	external_links: SocialMedia;
+}
+export interface SocialMedia {
+	facebook: string;
+	instagram: string;
+	twitter: string;
+	website: string;
+}
