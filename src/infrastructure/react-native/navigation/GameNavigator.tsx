@@ -4,7 +4,7 @@ import { IconButton, useTheme } from 'react-native-paper';
 import HangmanGameScreen from '../Screens/Game/HangmanGame/HangmanGameScreen';
 import { MenuGameScreen } from '../Screens/Game/MenuGameScreen';
 import { QuizGameScreen } from '../Screens/Game/QuizGame/QuizGameScreen';
-import SearchWordsScreen from '../Screens/Game/SearchWordsGame/SearchWordsGame';
+import SearchWordsScreen from '../Screens/Game/CrosswordGame/CrosswordGame';
 
 interface GameNavigationProps {
 	visible: boolean;
