@@ -3,7 +3,6 @@ import axios from 'axios';
 import * as Linking from 'expo-linking';
 import * as Sharing from 'expo-sharing';
 import { RefObject } from 'react';
-import { set } from 'react-hook-form';
 import { View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 

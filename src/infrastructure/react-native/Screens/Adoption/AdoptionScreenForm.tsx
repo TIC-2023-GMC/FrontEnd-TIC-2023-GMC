@@ -19,8 +19,8 @@ import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../application/auth/user.auth';
 import {
 	CreateAdoptionUseCase,
-	UploadImageUseCase,
-	useParish
+	GetParishUseCase,
+	UploadImageUseCase
 } from '../../../../application/hooks';
 import { AdoptionPublication, Photo } from '../../../../domain/models/InterfacesModels';
 import { AdoptionPublicationSchema } from '../../../../domain/schemas/Schemas';
@@ -28,8 +28,11 @@ import { parseNumber, resetNavigationStack } from '../../../../utils/utils';
 import PhotoSelection from '../../components/PhotoSelection';
 import { SnackBarError } from '../../components/SnackBarError';
 import { styles } from './AdoptionScreenForm.styles';
+
 const createAdoption = container.resolve(CreateAdoptionUseCase);
 const uploadImg = container.resolve(UploadImageUseCase);
+const parish = container.resolve(GetParishUseCase);
+
 export function AdoptionScreenForm() {
 	const theme = useTheme();
 	const { user } = useContext<UserContextParams>(UserContext);
@@ -88,7 +91,7 @@ export function AdoptionScreenForm() {
 	]);
 	const [openLocation, setOpenLocation] = useState(false);
 
-	const { isLoading, itemsLocation, setItemsLocation } = useParish();
+	const { isLoading, itemsLocation, setItemsLocation } = parish.useQueryParish();
 	const [size, setSize] = useState<string>('');
 	const [location, setLocation] = useState<string>('');
 

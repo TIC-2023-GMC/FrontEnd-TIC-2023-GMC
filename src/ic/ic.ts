@@ -10,8 +10,11 @@ import {
 	AxiosCommentsRepository,
 	AxiosExperienceRepository,
 	AxiosFavoritesRepository,
+	AxiosGameRepository,
 	AxiosLikeRepository,
+	AxiosMatchRepository,
 	AxiosOrganizationRepository,
+	AxiosParishRepository,
 	AxiosUserRepository,
 	ExpoFileSystemPhotoRepository,
 	ExpoStoreRepository
@@ -27,4 +30,8 @@ container.register('PhotoRepository', { useClass: ExpoFileSystemPhotoRepository 
 container.register('GetStoragedToken', { useClass: GetStoragedTokenUseCase });
 container.register('SetTokenInStorage', { useClass: SetTokenInStorageUseCase });
 container.register('LogoutUser', { useClass: LogoutUserUseCase });
+container.register('LocationRepository', { useClass: AxiosParishRepository });
 container.registerSingleton('OrganizationRepository', AxiosOrganizationRepository);
+//Game Section
+container.register('GameRepository', { useClass: AxiosGameRepository });
+container.register('MatchRepository', { useClass: AxiosMatchRepository });

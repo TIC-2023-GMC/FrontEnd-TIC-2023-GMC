@@ -7,3 +7,6 @@ export * from './AxiosUserRepository';
 export * from './ExpoFileSystemPhotoRepository';
 export * from './ExpoStoreRepository';
 export * from './AxiosOrganizationRepository';
+export * from './AxiosParishRepository';
+export * from './AxiosGameRepository';
+export * from './AxiosMatchRepository';

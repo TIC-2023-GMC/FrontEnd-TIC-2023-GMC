@@ -16,6 +16,7 @@ export type AuthStackParamsList = {
 
 export type ProfileStackParamsList = {
 	'Perfil de Usuarios': { userId: string };
+	'Editar Aptitud': undefined;
 	'Editar Perfil': undefined;
 	'Mis Publicaciones': undefined;
 	Favoritos: undefined;

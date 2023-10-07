@@ -32,6 +32,11 @@ export interface Filter {
 
 export type ExperienceFilter = Filter;
 
+export type UserPersonalData = Pick<
+	User,
+	'first_name' | 'last_name' | 'mobile_phone' | 'neighborhood' | 'email' | 'password'
+>;
+
 export type UserAptitude = Pick<
 	User,
 	| 'num_previous_pets'
@@ -153,12 +158,8 @@ export interface UserScore {
 	match_game_time: number;
 }
 
-export interface UserPosition {
-	position: number;
-	user: UserScore;
-}
 export interface LeaderBoard {
-	0: UserPosition[];
+	0: UserScore[];
 	1: number;
 }
 export interface OrganizationResults {

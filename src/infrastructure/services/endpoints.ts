@@ -53,11 +53,11 @@ export function getListFavoritesAdoptionsEndpoint({
 }
 
 export function getAddLikeEndpoint() {
-	return `/like/add_like`;
+	return '/like/add_like';
 }
 
 export function getRemoveLikeEndpoint() {
-	return `/like/remove_like`;
+	return '/like/remove_like';
 }
 
 export function getRemoveFavoriteAdoptionEndpoint() {
@@ -85,22 +85,22 @@ export function getQuizGameByUserEndpoint() {
 	return 'match/quiz_game';
 }
 export function getQuizGameEndpoint() {
-	return `match/quiz_game`;
+	return 'match/quiz_game';
 }
 export function getUpdateUserEndpoint() {
 	return '/user/update_user';
 }
 
 export function getAddAdoptionEndpoint() {
-	return `adoptions/add`;
+	return 'adoptions/add';
 }
 
 export function getAddExperienceEndpoint() {
-	return `experiences/add`;
+	return 'experiences/add';
 }
 
 export function getParishEndpoint() {
-	return `parish/get_all`;
+	return 'parish/get_all';
 }
 
 export function getUserByIdEndpoint(id: string) {
@@ -108,7 +108,7 @@ export function getUserByIdEndpoint(id: string) {
 }
 
 export function getGamesEndpoint() {
-	return `game/get_games`;
+	return 'game/get_games';
 }
 
 export function getListCommentsEndpoint({
@@ -124,12 +124,12 @@ export function getListCommentsEndpoint({
 }
 
 export function getUserMeEndpoint() {
-	return `user/user_me`;
+	return 'user/user_me';
 }
 export function getLoginEndpoint() {
-	return `user/token`;
+	return 'user/token';
 }
 
 export function getAddCommentEndpoint() {
-	return `comments/add_comment`;
+	return 'user/token';
 }
