@@ -12,7 +12,7 @@ import {
 	SendScoreQuizzGameUsecase,
 	useQuestion,
 	useQuizGame
-} from '../../../../../application/hooks/useMatch';
+} from '../../../../../application/hooks/UseMatch';
 import { container } from 'tsyringe';
 const getQuizGameMatchUsecase = container.resolve(GetQuizGameMatchUsecase);
 const leaderboard = container.resolve(GetLeaderboardUsecase);
