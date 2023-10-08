@@ -5,7 +5,9 @@ import DropDownPicker, { ItemType, ValueType } from 'react-native-dropdown-picke
 import { Button, Divider, IconButton, List, Modal, Portal, useTheme } from 'react-native-paper';
 import { DatePickerInput, registerTranslation } from 'react-native-paper-dates';
 import { AdoptionFilter } from '../../../domain/models/InterfacesModels';
-import { useParish } from '../../../application/hooks';
+import { GetParishUseCase } from '../../../application/hooks';
+import { container } from 'tsyringe';
+const parish = container.resolve(GetParishUseCase);
 registerTranslation('es', {
 	save: 'Guardar',
 	selectSingle: 'Seleccionar fecha',
@@ -49,7 +51,7 @@ const FilterModal = ({
 	const [location, setLocation] = useState(filter.location);
 	const [open, setOpen] = useState(false);
 
-	const { isLoading, itemsLocation: items, setItemsLocation: setItems } = useParish();
+	const { isLoading, itemsLocation: items, setItemsLocation: setItems } = parish.useQueryParish();
 
 	const handlerApplyFilter = () => {
 		onApplyFilter({

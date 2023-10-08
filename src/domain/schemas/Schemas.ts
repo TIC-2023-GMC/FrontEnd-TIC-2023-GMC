@@ -5,12 +5,24 @@ export const PhotoSchema = z.object({
 
 export const UserSchema = z.object({
 	_id: z.string(),
-	first_name: z.string().nonempty('El nombre es requerido'),
-	last_name: z.string().nonempty('El apellido es requerido'),
-	mobile_phone: z.string().nonempty('El número de teléfono es requerido'),
-	neighborhood: z.string(),
+	first_name: z
+		.string()
+		.nonempty('El nombre es requerido')
+		.regex(
+			/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*(\s+[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*)*$/,
+			'Por favor, ingrese su nombre iniciando con mayúscula (evite caracteres especiales)'
+		),
+	last_name: z
+		.string()
+		.nonempty('El apellido es requerido')
+		.regex(
+			/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*(\s+[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*)*$/,
+			'Por favor, ingrese su apellido iniciando con mayúscula (evite caracteres especiales)'
+		),
+	mobile_phone: z.string().regex(/^09\d{8}$/, 'Por favor, ingrese un número de teléfono válido'),
+	neighborhood: z.string().nonempty('El sector es requerido'),
 	birth_date: z.date(),
-	email: z.string().email().nonempty('El correo electrónico es requerido'),
+	email: z.string().email('Por favor, ingrese un correo electrónico válido'),
 	password: z.string().nonempty('La contraseña es requerida'),
 	num_previous_pets: z
 		.number({ invalid_type_error: 'Por favor, ingrese un número entero mayor o igual a 0' })
@@ -99,6 +111,16 @@ export const UserAptitudeSchema = UserSchema.pick({
 	main_pet_food: true,
 	pet_expenses: true,
 	motivation: true
+});
+
+export const UserPersonalDataSchema = UserSchema.pick({
+	first_name: true,
+	last_name: true,
+	mobile_phone: true,
+	neighborhood: true,
+	email: true,
+	password: true,
+	photo: true
 });
 
 export const LoginSchema = z.object({

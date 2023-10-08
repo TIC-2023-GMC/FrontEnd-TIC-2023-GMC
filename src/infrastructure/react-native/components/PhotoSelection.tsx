@@ -6,9 +6,10 @@ import * as ImagePicker from 'expo-image-picker';
 interface PhotoSelectionProps {
 	image: string | undefined;
 	setImage: React.Dispatch<React.SetStateAction<string | undefined>>;
+	aspect?: [number, number];
 }
 
-export default function PhotoSelection({ image, setImage }: PhotoSelectionProps) {
+export default function PhotoSelection({ image, setImage, aspect }: PhotoSelectionProps) {
 	const theme = useTheme();
 	const styles = createStyles(theme);
 	const pickImages = async () => {
@@ -16,7 +17,7 @@ export default function PhotoSelection({ image, setImage }: PhotoSelectionProps)
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: true,
 			selectionLimit: 1,
-			aspect: [16, 9],
+			aspect: aspect ? aspect : [16, 9],
 			quality: 1
 		});
 

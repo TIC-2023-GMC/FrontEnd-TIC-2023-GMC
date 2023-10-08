@@ -4,18 +4,22 @@ import { Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'reac
 import { ActivityIndicator, Button, Card, Modal, Portal, Snackbar, Text } from 'react-native-paper';
 import { useStopwatch } from 'react-timer-hook';
 import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
-import {
-	useQueryLeaderboard,
-	useQueryQuizGame,
-	useQuestion,
-	useQuizGame,
-	useSendScoreQuizzGame
-} from '../../../../../application/hooks';
 import { UserScore } from '../../../../../domain/models/InterfacesModels';
 import { GameTabNavigation } from '../../../../../domain/types/types';
+import {
+	GetLeaderboardUsecase,
+	GetQuizGameMatchUsecase,
+	SendScoreQuizzGameUsecase,
+	useQuestion,
+	useQuizGame
+} from '../../../../../application/hooks/UseMatch';
+import { container } from 'tsyringe';
+const getQuizGameMatchUsecase = container.resolve(GetQuizGameMatchUsecase);
+const leaderboard = container.resolve(GetLeaderboardUsecase);
+const scoreQuizzgame = container.resolve(SendScoreQuizzGameUsecase);
 
 const timeOutAnswer = 2000;
-const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' }; //cambiar por la imagen de la api
+const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' };
 const levelImages = { uri: 'https://usagif.com/wp-content/uploads/gif/confetti-25.gif' };
 
 export function QuizGameScreen() {
@@ -30,15 +34,12 @@ export function QuizGameScreen() {
 	});
 	const { quizzGame, changeScore, changeTime, setQuizzGame } = useQuizGame(user);
 	const { question, changeQuestion, updateQuestion } = useQuestion();
-	const { sendScoreQuizzGame } = useSendScoreQuizzGame();
+	const { sendScoreQuizzGame } = scoreQuizzgame.useMutationSendScoreQuizzGame();
 
-	const { loading } = useQueryQuizGame(setQuizzGame, updateQuestion);
-
-	const { data, isSuccess, isLoading, isFetching } = useQueryLeaderboard(
-		user,
+	const { loading } = getQuizGameMatchUsecase.useQueryQuizGame(setQuizzGame, updateQuestion);
+	const { data, isSuccess, isLoading, isFetching } = leaderboard.useQueryLeaderboard(
 		sendScoreQuizzGame.isSuccess
 	);
-
 	useEffect(() => {
 		if (question === 0) {
 			sendScoreQuizzGame.mutate(quizzGame);
@@ -160,7 +161,6 @@ export function QuizGameScreen() {
 										<Text style={[styles.leaderboardHeader, styles.pointsWidth]}>Puntos</Text>
 										<Text style={[styles.leaderboardHeader, styles.playerNameWidth]}>Jugador</Text>
 									</View>
-
 									{isSuccess &&
 										data[0]?.map((entry: UserScore, index: number) => (
 											<View key={index} style={styles.leaderboardHeaderGroup}>
@@ -175,7 +175,6 @@ export function QuizGameScreen() {
 												</Text>
 											</View>
 										))}
-
 									<Text style={styles.leaderboardTextTitle}>Tu posición:</Text>
 									<View style={styles.leaderboardHeaderGroup}>
 										<Text style={[styles.leaderboardScoreText, styles.positionWidth]}>

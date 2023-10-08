@@ -11,7 +11,7 @@ import { Photo, User } from '../../../../domain/models/InterfacesModels';
 import { RegisterSchema } from '../../../../domain/schemas/Schemas';
 import { AuthStackParamsList } from '../../../../domain/types/types';
 import { styles } from './RegisterScreenForm.styles';
-import { RegisterUserUseCase, UploadImageUseCase, useParish } from '../../../../application/hooks';
+import { GetParishUseCase, RegisterUserUseCase, UploadImageUseCase } from '../../../../application/hooks';
 import { container } from 'tsyringe';
 import { ScrollView } from 'react-native';
 import PhotoSelection from '../../components/PhotoSelection';
@@ -19,6 +19,7 @@ import { DatePickerInput } from 'react-native-paper-dates';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 const registeruser = container.resolve(RegisterUserUseCase);
 const uploadImg = container.resolve(UploadImageUseCase);
+const parish = container.resolve(GetParishUseCase);
 export function RegisterScreenForm({
 	error,
 	setError,
@@ -31,7 +32,7 @@ export function RegisterScreenForm({
 	const [failUpload, setFailUpload] = useState<string>('');
 	const [location, setLocation] = useState<string>('');
 	const [openLocation, setOpenLocation] = useState(false);
-	const { isLoading, itemsLocation, setItemsLocation } = useParish();
+	const { isLoading, itemsLocation, setItemsLocation } = parish.useQueryParish();
 	const theme = useTheme();
 	const [date, setDate] = useState<Date | undefined>(new Date());
 	const [isTextVisible, setIsTextVisible] = useState(false);

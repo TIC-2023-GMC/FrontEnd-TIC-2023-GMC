@@ -5,15 +5,20 @@ import {
 	LogoutUserUseCase,
 	SetTokenInStorageUseCase
 } from '../application/hooks';
-import { AxiosAdoptionRepository } from '../infrastructure/repositories/AxiosAdoptionRepository';
-import { AxiosCommentsRepository } from '../infrastructure/repositories/AxiosCommentsRepository';
-import { AxiosExperienceRepository } from '../infrastructure/repositories/AxiosExperienceRepository';
-import { AxiosFavoritesRepository } from '../infrastructure/repositories/AxiosFavoritesRepository';
-import { AxiosLikeRepository } from '../infrastructure/repositories/AxiosLikeRepository';
-import { AxiosUserRepository } from '../infrastructure/repositories/AxiosUserRepository';
-import { ExpoFileSystemPhotoRepository } from '../infrastructure/repositories/ExpoFileSystemPhotoRepository';
-import { ExpoStoreRepository } from '../infrastructure/repositories/ExpoStoreRepository';
-
+import {
+	AxiosAdoptionRepository,
+	AxiosCommentsRepository,
+	AxiosExperienceRepository,
+	AxiosFavoritesRepository,
+	AxiosGameRepository,
+	AxiosLikeRepository,
+	AxiosMatchRepository,
+	AxiosOrganizationRepository,
+	AxiosParishRepository,
+	AxiosUserRepository,
+	ExpoFileSystemPhotoRepository,
+	ExpoStoreRepository
+} from '../infrastructure/repositories/';
 container.register('UserRepository', { useClass: AxiosUserRepository });
 container.register('ExperienceRepository', { useClass: AxiosExperienceRepository });
 container.register('AdoptionRepository', { useClass: AxiosAdoptionRepository });
@@ -25,3 +30,8 @@ container.register('PhotoRepository', { useClass: ExpoFileSystemPhotoRepository 
 container.register('GetStoragedToken', { useClass: GetStoragedTokenUseCase });
 container.register('SetTokenInStorage', { useClass: SetTokenInStorageUseCase });
 container.register('LogoutUser', { useClass: LogoutUserUseCase });
+container.register('LocationRepository', { useClass: AxiosParishRepository });
+container.registerSingleton('OrganizationRepository', AxiosOrganizationRepository);
+//Game Section
+container.register('GameRepository', { useClass: AxiosGameRepository });
+container.register('MatchRepository', { useClass: AxiosMatchRepository });
