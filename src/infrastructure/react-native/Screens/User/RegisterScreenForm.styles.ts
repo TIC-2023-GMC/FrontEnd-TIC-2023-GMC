@@ -56,13 +56,13 @@ export const styles = StyleSheet.create({
 		borderRadius: 5,
 		flexDirection: 'row',
 		alignItems: 'center',
-		paddingHorizontal: 10,
+		paddingHorizontal: 10
 	},
 	inputDropdown: {
 		right: 0,
 		borderWidth: 0,
 		backgroundColor: 'transparent',
-		width: '100%',
+		width: '100%'
 	},
 	label: {
 		fontSize: 12,

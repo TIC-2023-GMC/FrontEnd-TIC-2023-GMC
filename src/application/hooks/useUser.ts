@@ -141,8 +141,7 @@ export class RegisterUserUseCase {
 	registerUser() {
 		const [loading, setLoading] = useState(false);
 		const userRegisterMutation = useMutation({
-			mutationFn: (data: User) =>
-			this._userRepository.create(data),
+			mutationFn: (data: User) => this._userRepository.create(data),
 			onSuccess: async (data: UserRegisterResult) => {
 				await this.setAuthUser(data);
 				this._userRepository.configAuth(data);
@@ -157,5 +156,4 @@ export class RegisterUserUseCase {
 	async setAuthUser(token: Token) {
 		await this._setTokenInStorageUseCase.setTokenInStorage(token);
 	}
-	
 }

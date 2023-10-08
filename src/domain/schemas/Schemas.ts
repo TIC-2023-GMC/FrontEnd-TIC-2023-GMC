@@ -131,7 +131,6 @@ export const LoginSchema = z.object({
 	password: z.string().nonempty('Por favor, ingrese su contraseña')
 });
 
-
 export const RegisterSchema = UserSchema.pick({
 	first_name: true,
 	last_name: true,
@@ -141,7 +140,7 @@ export const RegisterSchema = UserSchema.pick({
 	email: true,
 	password: true,
 	photo: true
-})
+});
 
 // export const RegisterSchema = z.object({
 // 	first_name: z.string().nonempty('El nombre es requerido'),

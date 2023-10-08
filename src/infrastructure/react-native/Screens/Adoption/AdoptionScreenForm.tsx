@@ -106,7 +106,6 @@ export function AdoptionScreenForm() {
 		createAdoption.useMutationAdoptionPublication(resetForm);
 
 	const onSubmit: SubmitHandler<AdoptionPublication> = async (data) => {
-		
 		if (image) {
 			setLoading(true);
 			const new_photo: Photo = (await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);

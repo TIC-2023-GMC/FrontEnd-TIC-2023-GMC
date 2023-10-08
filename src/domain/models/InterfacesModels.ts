@@ -58,7 +58,6 @@ export interface Token {
 	token_type: string;
 }
 
-
 export interface userRegister {
 	first_name: string;
 	last_name: string;
@@ -72,11 +71,10 @@ export interface userRegister {
 
 //Response
 export interface UserRegisterResult {
-	user: User,
+	user: User;
 	access_token: string;
 	token_type: string;
 }
-
 
 export interface Interaction {
 	user_id: string;

@@ -23,7 +23,11 @@ const AuthNavigator = ({
 			</AuthStack.Screen>
 			<AuthStack.Screen name="Register">
 				{(props) => (
-					<RegisterScreenForm {...props} setError={setError} error={error} registerUser={loginUser} />
+					<RegisterScreenForm
+						{...props}
+						setError={setError}
+						error={error}
+					/>
 				)}
 			</AuthStack.Screen>
 		</AuthStack.Navigator>

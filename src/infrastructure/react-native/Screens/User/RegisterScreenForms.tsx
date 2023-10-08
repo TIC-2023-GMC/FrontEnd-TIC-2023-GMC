@@ -6,41 +6,50 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Image, View } from 'react-native';
-import { Avatar, Button, HelperText, IconButton, Text, TextInput, useTheme } from 'react-native-paper';
+import {
+	Avatar,
+	Button,
+	HelperText,
+	IconButton,
+	Text,
+	TextInput,
+	useTheme
+} from 'react-native-paper';
 import { Photo, User } from '../../../../domain/models/InterfacesModels';
 import { RegisterSchema } from '../../../../domain/schemas/Schemas';
 import { AuthStackParamsList } from '../../../../domain/types/types';
 import { styles } from './RegisterScreenForm.styles';
-import { GetParishUseCase, RegisterUserUseCase, UploadImageUseCase } from '../../../../application/hooks';
+import {
+	GetParishUseCase,
+	RegisterUserUseCase,
+	UploadImageUseCase
+} from '../../../../application/hooks';
 import { container } from 'tsyringe';
 import { ScrollView } from 'react-native';
 import PhotoSelection from '../../components/PhotoSelection';
 import { DatePickerInput } from 'react-native-paper-dates';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
+import { SnackBarError } from '../../components/SnackBarError';
 const registeruser = container.resolve(RegisterUserUseCase);
 const uploadImg = container.resolve(UploadImageUseCase);
 const parish = container.resolve(GetParishUseCase);
 export function RegisterScreenForm({
 	error,
-	setError,
-	registerUser
+	setError
 }: {
 	error: string;
 	setError: React.Dispatch<React.SetStateAction<string>>;
-	registerUser: () => void;
 }) {
 	const [failUpload, setFailUpload] = useState<string>('');
 	const [location, setLocation] = useState<string>('');
 	const [openLocation, setOpenLocation] = useState(false);
 	const { isLoading, itemsLocation, setItemsLocation } = parish.useQueryParish();
 	const theme = useTheme();
-	const [date, setDate] = useState<Date | undefined>(new Date());
 	const [isTextVisible, setIsTextVisible] = useState(false);
 	const [image, setImage] = useState<string>();
 	const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamsList>>();
 	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(true);
 	const { userRegisterMutation, loading, setLoading } = registeruser.registerUser();
-
 
 	const {
 		control,
@@ -98,7 +107,6 @@ export function RegisterScreenForm({
 			onSuccess: () => {
 				navigation.navigate('Login');
 			}
-
 		});
 		setLoading(true);
 	};
@@ -199,7 +207,7 @@ export function RegisterScreenForm({
 										value={value}
 										mode="outlined"
 										label={'Número de teléfono'}
-										keyboardType='phone-pad'
+										keyboardType="phone-pad"
 										style={{ ...styles.input, backgroundColor: theme.colors.secondary }}
 										right={
 											errors.mobile_phone && (
@@ -216,7 +224,6 @@ export function RegisterScreenForm({
 											{errors.mobile_phone?.message}
 										</HelperText>
 									)}
-
 								</>
 							)}
 							name="mobile_phone"
@@ -230,17 +237,19 @@ export function RegisterScreenForm({
 								<>
 									<View style={styles.inputContainer}>
 										{isTextVisible && (
-											<Text style={{
-												...styles.label,
-												color: theme.colors.tertiary,
-												backgroundColor: theme.colors.secondary
-											}}>Domicilio</Text>
+											<Text
+												style={{
+													...styles.label,
+													color: theme.colors.tertiary,
+													backgroundColor: theme.colors.secondary
+												}}
+											>
+												Domicilio
+											</Text>
 										)}
-										<View
-											style={{ ...styles.viewDropdown }}
-										>
+										<View style={{ ...styles.viewDropdown }}>
 											<Avatar.Icon
-												icon={"home-city"}
+												icon={'home-city'}
 												size={38}
 												color={theme.colors.tertiary}
 												style={{ backgroundColor: theme.colors.secondary }}
@@ -261,12 +270,13 @@ export function RegisterScreenForm({
 												modalAnimationType="slide"
 												modalProps={{
 													animationType: 'fade'
-
 												}}
 												style={styles.inputDropdown}
-												textStyle={{ color: location ? 'black' : (openLocation ? 'black' : theme.colors.tertiary) }}
+												textStyle={{
+													color: location ? 'black' : openLocation ? 'black' : theme.colors.tertiary
+												}}
 												modalContentContainerStyle={{
-													backgroundColor: theme.colors.secondary,
+													backgroundColor: theme.colors.secondary
 												}}
 												onSelectItem={() => {
 													setIsTextVisible(true);
@@ -279,7 +289,6 @@ export function RegisterScreenForm({
 											</HelperText>
 										)}
 									</View>
-
 								</>
 							)}
 							name="neighborhood"
@@ -292,7 +301,12 @@ export function RegisterScreenForm({
 							render={({ field: { onChange, onBlur, value } }) => (
 								<>
 									<View
-										style={{ ...styles.input, backgroundColor: theme.colors.secondary, height: "5%", marginBottom: '8%' }}
+										style={{
+											...styles.input,
+											backgroundColor: theme.colors.secondary,
+											height: '5%',
+											marginBottom: '8%'
+										}}
 									>
 										<DatePickerInput
 											locale="es"
@@ -307,7 +321,12 @@ export function RegisterScreenForm({
 												<IconButton
 													icon="pet"
 													iconColor={theme.colors.tertiary}
-													style={{ alignSelf: 'center', justifyContent: 'space-around', margin: 0, height: 30 }}
+													style={{
+														alignSelf: 'center',
+														justifyContent: 'space-around',
+														margin: 0,
+														height: 30
+													}}
 												/>
 											}
 											left={<TextInput.Icon icon="calendar" />}
@@ -418,7 +437,9 @@ export function RegisterScreenForm({
 						</Button>
 					</View>
 				</View>
+				<SnackBarError setFailUpload={setFailUpload} failUpload={failUpload} reset={reset} />
+				<SnackBarError failUpload={error} setFailUpload={setError} reset={reset} />
 			</ScrollView>
 		</>
-	)
+	);
 }
