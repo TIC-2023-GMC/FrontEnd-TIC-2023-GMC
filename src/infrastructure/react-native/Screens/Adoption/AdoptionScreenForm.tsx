@@ -117,7 +117,6 @@ export function AdoptionScreenForm() {
 				publication_date: currentDateLocal,
 				photo: new_photo
 			};
-			console.log(new_publication);
 			createPublicationMutation.mutate(new_publication);
 		}
 	};
