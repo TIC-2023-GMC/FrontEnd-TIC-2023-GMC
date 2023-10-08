@@ -6,16 +6,17 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Image, View } from 'react-native';
-import { Button, HelperText, IconButton, Text, TextInput, useTheme } from 'react-native-paper';
-import { LoginCredentials, Photo, User, UserRegisterResult, userRegister } from '../../../../domain/models/InterfacesModels';
-import { LoginSchema, RegisterSchema } from '../../../../domain/schemas/Schemas';
+import { Avatar, Button, HelperText, IconButton, Text, TextInput, useTheme } from 'react-native-paper';
+import { Photo, User } from '../../../../domain/models/InterfacesModels';
+import { RegisterSchema } from '../../../../domain/schemas/Schemas';
 import { AuthStackParamsList } from '../../../../domain/types/types';
 import { styles } from './RegisterScreenForm.styles';
-import { RegisterUserUseCase, UploadImageUseCase } from '../../../../application/hooks';
+import { RegisterUserUseCase, UploadImageUseCase, useParish } from '../../../../application/hooks';
 import { container } from 'tsyringe';
 import { ScrollView } from 'react-native';
 import PhotoSelection from '../../components/PhotoSelection';
 import { DatePickerInput } from 'react-native-paper-dates';
+import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 const registeruser = container.resolve(RegisterUserUseCase);
 const uploadImg = container.resolve(UploadImageUseCase);
 export function RegisterScreenForm({
@@ -28,12 +29,18 @@ export function RegisterScreenForm({
 	registerUser: () => void;
 }) {
 	const [failUpload, setFailUpload] = useState<string>('');
+	const [location, setLocation] = useState<string>('');
+	const [openLocation, setOpenLocation] = useState(false);
+	const { isLoading, itemsLocation, setItemsLocation } = useParish();
 	const theme = useTheme();
 	const [date, setDate] = useState<Date | undefined>(new Date());
+	const [isTextVisible, setIsTextVisible] = useState(false);
 	const [image, setImage] = useState<string>();
 	const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamsList>>();
 	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(true);
 	const { userRegisterMutation, loading, setLoading } = registeruser.registerUser();
+
+
 	const {
 		control,
 		formState: { errors },
@@ -77,18 +84,20 @@ export function RegisterScreenForm({
 			num_current_pets: -1,
 			outdoor_hours: -1,
 			house_space: -1,
-			has_yard: undefined,
+			has_yard: false,
 			main_pet_food: '',
 			pet_expenses: -1,
-			motivation: '',
-			photo: {img_path: 'nuevafo'}
+			motivation: ''
 		};
-		console.log(newUser);
 		userRegisterMutation.mutate(newUser, {
 			onError: () => {
 				setError('Error al registrar usuario');
 				setLoading(false);
+			},
+			onSuccess: () => {
+				navigation.navigate('Login');
 			}
+
 		});
 		setLoading(true);
 	};
@@ -102,7 +111,8 @@ export function RegisterScreenForm({
 					<Text variant="headlineMedium" style={{ ...styles.text, color: theme.colors.primary }}>
 						Registro de Nuevo Usuario
 					</Text>
-					<View style={styles.inputsView}>
+					<View style={{ ...styles.inputsView }}>
+						<PhotoSelection image={image} setImage={setImage} />
 						<Controller
 							control={control}
 							rules={{
@@ -120,12 +130,13 @@ export function RegisterScreenForm({
 										label={'Nombre'}
 										style={{ ...styles.input, backgroundColor: theme.colors.secondary }}
 										right={
-											errors.email && (
+											errors.first_name && (
 												<TextInput.Icon
 													icon={() => <Ionicons name="alert-circle" size={24} color="red" />}
 												/>
 											)
 										}
+										left={<TextInput.Icon icon="account-edit" />}
 										error={!!errors.first_name}
 									/>
 									{errors.first_name && (
@@ -160,6 +171,7 @@ export function RegisterScreenForm({
 												/>
 											)
 										}
+										left={<TextInput.Icon icon="account-details" />}
 										error={!!errors.last_name}
 									/>
 									{errors.last_name && (
@@ -196,12 +208,14 @@ export function RegisterScreenForm({
 											)
 										}
 										error={!!errors.mobile_phone}
+										left={<TextInput.Icon icon="cellphone" />}
 									/>
 									{errors.mobile_phone && (
 										<HelperText type="error" style={styles.errorText}>
 											{errors.mobile_phone?.message}
 										</HelperText>
 									)}
+
 								</>
 							)}
 							name="mobile_phone"
@@ -211,31 +225,60 @@ export function RegisterScreenForm({
 							rules={{
 								required: true
 							}}
-							render={({ field: { onChange, onBlur, value } }) => (
+							render={({ field: { onChange } }) => (
 								<>
-									<TextInput
-										textColor={theme.colors.shadow}
-										placeholder="Ingrese su barrio"
-										onBlur={onBlur}
-										onChangeText={onChange}
-										value={value}
-										mode="outlined"
-										label={'Barrio'}
-										style={{ ...styles.input, backgroundColor: theme.colors.secondary }}
-										right={
-											errors.neighborhood && (
-												<TextInput.Icon
-													icon={() => <Ionicons name="alert-circle" size={24} color="red" />}
-												/>
-											)
-										}
-										error={!!errors.neighborhood}
-									/>
-									{errors.neighborhood && (
-										<HelperText type="error" style={styles.errorText}>
-											{errors.neighborhood?.message}
-										</HelperText>
-									)}
+									<View style={styles.inputContainer}>
+										{isTextVisible && (
+											<Text style={{
+												...styles.label,
+												color: theme.colors.tertiary,
+												backgroundColor: theme.colors.secondary
+											}}>Domicilio</Text>
+										)}
+										<View
+											style={{ ...styles.viewDropdown }}
+										>
+											<Avatar.Icon
+												icon={"home-city"}
+												size={38}
+												color={theme.colors.tertiary}
+												style={{ backgroundColor: theme.colors.secondary }}
+											/>
+											<DropDownPicker
+												placeholder="Selecciona el sector de tu residencia"
+												open={openLocation}
+												value={location}
+												items={itemsLocation as ItemType<string>[]}
+												setValue={setLocation}
+												setOpen={setOpenLocation}
+												setItems={setItemsLocation}
+												onChangeValue={onChange}
+												loading={isLoading}
+												disableBorderRadius={true}
+												listMode="MODAL"
+												modalTitle="Seleccione el sector de su residencia"
+												modalAnimationType="slide"
+												modalProps={{
+													animationType: 'fade'
+
+												}}
+												style={styles.inputDropdown}
+												textStyle={{ color: location ? 'black' : (openLocation ? 'black' : theme.colors.tertiary) }}
+												modalContentContainerStyle={{
+													backgroundColor: theme.colors.secondary,
+												}}
+												onSelectItem={() => {
+													setIsTextVisible(true);
+												}}
+											/>
+										</View>
+										{errors.neighborhood && (
+											<HelperText type="error" style={styles.errorText}>
+												{errors.neighborhood.message}
+											</HelperText>
+										)}
+									</View>
+
 								</>
 							)}
 							name="neighborhood"
@@ -248,18 +291,17 @@ export function RegisterScreenForm({
 							render={({ field: { onChange, onBlur, value } }) => (
 								<>
 									<View
-										style={{ justifyContent: 'flex-start', alignContent: 'center', height: "5%" }}
+										style={{ ...styles.input, backgroundColor: theme.colors.secondary, height: "5%", marginBottom: '8%' }}
 									>
 										<DatePickerInput
 											locale="es"
-											label="Fecha de nacimiento:"
 											value={value}
 											onChange={(d) => onChange(d)}
+											onBlur={onBlur}
 											inputMode="start"
 											mode="outlined"
-											//style={{ backgroundColor: 'transparent', color: theme.colors.tertiary }}
+											style={{ backgroundColor: theme.colors.secondary }}
 											calendarIcon="calendar-range"
-											outlineStyle={{ borderColor: 'transparent' }}
 											right={
 												<IconButton
 													icon="pet"
@@ -267,6 +309,7 @@ export function RegisterScreenForm({
 													style={{ alignSelf: 'center', justifyContent: 'space-around', margin: 0, height: 30 }}
 												/>
 											}
+											left={<TextInput.Icon icon="calendar" />}
 										/>
 									</View>
 								</>
@@ -352,8 +395,6 @@ export function RegisterScreenForm({
 							)}
 							name="password"
 						/>
-
-						<PhotoSelection image={image} setImage={setImage} />
 					</View>
 					<View style={styles.buttonView}>
 						<Button
@@ -364,7 +405,15 @@ export function RegisterScreenForm({
 							onPress={handleSubmit(onSubmit)}
 							loading={loading}
 						>
-							Ingresar
+							Crear Cuenta
+						</Button>
+						<Button
+							style={styles.button}
+							mode="text"
+							compact={true}
+							onPress={() => navigation.navigate('Login')}
+						>
+							Iniciar Sesión
 						</Button>
 					</View>
 				</View>

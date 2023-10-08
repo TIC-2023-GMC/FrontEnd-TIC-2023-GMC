@@ -141,7 +141,6 @@ export class RegisterUserUseCase {
 				await this.setAuthUser(data);
 				this._userRepository.configAuth(data);
 				setLoading(false);
-				// registerUser();
 			},
 			onError: () => {
 				setLoading(false);

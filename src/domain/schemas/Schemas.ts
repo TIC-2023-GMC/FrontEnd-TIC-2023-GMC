@@ -5,13 +5,13 @@ export const PhotoSchema = z.object({
 
 export const UserSchema = z.object({
 	_id: z.string(),
-	first_name: z.string(),
-	last_name: z.string(),
-	mobile_phone: z.string(),
+	first_name: z.string().nonempty('El nombre es requerido'),
+	last_name: z.string().nonempty('El apellido es requerido'),
+	mobile_phone: z.string().nonempty('El número de teléfono es requerido'),
 	neighborhood: z.string(),
 	birth_date: z.date(),
-	email: z.string().email(),
-	password: z.string(),
+	email: z.string().email().nonempty('El correo electrónico es requerido'),
+	password: z.string().nonempty('La contraseña es requerida'),
 	num_previous_pets: z
 		.number({ invalid_type_error: 'Por favor, ingrese un número entero mayor o igual a 0' })
 		.gte(0, 'El número de mascotas previas debe ser mayor o igual a 0'),
