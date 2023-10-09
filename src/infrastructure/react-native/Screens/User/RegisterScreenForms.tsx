@@ -6,14 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Image, View } from 'react-native';
-import {
-	Avatar,
-	Button,
-	HelperText,
-	Text,
-	TextInput,
-	useTheme
-} from 'react-native-paper';
+import { Avatar, Button, HelperText, Text, TextInput, useTheme } from 'react-native-paper';
 import { Photo, User } from '../../../../domain/models/InterfacesModels';
 import { RegisterSchema } from '../../../../domain/schemas/Schemas';
 import { AuthStackParamsList } from '../../../../domain/types/types';
