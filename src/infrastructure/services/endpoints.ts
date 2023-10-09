@@ -108,7 +108,7 @@ export function getUserByIdEndpoint(id: string) {
 }
 
 export function getRegisterUserEndpoint() {
-	return `user/register`;
+	return 'user/register';
 }
 
 export function getGamesEndpoint() {

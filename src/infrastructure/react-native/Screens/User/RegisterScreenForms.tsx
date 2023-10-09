@@ -10,7 +10,6 @@ import {
 	Avatar,
 	Button,
 	HelperText,
-	IconButton,
 	Text,
 	TextInput,
 	useTheme
@@ -35,10 +34,12 @@ const uploadImg = container.resolve(UploadImageUseCase);
 const parish = container.resolve(GetParishUseCase);
 export function RegisterScreenForm({
 	error,
-	setError
+	setError,
+	loginUser
 }: {
 	error: string;
 	setError: React.Dispatch<React.SetStateAction<string>>;
+	loginUser: () => void;
 }) {
 	const [failUpload, setFailUpload] = useState<string>('');
 	const [location, setLocation] = useState<string>('');
@@ -49,7 +50,7 @@ export function RegisterScreenForm({
 	const [image, setImage] = useState<string>();
 	const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamsList>>();
 	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(true);
-	const { userRegisterMutation, loading, setLoading } = registeruser.registerUser();
+	const { userRegisterMutation, loading, setLoading } = registeruser.registerUser(loginUser);
 
 	const {
 		control,
@@ -88,6 +89,7 @@ export function RegisterScreenForm({
 			const new_photo: Photo = (await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);
 			data.photo = new_photo;
 		}
+
 		const newUser: User = {
 			...data,
 			num_previous_pets: -1,
@@ -122,6 +124,7 @@ export function RegisterScreenForm({
 					</Text>
 					<View style={{ ...styles.inputsView }}>
 						<PhotoSelection image={image} setImage={setImage} />
+						{image === undefined && <HelperText type="error">La foto es requerida</HelperText>}
 						<Controller
 							control={control}
 							rules={{
@@ -133,7 +136,7 @@ export function RegisterScreenForm({
 										textColor={theme.colors.shadow}
 										placeholder="Ingrese su nombre"
 										onBlur={onBlur}
-										onChangeText={onChange}
+										onChangeText={(text) => onChange(text.replace(/\s/g, ''))}
 										value={value}
 										mode="outlined"
 										label={'Nombre'}
@@ -316,20 +319,7 @@ export function RegisterScreenForm({
 											inputMode="start"
 											mode="outlined"
 											style={{ backgroundColor: theme.colors.secondary }}
-											calendarIcon="calendar-range"
-											right={
-												<IconButton
-													icon="pet"
-													iconColor={theme.colors.tertiary}
-													style={{
-														alignSelf: 'center',
-														justifyContent: 'space-around',
-														margin: 0,
-														height: 30
-													}}
-												/>
-											}
-											left={<TextInput.Icon icon="calendar" />}
+											left={<TextInput.Icon icon="cake-variant" />}
 										/>
 									</View>
 								</>
