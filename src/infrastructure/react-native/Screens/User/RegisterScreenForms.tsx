@@ -5,23 +5,22 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Image, View } from 'react-native';
+import { Image, ScrollView, View } from 'react-native';
+import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { Avatar, Button, HelperText, Text, TextInput, useTheme } from 'react-native-paper';
-import { Photo, User } from '../../../../domain/models/InterfacesModels';
-import { RegisterSchema } from '../../../../domain/schemas/Schemas';
-import { AuthStackParamsList } from '../../../../domain/types/types';
-import { styles } from './RegisterScreenForm.styles';
+import { DatePickerInput } from 'react-native-paper-dates';
+import { container } from 'tsyringe';
 import {
 	GetParishUseCase,
 	RegisterUserUseCase,
 	UploadImageUseCase
 } from '../../../../application/hooks';
-import { container } from 'tsyringe';
-import { ScrollView } from 'react-native';
+import { Photo, User } from '../../../../domain/models/InterfacesModels';
+import { RegisterSchema } from '../../../../domain/schemas/Schemas';
+import { AuthStackParamsList } from '../../../../domain/types/types';
 import PhotoSelection from '../../components/PhotoSelection';
-import { DatePickerInput } from 'react-native-paper-dates';
-import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
 import { SnackBarError } from '../../components/SnackBarError';
+import { styles } from './RegisterScreenForm.styles';
 const registeruser = container.resolve(RegisterUserUseCase);
 const uploadImg = container.resolve(UploadImageUseCase);
 const parish = container.resolve(GetParishUseCase);
@@ -79,31 +78,30 @@ export function RegisterScreenForm({
 
 	const onSubmit: SubmitHandler<User> = async (data) => {
 		if (image) {
+			setLoading(true);
 			const new_photo: Photo = (await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);
-			data.photo = new_photo;
+			const newUser: User = {
+				...data,
+				photo: new_photo,
+				num_previous_pets: -1,
+				num_current_pets: -1,
+				outdoor_hours: -1,
+				house_space: -1,
+				has_yard: false,
+				main_pet_food: '',
+				pet_expenses: -1,
+				motivation: ''
+			};
+			userRegisterMutation.mutate(newUser, {
+				onError: () => {
+					setError('Error al registrar usuario');
+					setLoading(false);
+				},
+				onSuccess: () => {
+					navigation.navigate('Login');
+				}
+			});
 		}
-
-		const newUser: User = {
-			...data,
-			num_previous_pets: -1,
-			num_current_pets: -1,
-			outdoor_hours: -1,
-			house_space: -1,
-			has_yard: false,
-			main_pet_food: '',
-			pet_expenses: -1,
-			motivation: ''
-		};
-		userRegisterMutation.mutate(newUser, {
-			onError: () => {
-				setError('Error al registrar usuario');
-				setLoading(false);
-			},
-			onSuccess: () => {
-				navigation.navigate('Login');
-			}
-		});
-		setLoading(true);
 	};
 
 	return (
@@ -146,7 +144,7 @@ export function RegisterScreenForm({
 									/>
 									{errors.first_name && (
 										<HelperText type="error" style={styles.errorText}>
-											{errors.first_name?.message}
+											{errors.first_name.message}
 										</HelperText>
 									)}
 								</>
