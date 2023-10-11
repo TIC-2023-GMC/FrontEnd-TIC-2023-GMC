@@ -3,11 +3,12 @@ import {
 	LoginCredentials,
 	PublicationScreen,
 	Token,
-	User
+	User,
+	UserRegisterResult
 } from '../../domain/models/InterfacesModels';
 
 export interface IUserRepository {
-	create(_user: User): Promise<User | any>;
+	create(_user: User): Promise<UserRegisterResult | any>;
 	findById(_id: string): Promise<User | any>;
 	findByEmail(_email: string): Promise<User | any>;
 	findByToken(): Promise<User | any>;

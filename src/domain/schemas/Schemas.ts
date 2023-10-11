@@ -131,6 +131,17 @@ export const LoginSchema = z.object({
 	password: z.string().nonempty('Por favor, ingrese su contraseña')
 });
 
+export const RegisterSchema = UserSchema.pick({
+	first_name: true,
+	last_name: true,
+	mobile_phone: true,
+	neighborhood: true,
+	birth_date: true,
+	email: true,
+	password: true,
+	photo: true
+});
+
 export const CommentTextSchema = z.object({
 	comment_text: z
 		.string()

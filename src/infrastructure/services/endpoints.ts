@@ -107,6 +107,10 @@ export function getUserByIdEndpoint(id: string) {
 	return `user/get_by_id?_id=${id}`;
 }
 
+export function getRegisterUserEndpoint() {
+	return 'user/register';
+}
+
 export function getGamesEndpoint() {
 	return 'game/get_games';
 }
