@@ -23,7 +23,7 @@ export type ProfileStackParamsList = {
 };
 
 export type GameTabNavigation = {
-	'Hangman Game': undefined;
+	'Wordle Game': undefined;
 	'Search Words Game': undefined;
 	'Quiz Game': undefined;
 	'Menu Games': undefined;

@@ -1,7 +1,7 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { IconButton, useTheme } from 'react-native-paper';
-import WordSearchScreen from '../Screens/Game/WordSearchGame/WordSearchGame';
+import WordSearchScreen from '../Screens/Game/WordSearchGame/WordSearchGameScreen';
 import { MenuGameScreen } from '../Screens/Game/MenuGameScreen';
 import { QuizGameScreen } from '../Screens/Game/QuizGame/QuizGameScreen';
 import WordleGameScreen from '../Screens/Game/WordleGame/WordleGameScreen';
@@ -54,7 +54,7 @@ export function GameNavigationStack({ visible, setVisible }: GameNavigationProps
 				component={MenuGameScreen}
 			/>
 			<Stack.Screen
-				name="Hangman Game"
+				name="Wordle Game"
 				options={{ title: 'Leyes y Sanciones' }}
 				component={WordleGameScreen}
 			/>

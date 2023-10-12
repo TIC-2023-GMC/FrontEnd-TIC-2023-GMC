@@ -192,5 +192,4 @@ export class MobxWordSearchStore implements IWordSearchStore {
 	}
 }
 
-const store = new MobxWordSearchStore();
-export default store;
+export default MobxWordSearchStore;

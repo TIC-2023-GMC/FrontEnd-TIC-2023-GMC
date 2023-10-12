@@ -36,7 +36,7 @@ export function MenuGameScreen() {
 							onPress={() => {
 								switch (opcion.game_name) {
 									case 'Leyes y Sanciones':
-										navigation.navigate('Hangman Game');
+										navigation.navigate('Wordle Game');
 										break;
 									case 'Cuidado Responsable':
 										navigation.navigate('Search Words Game');

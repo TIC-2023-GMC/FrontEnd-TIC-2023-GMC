@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import {
 	ActivityIndicator,
@@ -20,11 +20,13 @@ import {
 } from '../../../../../application/hooks/useWordSearchMatch';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { GameTabNavigation } from '../../../../../domain/types/types';
+import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
 
 const getWordSearchGameMatch = container.resolve(GetWordSearchGameMatchUseCase);
 const getWordSearchStore = container.resolve(GetWordSearchStoreUseCase);
 
 function WordSearchScreen() {
+	const { user } = useContext<UserContextParams>(UserContext);
 	const navigation = useNavigation<NavigationProp<GameTabNavigation>>();
 	const theme = useTheme();
 	const [openInfoModal, setOpenInfoModal] = useState(true);
@@ -75,18 +77,13 @@ function WordSearchScreen() {
 								<Chip
 									key={index}
 									style={{
-										width: '60%',
-										marginBottom: 3,
+										...styles.chip,
 										backgroundColor: checkCompletedWord(answer)
 											? '#4caf5066'
 											: theme.colors.secondary,
-										borderColor: theme.colors.tertiary,
-										borderWidth: 1
+										borderColor: theme.colors.tertiary
 									}}
-									textStyle={{
-										fontSize: 16,
-										textAlign: 'center'
-									}}
+									textStyle={styles.chipText}
 									icon={`${checkCompletedWord(answer) ? 'check' : 'magnify'}`}
 								>
 									{index + 1}. {answer.answer}
@@ -104,8 +101,9 @@ function WordSearchScreen() {
 							mode="elevated"
 							buttonColor={theme.colors.tertiary}
 							textColor={theme.colors.secondary}
+							icon="information-outline"
 						>
-							INSTRUCCIONES
+							INFO
 						</Button>
 						<Button
 							style={styles.buttonOptions}
@@ -125,6 +123,9 @@ function WordSearchScreen() {
 							setOpenInfoModal(false);
 						}}
 					>
+						<Text style={styles.infoTitleText}>
+							¡Bienvenido {user.first_name} a{'\n'} Sopa de Letras!
+						</Text>
 						<Text style={styles.infoTitleText}>Tema: {data?.match_game_topic.title}</Text>
 						<View style={styles.infoContainer}>
 							<Text style={styles.infoText}>{data?.match_game_topic.info}</Text>
@@ -183,15 +184,7 @@ function WordSearchScreen() {
 						</Button>
 					</Modal>
 					<Portal>
-						<Dialog
-							dismissable={false}
-							visible={
-								//answers.every((answer) => checkCompletedWord(answer)) &&
-								//isBoardWin && seconds > 0 && openSuccessModal}
-								isBoardWin && seconds > 0 && openSuccessModal
-								//openSuccessModal
-							}
-						>
+						<Dialog dismissable={false} visible={isBoardWin && seconds > 0 && openSuccessModal}>
 							<Dialog.Title>¡Felicidades, lo has logrado!</Dialog.Title>
 							<Dialog.Content>
 								<Text style={styles.infoText}>Recuerda que...{'\n'}</Text>
@@ -251,6 +244,15 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		marginVertical: 5
 	},
+	chip: {
+		width: '60%',
+		marginBottom: 3,
+		borderWidth: 1
+	},
+	chipText: {
+		fontSize: 15,
+		textAlign: 'center'
+	},
 	buttonView: {
 		flexDirection: 'row',
 		justifyContent: 'space-evenly',
@@ -263,7 +265,7 @@ const styles = StyleSheet.create({
 		width: '45%'
 	},
 	infoModal: {
-		height: '80%',
+		height: '95%',
 		width: '90%',
 		borderRadius: 20,
 		justifyContent: 'space-between',
@@ -290,7 +292,7 @@ const styles = StyleSheet.create({
 	infoContainer: {
 		backgroundColor: '#F3FFE5',
 		width: '90%',
-		height: '40%',
+		height: 'auto',
 		borderRadius: 10,
 		alignSelf: 'center',
 		justifyContent: 'center',
