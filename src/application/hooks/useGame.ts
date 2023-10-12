@@ -1,8 +1,8 @@
-import { inject, injectable } from 'tsyringe';
-import { IGameRepository } from '../../domain/repositories/IGameRepository';
-import { useState } from 'react';
-import { Game } from '../../domain/models/InterfacesModels';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { inject, injectable } from 'tsyringe';
+import { Game } from '../../domain/models/InterfacesModels';
+import { IGameRepository } from '../../domain/repositories/IGameRepository';
 
 @injectable()
 export class GetGamesUseCase {

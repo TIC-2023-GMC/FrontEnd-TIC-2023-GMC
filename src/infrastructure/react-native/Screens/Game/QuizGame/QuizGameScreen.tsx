@@ -6,15 +6,16 @@ import { useStopwatch } from 'react-timer-hook';
 import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
 import { UserScore } from '../../../../../domain/models/InterfacesModels';
 import { GameTabNavigation } from '../../../../../domain/types/types';
+import { container } from 'tsyringe';
 import {
 	GetLeaderboardUseCase,
 	GetQuizGameMatchUseCase,
 	SendScoreQuizzGameUseCase,
 	useQuestion,
 	useQuizGame
-} from '../../../../../application/hooks/UseMatch';
-import { container } from 'tsyringe';
-const getQuizGameMatchUsecase = container.resolve(GetQuizGameMatchUseCase);
+} from '../../../../../application/hooks/useMatchGame';
+
+const getQuizGameMatch = container.resolve(GetQuizGameMatchUseCase);
 const leaderboard = container.resolve(GetLeaderboardUseCase);
 const scoreQuizzgame = container.resolve(SendScoreQuizzGameUseCase);
 
@@ -36,7 +37,7 @@ export function QuizGameScreen() {
 	const { question, changeQuestion, updateQuestion } = useQuestion();
 	const { sendScoreQuizzGame } = scoreQuizzgame.useMutationSendScoreQuizzGame();
 
-	const { loading } = getQuizGameMatchUsecase.useQueryQuizGame(setQuizzGame, updateQuestion);
+	const { loading } = getQuizGameMatch.useQueryQuizGame(setQuizzGame, updateQuestion);
 	const { data, isSuccess, isLoading, isFetching } = leaderboard.useQueryLeaderboard(
 		sendScoreQuizzGame.isSuccess
 	);

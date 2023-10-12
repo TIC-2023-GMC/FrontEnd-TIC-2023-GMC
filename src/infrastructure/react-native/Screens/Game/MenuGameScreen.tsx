@@ -1,11 +1,13 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import { ActivityIndicator, Button } from 'react-native-paper';
-import { GameTabNavigation } from '../../../../domain/types/types';
-import { styles } from './MenuGameScreen.styles';
 import { container } from 'tsyringe';
 import { GetGamesUseCase } from '../../../../application/hooks';
+import { GameTabNavigation } from '../../../../domain/types/types';
+import { styles } from './MenuGameScreen.styles';
+
 const getGamesUseCase = container.resolve(GetGamesUseCase);
 
 const imgLogo = {
@@ -19,6 +21,7 @@ export function MenuGameScreen() {
 		<ActivityIndicator animating={true} size={'large'} style={styles.activityIndicator} />
 	) : (
 		<View style={styles.container}>
+			<StatusBar style="light" />
 			<Image source={imgLogo} resizeMode="contain" style={styles.imgLogo} />
 			{games?.map((opcion, index) => (
 				<View key={index} style={styles.cardContainer}>

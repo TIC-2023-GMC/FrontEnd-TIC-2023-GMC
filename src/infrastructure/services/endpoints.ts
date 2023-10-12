@@ -142,3 +142,11 @@ export function getLoginEndpoint() {
 export function getAddCommentEndpoint() {
 	return 'user/token';
 }
+
+export function getWordleGameEndpoint() {
+	return 'wordle/get_wordle_match';
+}
+
+export function putWordleGameEndpoint() {
+	return 'wordle/put_wordle_match';
+}

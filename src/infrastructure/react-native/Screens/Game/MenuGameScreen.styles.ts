@@ -30,7 +30,7 @@ export const styles = StyleSheet.create({
 	},
 	gameIcon: {
 		width: '40%',
-		height: '80%',
+		height: '95%',
 		margin: 10,
 		borderRadius: 10
 	},

@@ -158,15 +158,6 @@ export interface Question {
 	answers: Answer[];
 }
 
-export interface Match {
-	_id: string;
-	user_id: string;
-	match_name: string;
-	match_game_score: number;
-	match_game_time: number;
-	match_game_onboarding: string;
-}
-
 export interface QuizGameMatch extends Match {
 	match_game_questions: Question[];
 }
@@ -217,4 +208,19 @@ export interface SocialMedia {
 	instagram: string;
 	twitter: string;
 	website: string;
+}
+
+export interface WordleGame extends Match {
+	wordle_game_clue: string;
+	wordle_game_description: string;
+	wordle_game_words: string[];
+}
+
+export interface Match {
+	_id: string;
+	user_id: string;
+	match_name: string;
+	match_game_score: number;
+	match_game_time: number;
+	match_game_onboarding: string;
 }
