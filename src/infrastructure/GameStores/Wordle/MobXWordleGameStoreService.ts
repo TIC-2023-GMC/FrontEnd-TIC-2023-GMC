@@ -13,7 +13,9 @@ class MobXWordleGameStoreService implements IWordleGameStoreService {
 	}
 
 	get won() {
-		return this.word === this.guesses[this.currentGuess - 1];
+		if (this.word && this.guesses[this.currentGuess - 1])
+			return this.word.toUpperCase() === this.guesses[this.currentGuess - 1].toUpperCase();
+		return false;
 	}
 
 	get lost() {
@@ -38,8 +40,8 @@ class MobXWordleGameStoreService implements IWordleGameStoreService {
 	}
 
 	submitGuess() {
-		if (this.score > 0) this.score--;
 		this.currentGuess++;
+		if (this.score > 0 && !this.won) this.score--;
 	}
 	get allGuesses() {
 		return this.guesses.slice(0, this.currentGuess).join('').split('');

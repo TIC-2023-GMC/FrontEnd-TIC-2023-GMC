@@ -62,10 +62,9 @@ const style = StyleSheet.create({
 		maxWidth: 70,
 		height: 30,
 		flex: 1,
-		borderWidth: 2,
 		borderRadius: 5,
 		aspectRatio: 1,
-		margin: 3,
+		margin: 2,
 		justifyContent: 'center',
 		alignItems: 'center'
 	},

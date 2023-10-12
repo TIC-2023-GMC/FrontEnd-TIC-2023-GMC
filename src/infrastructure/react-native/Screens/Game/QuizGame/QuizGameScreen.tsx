@@ -13,7 +13,7 @@ import {
 	SendScoreQuizzGameUsecase,
 	useQuestion,
 	useQuizGame
-} from '../../../../../application/hooks/UseMatch';
+} from '../../../../../application/hooks/useMatchGame';
 
 const getQuizGameMatch = container.resolve(GetQuizGameMatchUsecase);
 const leaderboard = container.resolve(GetLeaderboardUsecase);

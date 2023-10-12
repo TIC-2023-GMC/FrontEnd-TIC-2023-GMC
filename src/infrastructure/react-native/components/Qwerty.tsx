@@ -57,13 +57,16 @@ export default observer(function Qwerty({ store }: { store: IWordleGameStoreServ
 });
 const styles = StyleSheet.create({
 	container: {
-		alignSelf: 'stretch',
 		marginTop: 'auto',
 		backgroundColor: '#797979',
 		padding: 5,
 		paddingTop: 10,
-		paddingBottom: '10%',
-		borderRadius: 10
+		paddingBottom: 25,
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
+		borderBottomLeftRadius: 0,
+		borderBottomRightRadius: 0,
+		alignSelf: 'stretch'
 	},
 	options: {
 		flexDirection: 'row',

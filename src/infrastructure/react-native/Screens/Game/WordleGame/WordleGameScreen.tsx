@@ -1,34 +1,36 @@
 import { useNavigation } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
 import { observer } from 'mobx-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import {
+	ActivityIndicator,
 	Button,
+	Dialog,
+	IconButton,
 	Modal,
 	Portal,
 	Text,
-	useTheme,
-	ActivityIndicator,
-	IconButton
+	useTheme
 } from 'react-native-paper';
 import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
-import Guess from '../../../components/Guess';
-import Querty from '../../../components/Qwerty';
-import { ScrollView } from 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
 import {
 	GetWordleGameStoreUseCase,
 	GetWordleWordsUseCase,
 	sendScoreWordleGameUsecase
-} from '../../../../../application/hooks/UseWordleGame';
-const getStore = container.resolve(GetWordleGameStoreUseCase);
+} from '../../../../../application/hooks/useWordle';
+import Guess from '../../../components/Guess';
+import Querty from '../../../components/Qwerty';
 const getUseQuery = container.resolve(GetWordleWordsUseCase);
 const sendScore = container.resolve(sendScoreWordleGameUsecase);
+const getStore = container.resolve(GetWordleGameStoreUseCase);
 export default observer(function WordleGameScreen() {
 	const store = getStore.useWordleGameStore();
 	const [visibleModal, setVisibleModal] = useState(true);
 	const [initVisibleModal, setInitVisibleModal] = useState(true);
+	const [visibleDialog, setVisibleDialog] = useState(false);
 	const navigation = useNavigation();
 	const { user } = useContext<UserContextParams>(UserContext);
 	const { loading, wordle } = getUseQuery.useQueryWordleWords();
@@ -40,6 +42,11 @@ export default observer(function WordleGameScreen() {
 			store.init(wordle.wordle_game_words);
 		}
 	}, [wordle]);
+	useEffect(() => {
+		return () => {
+			store.restartGame();
+		};
+	}, []);
 
 	const attempts = store.attempts;
 	const style = styles;
@@ -54,25 +61,39 @@ export default observer(function WordleGameScreen() {
 	return (
 		<View style={styles.container}>
 			<StatusBar style="light" />
+			<Portal>
+				<Dialog visible={visibleDialog} onDismiss={() => setVisibleDialog(false)}>
+					<Dialog.Title>Pista:</Dialog.Title>
+					<Dialog.Content>
+						<Text variant="bodyMedium">{wordle.wordle_game_description}</Text>
+					</Dialog.Content>
+					<Dialog.Actions>
+						<Button onPress={() => setVisibleDialog(false)}>Cerrar</Button>
+					</Dialog.Actions>
+				</Dialog>
+			</Portal>
 			<View style={{ justifyContent: 'center', alignItems: 'center', width: '100%' }}>
 				<Text variant="headlineMedium">Adivina la Palabra</Text>
-				<View style={style.clue}>
-					<IconButton
-						icon={'lightbulb'}
-						size={25}
-						iconColor="#B59F3B"
-						style={{ margin: 0, padding: 0 }}
-					/>
-					<Text style={style.textDescription}>{wordle.wordle_game_description}</Text>
-				</View>
+
 				<View style={style.gameInformation}>
+					<View>
+						<Button
+							icon="lightbulb"
+							mode="text"
+							textColor="#B59F3B"
+							style={{ margin: 0, padding: 0 }}
+							onPress={() => setVisibleDialog(true)}
+						>
+							Pista
+						</Button>
+					</View>
 					<View style={style.itemInformation}>
-						<IconButton icon={'gamepad'} size={25} iconColor={theme.colors.primary} />
+						<IconButton icon="gamepad" size={25} iconColor={theme.colors.primary} />
 						<Text>Intentos: {attempts}</Text>
 					</View>
 					<View style={style.itemInformation}>
 						<IconButton
-							icon={'numeric'}
+							icon="numeric"
 							size={30}
 							iconColor={theme.colors.tertiary}
 							style={{ margin: 0, padding: 0 }}
@@ -112,12 +133,12 @@ export default observer(function WordleGameScreen() {
 					<View style={styles.subCard}>
 						{store.won && (
 							<Text style={styles.title}>
-								¡Felicidades!{'\n'}Ganaste{'\n'} sigue aprediendo
+								¡Felicidades adivinaste la palabra!{'\n'}Ganaste{'\n'} sigue aprediendo
 							</Text>
 						)}
 						{store.lost && (
 							<Text style={styles.title}>
-								Perdiste, pero no te preocupes, puedes volver a Jugar de nuevo
+								Perdiste, pero no te preocupes, puedes volver a Jugar
 							</Text>
 						)}
 						{initVisibleModal &&
@@ -128,14 +149,23 @@ export default observer(function WordleGameScreen() {
 									<Text style={styles.title}>
 										¡Bienvenido {user.first_name} a{'\n'}Adivina la palabra!{'\n'}
 									</Text>
+									<Text style={styles.subtitle}>Instrucciones:</Text>
+									<Text variant="bodyLarge" style={styles.textDescription}>
+										{wordle.match_game_onboarding}
+									</Text>
 									<Text style={styles.subtitle}>Descripción:</Text>
-									<Text variant="bodyLarge"> {wordle.wordle_game_description}</Text>
+									<Text variant="bodyLarge" style={styles.textDescription}>
+										{wordle.wordle_game_description}
+									</Text>
 								</>
 							))}
-						<Text style={styles.title}>Puntuación: {store.score}</Text>
+						<Text style={styles.title}>Tu puntuación: {store.score}</Text>
 					</View>
+
 					<Button
-						mode="contained"
+						mode="elevated"
+						buttonColor={theme.colors.primary}
+						textColor={theme.colors.secondary}
 						onPress={() => {
 							if (!initVisibleModal) {
 								setVisibleModal(false);
@@ -144,6 +174,7 @@ export default observer(function WordleGameScreen() {
 								setInitVisibleModal(false);
 							}
 						}}
+						style={styles.button}
 					>
 						ACEPTAR
 					</Button>
@@ -155,10 +186,12 @@ export default observer(function WordleGameScreen() {
 
 const styles = StyleSheet.create({
 	container: {
-		alignItems: 'baseline'
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'space-evenly'
 	},
 	square: {
-		borderWidth: 2,
+		borderWidth: 1,
 		borderRadius: 5,
 		borderBlockColor: 'black',
 		padding: 5,
@@ -190,7 +223,7 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold'
 	},
 	modal: {
-		height: '80%',
+		height: '90%',
 		width: '90%',
 		borderRadius: 20,
 		justifyContent: 'space-between',
@@ -233,9 +266,16 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		gap: 0
 	},
+	button: {
+		marginVertical: 10,
+		marginHorizontal: 20,
+		width: '50%',
+		alignSelf: 'center'
+	},
 	gameInformation: {
 		flexDirection: 'row',
-		width: '75%',
+		width: '90%',
+		gap: 15,
 		flexWrap: 'wrap',
 		justifyContent: 'center',
 		alignItems: 'center'
@@ -243,11 +283,13 @@ const styles = StyleSheet.create({
 	itemInformation: {
 		alignItems: 'center',
 		flexDirection: 'row',
-		fontVariant: 'bodyLarge'
+		fontVariant: 'bodyLarge',
+		paddingVertical: 0,
+		marginVertical: 0
 	},
 	textDescription: {
-		fontSize: 16,
 		color: '#000',
-		textAlign: 'center'
+		textAlign: 'justify',
+		padding: 10
 	}
 });
