@@ -43,7 +43,6 @@ export default observer(function WordleGameScreen() {
 
 	const attempts = store.attempts;
 	const style = styles;
-	//llevar a la pantalla de final
 	useEffect(() => {
 		if (store.won || store.lost) {
 			sendScoreWordleGame.mutate({
@@ -64,10 +63,7 @@ export default observer(function WordleGameScreen() {
 						iconColor="#B59F3B"
 						style={{ margin: 0, padding: 0 }}
 					/>
-					<Text>
-						Pista: La multa de este tipo de infracciones es del 30% del salario mínimo, no olvides
-						qye tienes que pagar la multa pronto
-					</Text>
+					<Text style={style.textDescription}>{wordle.wordle_game_description}</Text>
 				</View>
 				<View style={style.gameInformation}>
 					<View style={style.itemInformation}>
@@ -136,10 +132,9 @@ export default observer(function WordleGameScreen() {
 									<Text variant="bodyLarge"> {wordle.wordle_game_description}</Text>
 								</>
 							))}
-						<Text style={styles.title}>Puntuación: {user.first_name}</Text>
+						<Text style={styles.title}>Puntuación: {store.score}</Text>
 					</View>
 					<Button
-						//style={styles.acceptButton}
 						mode="contained"
 						onPress={() => {
 							if (!initVisibleModal) {
@@ -249,59 +244,10 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		flexDirection: 'row',
 		fontVariant: 'bodyLarge'
+	},
+	textDescription: {
+		fontSize: 16,
+		color: '#000',
+		textAlign: 'center'
 	}
 });
-
-// const styles = StyleSheet.create({
-// 	container: {
-// 		flex: 1,
-// 		flexDirection: 'column',
-// 		flexWrap: 'wrap',
-// 		gap: 5,
-// 		justifyContent: 'flex-start',
-// 		alignItems: 'center'
-// 	},
-// 	modal: {
-// 		height: '80%',
-// 		width: '90%',
-// 		borderRadius: 20,
-// 		justifyContent: 'space-between',
-// 		alignSelf: 'center',
-// 		backgroundColor: '#ECEBEB',
-// 		paddingVertical: 20
-// 	},
-// 	subCard: {
-// 		backgroundColor: '#F3FFE5',
-// 		height: '90%',
-// 		width: '90%',
-// 		marginHorizontal: 0,
-// 		borderRadius: 10,
-// 		alignSelf: 'center',
-// 		justifyContent: 'center',
-// 		paddingVertical: 10,
-// 		gap: 10,
-// 		borderColor: '#A3A3A3',
-// 		borderWidth: 1
-// 	},
-// 	title: {
-// 		textAlign: 'center',
-// 		fontWeight: 'bold',
-// 		fontSize: 20,
-// 		color: '#000',
-// 		shadowColor: '#000'
-// 	},
-// 	subtitle: {
-// 		textAlign: 'center',
-// 		fontWeight: 'bold',
-// 		fontSize: 16,
-// 		color: '#000'
-// 	},
-// 	text: {
-// 		textAlign: 'justify',
-// 		marginHorizontal: 10
-// 	},
-// 	acceptButton: {
-// 		width: '90%',
-// 		alignSelf: 'center'
-// 	}
-// });
