@@ -61,7 +61,7 @@ class MobXWordleGameStoreService implements IWordleGameStoreService {
 	}
 
 	get attempts() {
-		return this.word.length - this.currentGuess;
+		return this.currentGuess;
 	}
 
 	handlerKeyup(key: string) {

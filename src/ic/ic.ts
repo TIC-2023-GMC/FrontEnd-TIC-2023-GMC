@@ -20,7 +20,7 @@ import {
 	ExpoStoreRepository
 } from '../infrastructure/repositories/';
 import AxiosWordSearchMatchRepository from '../infrastructure/repositories/AxiosWordSearchMatchRepository';
-import MobxWordSearchStore from '../infrastructure/services/MobxWordSearchStore';
+import MobxWordSearchStore from '../infrastructure/GameStores/Wordle/MobxWordSearchStore';
 import MobXWordleGameStoreService from '../infrastructure/GameStores/Wordle/MobXWordleGameStoreService';
 import AxiosWordleGameRepository from '../infrastructure/repositories/AxiosWordleGameRespository';
 container.register('UserRepository', { useClass: AxiosUserRepository });

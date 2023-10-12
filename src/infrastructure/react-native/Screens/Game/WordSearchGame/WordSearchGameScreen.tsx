@@ -21,6 +21,7 @@ import {
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { GameTabNavigation } from '../../../../../domain/types/types';
 import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
+import LottieView from 'lottie-react-native';
 
 const getWordSearchGameMatch = container.resolve(GetWordSearchGameMatchUseCase);
 const getWordSearchStore = container.resolve(GetWordSearchStoreUseCase);
@@ -66,12 +67,22 @@ function WordSearchScreen() {
 			{loading ? (
 				<ActivityIndicator style={{ flex: 1 }} size="large" />
 			) : (
-				<>
+				<View style={{ flex: 1 }}>
 					<Text style={{ ...styles.timer, color: theme.colors.primary }}>
 						Tiempo restante: {seconds ? seconds : '60'}
 					</Text>
 
-					<View style={{ justifyContent: 'space-evenly', alignItems: 'center' }}>
+					<View
+						style={{
+							flexDirection: 'row',
+							width: '100%',
+							gap: 5,
+							flexWrap: 'wrap',
+							justifyContent: 'center',
+							alignItems: 'center',
+							alignSelf: 'center'
+						}}
+					>
 						{answers.map((answer, index) => {
 							return (
 								<Chip
@@ -189,6 +200,12 @@ function WordSearchScreen() {
 							<Dialog.Content>
 								<Text style={styles.infoText}>Recuerda que...{'\n'}</Text>
 								<Text style={styles.dialogText}>{data?.match_game_topic.info}</Text>
+								<LottieView
+									source={require('../../../../../assets/won.json')}
+									autoPlay
+									loop
+									style={styles.winnerAnimation}
+								/>
 							</Dialog.Content>
 							<Dialog.Actions>
 								<Button
@@ -206,6 +223,13 @@ function WordSearchScreen() {
 							<Dialog.Content>
 								<Text style={styles.infoText}>Vuelve a intentarlo y recuerda que...{'\n'}</Text>
 								<Text style={styles.dialogText}>{data?.match_game_topic.info}</Text>
+								<LottieView
+									source={require('../../../../../assets/lost.json')}
+									autoPlay
+									loop
+									autoSize
+									style={styles.loserAnimation}
+								/>
 							</Dialog.Content>
 							<Dialog.Actions>
 								<Button
@@ -219,7 +243,7 @@ function WordSearchScreen() {
 							</Dialog.Actions>
 						</Dialog>
 					</Portal>
-				</>
+				</View>
 			)}
 		</>
 	);
@@ -242,24 +266,26 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: 'black',
 		textAlign: 'center',
-		marginVertical: 5
+		marginVertical: 10
 	},
 	chip: {
-		width: '60%',
+		width: '40%',
 		marginBottom: 3,
-		borderWidth: 1
+		borderWidth: 1,
+		height: 30
 	},
 	chipText: {
-		fontSize: 15,
-		textAlign: 'center'
+		fontSize: 14,
+		textAlign: 'center',
+		lineHeight: 17,
+		marginLeft: 3
 	},
 	buttonView: {
 		flexDirection: 'row',
 		justifyContent: 'space-evenly',
 		alignItems: 'center',
 		marginHorizontal: 10,
-		marginBottom: 20,
-		marginTop: 5
+		marginBottom: 30
 	},
 	buttonOptions: {
 		width: '45%'
@@ -318,5 +344,18 @@ const styles = StyleSheet.create({
 	buttonModal: {
 		width: '60%',
 		alignSelf: 'center'
+	},
+	winnerAnimation: {
+		width: 150,
+		height: 150,
+		alignSelf: 'center',
+		justifyContent: 'center'
+	},
+	loserAnimation: {
+		width: 150,
+		height: 150,
+		alignSelf: 'center',
+		justifyContent: 'center',
+		marginTop: 15
 	}
 });

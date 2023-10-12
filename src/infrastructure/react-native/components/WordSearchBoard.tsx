@@ -42,7 +42,7 @@ const WordSearchBoard = ({ store }: { store: IWordSearchStore }) => {
 	const boardHeight = verticalBoardSize * cellSize;
 
 	const xOffset = (Dimensions.get('window').width - boardWidth) / 2;
-	const yOffset = (Dimensions.get('window').height - boardHeight) / 24;
+	const yOffset = (Dimensions.get('window').height - boardHeight) / 10;
 
 	for (let i = 0; i < verticalBoardSize; i++) {
 		for (let j = 0; j < horizontalBoardSize; j++) {

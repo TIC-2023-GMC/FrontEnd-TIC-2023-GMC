@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx';
-import { Statement } from '../../domain/models/InterfacesModels';
-import { IWordSearchStore } from '../../domain/services/IWordSearchStore';
+import { Statement } from '../../../domain/models/InterfacesModels';
+import { IWordSearchStore } from '../../../domain/services/IWordSearchStore';
 
 export class MobxWordSearchStore implements IWordSearchStore {
 	board: ({ letter: string; wordNumber: number; isCompleted: boolean } | null)[][] = [];
