@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
 		marginVertical: 10
 	},
 	chip: {
-		width: '40%',
+		width: '45%',
 		marginBottom: 3,
 		borderWidth: 1,
 		height: 30
