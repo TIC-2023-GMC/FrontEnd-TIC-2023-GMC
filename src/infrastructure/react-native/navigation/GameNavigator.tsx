@@ -1,7 +1,7 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { IconButton, useTheme } from 'react-native-paper';
-import WordSearchScreen from '../Screens/Game/CrosswordGame/WordSearchGame';
+import WordSearchScreen from '../Screens/Game/WordSearchGame/WordSearchGame';
 import HangmanGameScreen from '../Screens/Game/HangmanGame/HangmanGameScreen';
 import { MenuGameScreen } from '../Screens/Game/MenuGameScreen';
 import { QuizGameScreen } from '../Screens/Game/QuizGame/QuizGameScreen';

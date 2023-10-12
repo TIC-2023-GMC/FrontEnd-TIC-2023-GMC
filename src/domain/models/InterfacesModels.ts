@@ -140,14 +140,35 @@ export interface Question {
 	answers: Answer[];
 }
 
-export interface QuizGameMatch {
+export interface Match {
 	_id: string;
 	user_id: string;
 	match_name: string;
 	match_game_score: number;
 	match_game_time: number;
 	match_game_onboarding: string;
+}
+
+export interface QuizGameMatch extends Match {
 	match_game_questions: Question[];
+}
+
+export interface Statement {
+	orientation: string;
+	number: number;
+	clue: string;
+	answer: string;
+	position?: [number, number];
+}
+
+export interface Topic {
+	title: string;
+	info: string;
+	statements: Statement[];
+}
+
+export interface WordSearchMatch extends Match {
+	match_game_topic: Topic;
 }
 
 export interface UserScore {
@@ -162,7 +183,7 @@ export interface LeaderBoard {
 	0: UserScore[];
 	1: number;
 }
-export interface CrosswordAnswer {
+export interface WordSearchStatement {
 	type: 'horizontal' | 'vertical';
 	number: number;
 	question: string;

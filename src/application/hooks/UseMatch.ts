@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 @injectable()
-export class GetQuizGameMatchUsecase {
+export class GetQuizGameMatchUseCase {
 	constructor(@inject('MatchRepository') private _repository: IMatchRespository) {}
 	useQueryQuizGame(
 		setQuizzGame: (_value: QuizGameMatch) => void,
@@ -29,7 +29,7 @@ export class GetQuizGameMatchUsecase {
 }
 
 @injectable()
-export class GetLeaderboardUsecase {
+export class GetLeaderboardUseCase {
 	constructor(@inject('MatchRepository') private _repository: IMatchRespository) {}
 	useQueryLeaderboard(sendScoreQuizzGameIsSuccess: boolean) {
 		return useQuery({
@@ -43,7 +43,7 @@ export class GetLeaderboardUsecase {
 }
 
 @injectable()
-export class SendScoreQuizzGameUsecase {
+export class SendScoreQuizzGameUseCase {
 	constructor(@inject('MatchRepository') private _repository: IMatchRespository) {}
 	useMutationSendScoreQuizzGame() {
 		const sendScoreQuizzGame = useMutation({

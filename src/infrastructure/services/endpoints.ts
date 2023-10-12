@@ -79,6 +79,11 @@ export function getQuizGameByUserEndpoint() {
 export function getQuizGameEndpoint() {
 	return 'match/quiz_game';
 }
+
+export function getWordSearchGameEndpoint() {
+	return 'word_search_game/get_match';
+}
+
 export function getUpdateUserEndpoint() {
 	return '/user/update_user';
 }

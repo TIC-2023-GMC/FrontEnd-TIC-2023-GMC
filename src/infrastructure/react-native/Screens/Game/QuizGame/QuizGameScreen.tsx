@@ -7,16 +7,16 @@ import { UserContext, UserContextParams } from '../../../../../application/auth/
 import { UserScore } from '../../../../../domain/models/InterfacesModels';
 import { GameTabNavigation } from '../../../../../domain/types/types';
 import {
-	GetLeaderboardUsecase,
-	GetQuizGameMatchUsecase,
-	SendScoreQuizzGameUsecase,
+	GetLeaderboardUseCase,
+	GetQuizGameMatchUseCase,
+	SendScoreQuizzGameUseCase,
 	useQuestion,
 	useQuizGame
 } from '../../../../../application/hooks/UseMatch';
 import { container } from 'tsyringe';
-const getQuizGameMatchUsecase = container.resolve(GetQuizGameMatchUsecase);
-const leaderboard = container.resolve(GetLeaderboardUsecase);
-const scoreQuizzgame = container.resolve(SendScoreQuizzGameUsecase);
+const getQuizGameMatchUsecase = container.resolve(GetQuizGameMatchUseCase);
+const leaderboard = container.resolve(GetLeaderboardUseCase);
+const scoreQuizzgame = container.resolve(SendScoreQuizzGameUseCase);
 
 const timeOutAnswer = 2000;
 const image = { uri: 'https://i.pinimg.com/564x/e8/a3/dc/e8a3dc3e8a2a108341ddc42656fae863.jpg' };
