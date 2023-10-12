@@ -58,6 +58,24 @@ export interface Token {
 	token_type: string;
 }
 
+export interface userRegister {
+	first_name: string;
+	last_name: string;
+	mobile_phone: string;
+	neighborhood: string;
+	birth_date: Date;
+	email: string;
+	password: string;
+	photo: Photo;
+}
+
+//Response
+export interface UserRegisterResult {
+	user: User;
+	access_token: string;
+	token_type: string;
+}
+
 export interface Interaction {
 	user_id: string;
 }
@@ -155,6 +173,23 @@ export interface UserScore {
 export interface LeaderBoard {
 	0: UserScore[];
 	1: number;
+}
+export interface OrganizationResults {
+	0: Organization[];
+	1: number;
+}
+export interface Organization {
+	_id: string;
+	organization_name: string;
+	organization_description: string;
+	organization_photo: Photo;
+	external_links: SocialMedia;
+}
+export interface SocialMedia {
+	facebook: string;
+	instagram: string;
+	twitter: string;
+	website: string;
 }
 
 export interface WordleGame extends Match {

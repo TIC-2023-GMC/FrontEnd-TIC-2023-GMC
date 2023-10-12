@@ -17,7 +17,15 @@ export function getListAdoptionsEndpoint({
 		filter?.location ? '&location=' + filter?.location : ''
 	}`;
 }
-//
+export function getListOrganizationsEndpoint({
+	pageParam,
+	pageSize
+}: {
+	pageParam: number;
+	pageSize: number;
+}) {
+	return `organization/get_organizations?page_number=${pageParam}&page_size=${pageSize}`;
+}
 export function getListExperiencesEnpoint({
 	pageParam,
 	pageSize,
@@ -97,6 +105,10 @@ export function getParishEndpoint() {
 
 export function getUserByIdEndpoint(id: string) {
 	return `user/get_by_id?_id=${id}`;
+}
+
+export function getRegisterUserEndpoint() {
+	return 'user/register';
 }
 
 export function getGamesEndpoint() {

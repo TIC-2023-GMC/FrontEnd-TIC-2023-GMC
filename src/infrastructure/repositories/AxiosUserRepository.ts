@@ -3,13 +3,15 @@ import {
 	LoginCredentials,
 	PublicationScreen,
 	Token,
-	User
+	User,
+	UserRegisterResult
 } from '../../domain/models/InterfacesModels';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { get, post, put } from '../services/api';
 import {
 	getLoginEndpoint,
 	getMyPublicationsEndpoint,
+	getRegisterUserEndpoint,
 	getUpdateUserEndpoint,
 	getUserByIdEndpoint,
 	getUserMeEndpoint
@@ -44,8 +46,9 @@ export class AxiosUserRepository implements IUserRepository {
 
 		return response.data;
 	}
-	create(_user: User): Promise<User> {
-		throw new Error('Method not implemented.');
+	async create(_user: User): Promise<UserRegisterResult> {
+		const response = await post<UserRegisterResult>(getRegisterUserEndpoint(), _user);
+		return response.data;
 	}
 	async findById(_id: string): Promise<User> {
 		const response = await get<User>(getUserByIdEndpoint(_id ?? ''));
