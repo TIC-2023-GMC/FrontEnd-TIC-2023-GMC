@@ -23,20 +23,3 @@ export class GetGamesUseCase {
 		return { loading, games };
 	}
 }
-@injectable()
-export class GetWordleGameStoreUseCase {
-	constructor(@inject('WordleGameStore') private _service: IWordleGameStoreService) {}
-	useWordleGameStore() {
-		return this._service;
-	}
-}
-// @injectable()
-// export class GetWordleWordsUseCase {
-// 	constructor(@inject('WordleGameRepository') private _repository: IWordleGameRepository) {}
-// 	useWordleWords() {
-// 		return useQuery({
-// 			queryKey: ['initWordleGame'],
-// 			queryFn: this._repository.find
-// 		});
-// 	}
-// }
