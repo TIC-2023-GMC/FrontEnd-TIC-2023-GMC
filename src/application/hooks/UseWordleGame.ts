@@ -1,13 +1,13 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { inject, injectable } from "tsyringe";
-import { IWordleGameRepository } from "../../domain/repositories/IWordleGameRepository";
-import { WordleGame } from "../../domain/models/InterfacesModels";
-import { useState } from "react";
-import { IWordleGameStoreService } from "../../domain/repositories/IWordleGameStoreService";
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { inject, injectable } from 'tsyringe';
+import { IWordleGameRepository } from '../../domain/repositories/IWordleGameRepository';
+import { WordleGame } from '../../domain/models/InterfacesModels';
+import { useState } from 'react';
+import { IWordleGameStoreService } from '../../domain/repositories/IWordleGameStoreService';
 
 @injectable()
 export class GetWordleGameStoreUseCase {
-	constructor(@inject('WordleGameStore') private _service: IWordleGameStoreService) { }
+	constructor(@inject('WordleGameStore') private _service: IWordleGameStoreService) {}
 	useWordleGameStore() {
 		return this._service;
 	}
@@ -15,7 +15,7 @@ export class GetWordleGameStoreUseCase {
 
 @injectable()
 export class GetWordleWordsUseCase {
-	constructor(@inject('WordleGameRepository') private _repository: IWordleGameRepository) { }
+	constructor(@inject('WordleGameRepository') private _repository: IWordleGameRepository) {}
 	useQueryWordleWords() {
 		const [wordle, setWordle] = useState<WordleGame>({
 			_id: '',
@@ -44,7 +44,7 @@ export class GetWordleWordsUseCase {
 
 @injectable()
 export class sendScoreWordleGameUsecase {
-	constructor(@inject('WordleGameRepository') private _repository: IWordleGameRepository) { }
+	constructor(@inject('WordleGameRepository') private _repository: IWordleGameRepository) {}
 	useMutationSendScoreWordleGame() {
 		const sendScoreWordleGame = useMutation({
 			mutationFn: this._repository.update

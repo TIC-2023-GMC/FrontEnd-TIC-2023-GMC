@@ -7,7 +7,7 @@ export default class AxiosWordleGameRepository implements IWordleGameRepository 
 	async find() {
 		const response = await get<WordleGame>(getWordleGameEndpoint());
 		return response.data;
-	};
+	}
 
 	async update(wordleGame: WordleGame): Promise<void> {
 		const response = put<WordleGame>(putWordleGameEndpoint(), wordleGame).then((response) => {

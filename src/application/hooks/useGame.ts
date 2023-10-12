@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { inject, injectable } from 'tsyringe';
 import { Game } from '../../domain/models/InterfacesModels';
 import { IGameRepository } from '../../domain/repositories/IGameRepository';
-import { IWordleGameStoreService } from '../../domain/repositories/IWordleGameStoreService';
 
 @injectable()
 export class GetGamesUseCase {

@@ -23,10 +23,9 @@ class MobXWordleGameStoreService implements IWordleGameStoreService {
 	init(_data?: string[]) {
 		if (_data?.length) {
 			this.words = _data;
-			const words = _data
+			const words = _data;
 			this.word = words[Math.floor(Math.random() * words.length)];
 			this.guesses = new Array(this.word.length).fill('');
-			console.log(this.guesses);
 			this.currentGuess = 0;
 		}
 	}

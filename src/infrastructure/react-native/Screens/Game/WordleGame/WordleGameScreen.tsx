@@ -2,17 +2,29 @@ import { useNavigation } from '@react-navigation/native';
 import { observer } from 'mobx-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Modal, Portal, Text, useTheme, ActivityIndicator, IconButton, Snackbar } from 'react-native-paper';
+import {
+	Button,
+	Modal,
+	Portal,
+	Text,
+	useTheme,
+	ActivityIndicator,
+	IconButton
+} from 'react-native-paper';
 import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
 import Guess from '../../../components/Guess';
 import Querty from '../../../components/Qwerty';
 import { ScrollView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import { GetWordleGameStoreUseCase, GetWordleWordsUseCase, sendScoreWordleGameUsecase } from '../../../../../application/hooks/UseWordleGame';
+import {
+	GetWordleGameStoreUseCase,
+	GetWordleWordsUseCase,
+	sendScoreWordleGameUsecase
+} from '../../../../../application/hooks/UseWordleGame';
 const getStore = container.resolve(GetWordleGameStoreUseCase);
-const getUseQuery = container.resolve(GetWordleWordsUseCase)
-const sendScore = container.resolve(sendScoreWordleGameUsecase)
+const getUseQuery = container.resolve(GetWordleWordsUseCase);
+const sendScore = container.resolve(sendScoreWordleGameUsecase);
 export default observer(function WordleGameScreen() {
 	const store = getStore.useWordleGameStore();
 	const [visibleModal, setVisibleModal] = useState(true);
@@ -30,34 +42,45 @@ export default observer(function WordleGameScreen() {
 	}, [wordle]);
 
 	const attempts = store.attempts;
-	const style = styles
-	//llevar a la pantalla de final 
+	const style = styles;
+	//llevar a la pantalla de final
 	useEffect(() => {
 		if (store.won || store.lost) {
 			sendScoreWordleGame.mutate({
 				...wordle,
 				match_game_score: store.score
-			})
+			});
 		}
 	}, [store.won, store.lost]);
 	return (
 		<View style={styles.container}>
 			<StatusBar style="light" />
-			<View style={{ justifyContent: "center", alignItems: "center", width: "100%" }}>
+			<View style={{ justifyContent: 'center', alignItems: 'center', width: '100%' }}>
 				<Text variant="headlineMedium">Adivina la Palabra</Text>
 				<View style={style.clue}>
-					<IconButton icon={"lightbulb"} size={25} iconColor='#B59F3B' style={{ margin: 0, padding: 0 }} />
+					<IconButton
+						icon={'lightbulb'}
+						size={25}
+						iconColor="#B59F3B"
+						style={{ margin: 0, padding: 0 }}
+					/>
 					<Text>
-						Pista: La multa de este tipo de infracciones es del 30% del salario mínimo, no olvides qye tienes que pagar la multa pronto
+						Pista: La multa de este tipo de infracciones es del 30% del salario mínimo, no olvides
+						qye tienes que pagar la multa pronto
 					</Text>
 				</View>
 				<View style={style.gameInformation}>
 					<View style={style.itemInformation}>
-						<IconButton icon={"gamepad"} size={25} iconColor={theme.colors.primary} />
+						<IconButton icon={'gamepad'} size={25} iconColor={theme.colors.primary} />
 						<Text>Intentos: {attempts}</Text>
 					</View>
 					<View style={style.itemInformation}>
-						<IconButton icon={"numeric"} size={30} iconColor={theme.colors.tertiary} style={{ margin: 0, padding: 0 }} />
+						<IconButton
+							icon={'numeric'}
+							size={30}
+							iconColor={theme.colors.tertiary}
+							style={{ margin: 0, padding: 0 }}
+						/>
 						<Text>Puntos: {store.score}</Text>
 					</View>
 				</View>
@@ -101,18 +124,18 @@ export default observer(function WordleGameScreen() {
 								Perdiste, pero no te preocupes, puedes volver a Jugar de nuevo
 							</Text>
 						)}
-						{initVisibleModal && (
-							loading ?
+						{initVisibleModal &&
+							(loading ? (
 								<ActivityIndicator animating={true} color={theme.colors.primary} size="large" />
-								: (<>
+							) : (
+								<>
 									<Text style={styles.title}>
 										¡Bienvenido {user.first_name} a{'\n'}Adivina la palabra!{'\n'}
 									</Text>
 									<Text style={styles.subtitle}>Descripción:</Text>
-									<Text variant="bodyLarge" >										{wordle.wordle_game_description}
-									</Text>
-								</>)
-						)}
+									<Text variant="bodyLarge"> {wordle.wordle_game_description}</Text>
+								</>
+							))}
 						<Text style={styles.title}>Puntuación: {user.first_name}</Text>
 					</View>
 					<Button
@@ -129,17 +152,15 @@ export default observer(function WordleGameScreen() {
 					>
 						ACEPTAR
 					</Button>
-				</Modal >
-			</Portal >
-		</View >
+				</Modal>
+			</Portal>
+		</View>
 	);
 });
 
 const styles = StyleSheet.create({
 	container: {
-		alignItems: 'baseline',
-
-
+		alignItems: 'baseline'
 	},
 	square: {
 		borderWidth: 2,
@@ -148,17 +169,16 @@ const styles = StyleSheet.create({
 		padding: 5,
 		margin: 5,
 		justifyContent: 'center',
-		alignItems: 'center',
+		alignItems: 'center'
 	},
 	map: {
 		alignSelf: 'stretch',
-		verticalAlign: 'center',
+		verticalAlign: 'center'
 	},
 	row: {
 		alignSelf: 'stretch',
 		flexDirection: 'row',
-		justifyContent: 'center',
-
+		justifyContent: 'center'
 	},
 	cell: {
 		maxWidth: 70,
@@ -169,10 +189,10 @@ const styles = StyleSheet.create({
 		aspectRatio: 1,
 		margin: 3,
 		justifyContent: 'center',
-		alignItems: 'center',
+		alignItems: 'center'
 	},
 	cellText: {
-		fontWeight: 'bold',
+		fontWeight: 'bold'
 	},
 	modal: {
 		height: '80%',
@@ -210,31 +230,27 @@ const styles = StyleSheet.create({
 		color: '#000'
 	},
 	clue: {
-		width: "75%",
-		flexWrap: "wrap",
-		justifyContent: "center",
-		alignItems: "center",
-		flexDirection: "column",
-		textAlign: "center",
-		gap: 0,
+		width: '75%',
+		flexWrap: 'wrap',
+		justifyContent: 'center',
+		alignItems: 'center',
+		flexDirection: 'column',
+		textAlign: 'center',
+		gap: 0
 	},
 	gameInformation: {
-		flexDirection: "row",
-		width: "75%",
-		flexWrap: "wrap",
-		justifyContent: "center",
-		alignItems: "center",
+		flexDirection: 'row',
+		width: '75%',
+		flexWrap: 'wrap',
+		justifyContent: 'center',
+		alignItems: 'center'
 	},
 	itemInformation: {
-		alignItems: "center",
-		flexDirection: "row",
-		fontVariant: "bodyLarge"
+		alignItems: 'center',
+		flexDirection: 'row',
+		fontVariant: 'bodyLarge'
 	}
-})
-
-
-
-
+});
 
 // const styles = StyleSheet.create({
 // 	container: {

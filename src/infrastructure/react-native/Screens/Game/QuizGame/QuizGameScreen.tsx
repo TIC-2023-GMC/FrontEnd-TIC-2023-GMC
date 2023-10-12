@@ -7,7 +7,13 @@ import { UserContext, UserContextParams } from '../../../../../application/auth/
 import { UserScore } from '../../../../../domain/models/InterfacesModels';
 import { GameTabNavigation } from '../../../../../domain/types/types';
 import { container } from 'tsyringe';
-import { GetLeaderboardUsecase, GetQuizGameMatchUsecase, SendScoreQuizzGameUsecase, useQuestion, useQuizGame } from '../../../../../application/hooks/UseMatch';
+import {
+	GetLeaderboardUsecase,
+	GetQuizGameMatchUsecase,
+	SendScoreQuizzGameUsecase,
+	useQuestion,
+	useQuizGame
+} from '../../../../../application/hooks/UseMatch';
 
 const getQuizGameMatch = container.resolve(GetQuizGameMatchUsecase);
 const leaderboard = container.resolve(GetLeaderboardUsecase);

@@ -171,4 +171,3 @@ export interface Match {
 	match_game_time: number;
 	match_game_onboarding: string;
 }
-

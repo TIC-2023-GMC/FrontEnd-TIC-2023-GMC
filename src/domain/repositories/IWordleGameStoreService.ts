@@ -1,5 +1,3 @@
-import { WordleGame } from "../models/InterfacesModels";
-
 export interface IWordleGameStoreService {
 	word: string;
 	guesses: string[];
@@ -18,5 +16,4 @@ export interface IWordleGameStoreService {
 	exactGuesses: string[];
 	inexactGuesses: string[];
 	score: number;
-
 }
