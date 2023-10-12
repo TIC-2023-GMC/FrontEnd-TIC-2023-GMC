@@ -1,8 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { IWordSearchMatchRepository } from '../../domain/repositories/IWordSearchMatchRepository';
-import { User, WordSearchMatch } from '../../domain/models/InterfacesModels';
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { IWordSearchStore } from '../../domain/services/IWordSearchStore';
 
 @injectable()
 export class GetWordSearchGameMatchUseCase {
@@ -22,4 +21,11 @@ export class GetWordSearchGameMatchUseCase {
 	}
 }
 
+@injectable()
+export class GetWordSearchStoreUseCase {
+	constructor(@inject('WordSearchStore') private _service: IWordSearchStore) {}
 
+	useWordSearchStore() {
+		return this._service;
+	}
+}

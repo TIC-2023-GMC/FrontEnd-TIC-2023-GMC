@@ -17,6 +17,7 @@ import { AxiosGameRepository } from '../infrastructure/repositories/AxiosGameRep
 import { AxiosMatchRepository } from '../infrastructure/repositories/AxiosMatchRepository';
 import { AxiosParishRepository } from '../infrastructure/repositories/AxiosParishRepository';
 import { AxiosWordSearchMatchRepository } from '../infrastructure/repositories/AxiosWordSearchMatchRepository';
+import { MobxWordSearchStore } from '../infrastructure/services/MobxWordSearchStore';
 
 container.register('UserRepository', { useClass: AxiosUserRepository });
 container.register('ExperienceRepository', { useClass: AxiosExperienceRepository });
@@ -35,3 +36,5 @@ container.register('GameRepository', { useClass: AxiosGameRepository });
 container.register('MatchRepository', { useClass: AxiosMatchRepository });
 //WordSearchGame
 container.registerSingleton('WordSearchMatchRepository', AxiosWordSearchMatchRepository);
+//WordSearchStore
+container.registerSingleton('WordSearchStore', MobxWordSearchStore);

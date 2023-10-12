@@ -1,5 +1,5 @@
-import { WordSearchMatch } from "../models/InterfacesModels";
+import { WordSearchMatch } from '../models/InterfacesModels';
 
 export interface IWordSearchMatchRepository {
-    find(): Promise<WordSearchMatch>;
+	find(): Promise<WordSearchMatch>;
 }

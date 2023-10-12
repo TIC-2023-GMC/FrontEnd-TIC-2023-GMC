@@ -1,43 +1,43 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import {
 	ActivityIndicator,
 	Button,
 	Chip,
 	Dialog,
-	IconButton,
 	Modal,
 	Portal,
 	useTheme
 } from 'react-native-paper';
-import store from './WordSearchStore';
 
 import { observer } from 'mobx-react';
 import { useTimer } from 'react-timer-hook';
-import { WordSearchStatement } from '../../../../../domain/models/InterfacesModels';
 import WordSearchBoard from '../../../components/WordSearchBoard';
 import { container } from 'tsyringe';
-import { GetWordSearchGameMatchUseCase } from '../../../../../application/hooks/useWordSearchMatch';
-import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
+import {
+	GetWordSearchGameMatchUseCase,
+	GetWordSearchStoreUseCase
+} from '../../../../../application/hooks/useWordSearchMatch';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { GameTabNavigation } from '../../../../../domain/types/types';
 
 const getWordSearchGameMatch = container.resolve(GetWordSearchGameMatchUseCase);
+const getWordSearchStore = container.resolve(GetWordSearchStoreUseCase);
 
 function WordSearchScreen() {
 	const navigation = useNavigation<NavigationProp<GameTabNavigation>>();
 	const theme = useTheme();
-	const { user } = useContext<UserContextParams>(UserContext);
 	const [openInfoModal, setOpenInfoModal] = useState(true);
 	const [openCluesModal, setOpenCluesModal] = useState(false);
-	const { setAnswers, checkCompletedWord, board, answers, resetBoard, isBoardWin } = store;
+	const { setAnswers, checkCompletedWord, answers, resetBoard, isBoardWin } =
+		getWordSearchStore.useWordSearchStore();
 
 	const { loading, data } = getWordSearchGameMatch.useQueryWordSearchGame();
 
 	const [openFailModal, setOpenFailModal] = useState(false);
-	const [openSuccessModal, setOpenSuccessModal] = useState(false);
+	const [openSuccessModal, setOpenSuccessModal] = useState(true);
 
-	const { seconds, start, pause, restart } = useTimer({
+	const { seconds, start, pause } = useTimer({
 		expiryTimestamp: new Date(new Date().getTime() + 60 * 1000),
 		autoStart: false,
 		onExpire: () => {
@@ -46,13 +46,15 @@ function WordSearchScreen() {
 	});
 
 	useEffect(() => {
-		resetBoard();
 		data && setAnswers(data.match_game_topic.statements);
+
+		return () => {
+			resetBoard();
+		};
 	}, [data]);
 
 	useEffect(() => {
 		if (isBoardWin) {
-			setOpenSuccessModal(true);
 			pause();
 		}
 	}, [isBoardWin]);
@@ -60,7 +62,7 @@ function WordSearchScreen() {
 	return (
 		<>
 			{loading ? (
-				<ActivityIndicator size="large" />
+				<ActivityIndicator style={{ flex: 1 }} size="large" />
 			) : (
 				<>
 					<Text style={{ ...styles.timer, color: theme.colors.primary }}>
@@ -93,11 +95,27 @@ function WordSearchScreen() {
 						})}
 					</View>
 					<View style={styles.container}>
-						<WordSearchBoard store={store} />
+						<WordSearchBoard store={getWordSearchStore.useWordSearchStore()} />
 					</View>
 					<View style={styles.buttonView}>
-						<Button onPress={() => setOpenInfoModal(true)}>INSTRUCCIONES</Button>
-						<Button onPress={() => setOpenCluesModal(true)}>PISTAS</Button>
+						<Button
+							style={styles.buttonOptions}
+							onPress={() => setOpenInfoModal(true)}
+							mode="elevated"
+							buttonColor={theme.colors.tertiary}
+							textColor={theme.colors.secondary}
+						>
+							INSTRUCCIONES
+						</Button>
+						<Button
+							style={styles.buttonOptions}
+							onPress={() => setOpenCluesModal(true)}
+							mode="elevated"
+							buttonColor={theme.colors.primary}
+							textColor={theme.colors.secondary}
+						>
+							PISTAS
+						</Button>
 					</View>
 					<Modal
 						contentContainerStyle={styles.infoModal}
@@ -116,12 +134,12 @@ function WordSearchScreen() {
 							<Text style={styles.instructionsText}>
 								Para jugar, revisa la información del tema y las pistas proporcionadas para
 								encontrar las palabras correspondientes en la sopa de letras. Para que una palabra
-								se marque como "encontrada", debes seleccionar todas las letras de dicha palabra.
-								Encuentra todas las palabras en el tiempo indicado (60 segundos).
+								se marque como &ldquo;encontrada&rdquo;, debes seleccionar todas las letras de dicha
+								palabra. Encuentra todas las palabras en el tiempo indicado (60 segundos).
 							</Text>
 						</View>
 						<Button
-							style={styles.button}
+							style={styles.buttonModal}
 							mode="elevated"
 							buttonColor={theme.colors.primary}
 							textColor={theme.colors.secondary}
@@ -145,22 +163,15 @@ function WordSearchScreen() {
 							<FlatList
 								data={answers}
 								renderItem={({ item, index }) => (
-									<TouchableOpacity
-										onPress={() => {
-											setOpenCluesModal(false);
-											console.log(item);
-										}}
-									>
-										<Text style={styles.instructionsText}>
-											{index + 1}. {item.clue}
-										</Text>
-									</TouchableOpacity>
+									<Text style={styles.instructionsText}>
+										{index + 1}. {item.clue}
+									</Text>
 								)}
 								keyExtractor={(item) => item.number.toString()}
 							/>
 						</View>
 						<Button
-							style={styles.button}
+							style={styles.buttonModal}
 							mode="elevated"
 							buttonColor={theme.colors.primary}
 							textColor={theme.colors.secondary}
@@ -176,14 +187,15 @@ function WordSearchScreen() {
 							dismissable={false}
 							visible={
 								//answers.every((answer) => checkCompletedWord(answer)) &&
-								//isBoardWin && seconds > 0 && openSuccessModal
-								openSuccessModal
+								//isBoardWin && seconds > 0 && openSuccessModal}
+								isBoardWin && seconds > 0 && openSuccessModal
+								//openSuccessModal
 							}
 						>
 							<Dialog.Title>¡Felicidades, lo has logrado!</Dialog.Title>
 							<Dialog.Content>
-								<Text style={styles.infoText}>Recuerda que...</Text>
-								<Text style={styles.instructionsText}>{data?.match_game_topic.info}</Text>
+								<Text style={styles.infoText}>Recuerda que...{'\n'}</Text>
+								<Text style={styles.dialogText}>{data?.match_game_topic.info}</Text>
 							</Dialog.Content>
 							<Dialog.Actions>
 								<Button
@@ -192,15 +204,15 @@ function WordSearchScreen() {
 										navigation.goBack();
 									}}
 								>
-									RREGRESAR A JUEGOS
+									REGRESAR A JUEGOS
 								</Button>
 							</Dialog.Actions>
 						</Dialog>
 						<Dialog dismissable={false} visible={openFailModal}>
 							<Dialog.Title>¡No lo lograste!</Dialog.Title>
 							<Dialog.Content>
-								<Text>Vuelve a intentarlo y recuerda que...</Text>
-								<Text>{data?.match_game_topic.info}</Text>
+								<Text style={styles.infoText}>Vuelve a intentarlo y recuerda que...{'\n'}</Text>
+								<Text style={styles.dialogText}>{data?.match_game_topic.info}</Text>
 							</Dialog.Content>
 							<Dialog.Actions>
 								<Button
@@ -241,11 +253,14 @@ const styles = StyleSheet.create({
 	},
 	buttonView: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
+		justifyContent: 'space-evenly',
 		alignItems: 'center',
 		marginHorizontal: 10,
 		marginBottom: 20,
 		marginTop: 5
+	},
+	buttonOptions: {
+		width: '45%'
 	},
 	infoModal: {
 		height: '80%',
@@ -286,7 +301,7 @@ const styles = StyleSheet.create({
 	cluesContainer: {
 		backgroundColor: '#F3FFE5',
 		width: '90%',
-		height: '70%',
+		height: 'auto',
 		borderRadius: 10,
 		alignSelf: 'center',
 		justifyContent: 'space-around',
@@ -296,8 +311,9 @@ const styles = StyleSheet.create({
 		marginBottom: 5
 	},
 	infoText: { textAlign: 'justify', fontSize: 16, fontStyle: 'italic' },
-	instructionsText: { textAlign: 'justify', fontSize: 16 },
-	button: {
+	instructionsText: { textAlign: 'left', fontSize: 16 },
+	dialogText: { textAlign: 'justify', fontSize: 16 },
+	buttonModal: {
 		width: '60%',
 		alignSelf: 'center'
 	}

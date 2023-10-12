@@ -1,20 +1,20 @@
 import { observer } from 'mobx-react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTheme } from 'react-native-paper';
 import { Rect, Svg, Text } from 'react-native-svg';
-import CrossGameStore from '../Screens/Game/WordSearchGame/WordSearchStore';
 import { Dimensions } from 'react-native';
+import { IWordSearchStore } from '../../../domain/services/IWordSearchStore';
 
-const WordSearchBoard = ({ store }: { store: typeof CrossGameStore }) => {
+const WordSearchBoard = ({ store }: { store: IWordSearchStore }) => {
 	const {
 		maxCols: horizontalBoardSize,
 		maxRows: verticalBoardSize,
 		board,
 		isCellSelected,
 		deselectCell,
-		selectCell,
-		resetBoard
+		selectCell
 	} = store;
+
 	const cellSize = 33;
 	const theme = useTheme();
 
@@ -28,7 +28,7 @@ const WordSearchBoard = ({ store }: { store: typeof CrossGameStore }) => {
 			? '#4caf5066'
 			: isCellSelected(i, j)
 			? theme.colors.tertiary
-			: 'white';
+			: theme.colors.secondary;
 
 	const handleCellClick = (i: number, j: number) => {
 		if (isCellSelected(i, j)) {
@@ -44,10 +44,6 @@ const WordSearchBoard = ({ store }: { store: typeof CrossGameStore }) => {
 	const xOffset = (Dimensions.get('window').width - boardWidth) / 2;
 	const yOffset = (Dimensions.get('window').height - boardHeight) / 20;
 
-	useEffect(() => {
-		resetBoard();
-	}, []);
-
 	for (let i = 0; i < verticalBoardSize; i++) {
 		for (let j = 0; j < horizontalBoardSize; j++) {
 			const cellContent = board[i][j];
@@ -60,8 +56,6 @@ const WordSearchBoard = ({ store }: { store: typeof CrossGameStore }) => {
 						width={cellSize}
 						height={cellSize}
 						fill={fillColor(cellContent, i, j)}
-						stroke="black"
-						strokeWidth="1"
 						onPress={() => {
 							!board[i][j]?.isCompleted && handleCellClick(i, j);
 						}}

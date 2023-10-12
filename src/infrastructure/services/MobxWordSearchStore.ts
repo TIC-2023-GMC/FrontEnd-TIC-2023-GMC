@@ -1,7 +1,8 @@
 import { makeAutoObservable } from 'mobx';
-import { Statement, WordSearchStatement } from '../../../../../domain/models/InterfacesModels';
+import { Statement } from '../../domain/models/InterfacesModels';
+import { IWordSearchStore } from '../../domain/services/IWordSearchStore';
 
-export class WordSearchStore {
+export class MobxWordSearchStore implements IWordSearchStore {
 	board: ({ letter: string; wordNumber: number; isCompleted: boolean } | null)[][] = [];
 	maxRows = 0;
 	maxCols = 0;
@@ -19,20 +20,14 @@ export class WordSearchStore {
 		if (answer.orientation === 'horizontal') {
 			for (let i = 0; i < answer.answer.length; i++) {
 				const pos = answer.position as [number, number];
-				/* if (!this.isCellSelected(pos[0], pos[1] + i)) {
-					return false;
-				} */
-				if (this.board[pos[0]][pos[1] + i]!.isCompleted === false) {
+				if (!this.isCellSelected(pos[0], pos[1] + i)) {
 					return false;
 				}
 			}
 		} else {
 			for (let i = 0; i < answer.answer.length; i++) {
 				const pos = answer.position as [number, number];
-				/* if (!this.isCellSelected(pos[0] + i, pos[1])) {
-					return false;
-				} */
-				if (this.board[pos[0] + i][pos[1]]!.isCompleted === false) {
+				if (!this.isCellSelected(pos[0] + i, pos[1])) {
 					return false;
 				}
 			}
@@ -44,6 +39,7 @@ export class WordSearchStore {
 		if (answer.orientation === 'horizontal') {
 			for (let i = 0; i < answer.answer.length; i++) {
 				const pos = answer.position as [number, number];
+
 				this.board[pos[0]][pos[1] + i]!.isCompleted = true;
 			}
 		} else {
@@ -69,7 +65,7 @@ export class WordSearchStore {
 		});
 
 		if (answer) {
-			let wordCompleted: boolean = true;
+			let wordCompleted = true;
 			for (let index = 0; index < answer.answer.length; index++) {
 				const pos = answer.position as [number, number];
 				if (answer.orientation === 'horizontal') {
@@ -85,7 +81,6 @@ export class WordSearchStore {
 
 			if (wordCompleted) {
 				this.completeWord(answer);
-				console.log(answer.answer);
 			}
 		}
 	};
@@ -101,10 +96,11 @@ export class WordSearchStore {
 	};
 
 	resetBoard(): void {
-
 		this.selectedCells = new Set();
 		this.answers = [];
 		this.board = [];
+		this.maxRows = 0;
+		this.maxCols = 0;
 	}
 
 	private generateBoard(): void {
@@ -120,7 +116,7 @@ export class WordSearchStore {
 			.map(() => Array(this.maxCols).fill(false));
 
 		for (const answer of this.answers) {
-			let startRow = answer.number - 1,
+			const startRow = answer.number - 1,
 				startCol = answer.number - 1;
 
 			if (answer.orientation === 'horizontal') {
@@ -191,24 +187,10 @@ export class WordSearchStore {
 		if (this.answers.length === 0) {
 			return false;
 		} else {
-			console.log(this.answers.every((answer) => this.checkCompletedWord(answer)));
 			return this.answers.every((answer) => this.checkCompletedWord(answer));
 		}
 	}
-
-	get isBoardReady() {
-		return this.maxRows > 0 && this.maxCols > 0;
-	}
-	get isBoardReadyToRender() {
-		return this.isBoardReady && this.board.length > 0;
-	}
-	get isBoardReadyToPlay() {
-		return this.isBoardReady && this.answers.length > 0;
-	}
-	get isBoardEmpty() {
-		return this.answers.length === 0;
-	}
 }
 
-const store = new WordSearchStore();
+const store = new MobxWordSearchStore();
 export default store;

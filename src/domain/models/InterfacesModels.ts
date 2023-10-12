@@ -183,10 +183,3 @@ export interface LeaderBoard {
 	0: UserScore[];
 	1: number;
 }
-export interface WordSearchStatement {
-	type: 'horizontal' | 'vertical';
-	number: number;
-	question: string;
-	answer: string;
-	position?: [number, number];
-}
