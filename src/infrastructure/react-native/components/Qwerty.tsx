@@ -9,22 +9,34 @@ export default observer(function Qwerty({ store }: { store: IWordleGameStoreServ
 
 	return (
 		<View style={styles.container}>
+			<View style={styles.options}>
+				<IconButton icon="delete" onPress={() => store.clearGuess()} iconColor={theme.colors.secondary} rippleColor={"red"} />
+				<IconButton icon="backspace" onPress={() => store.clearLastLetter()} iconColor={theme.colors.secondary} rippleColor={"#B59F3B"} />
+				<Button
+					onPress={() => store.submitGuess()}
+					labelStyle={styles.label}
+					mode='contained'
+				>
+					Enviar
+				</Button>
+			</View>
 			{qwerty.map((row, i) => (
 				<View key={i} style={styles.row}>
 					{row.split('').map((letter, j) => {
 						const bgColor = store.exactGuesses.includes(letter)
 							? theme.colors.primary
 							: store.inexactGuesses.includes(letter)
-							? theme.colors.tertiary
-							: store.allGuesses.includes(letter)
-							? theme.colors.secondary
-							: theme.colors.onSurface;
+								? "#B59F3B"
+								: store.allGuesses.includes(letter)
+									? theme.colors.tertiary
+									: theme.colors.tertiary;
 						return (
 							<Button
 								style={styles.button}
 								labelStyle={styles.label}
 								key={i + j}
 								buttonColor={bgColor}
+								rippleColor={theme.colors.secondary}
 								textColor={theme.colors.secondary}
 								onPress={() => store.handlerKeyup(letter)}
 							>
@@ -34,39 +46,42 @@ export default observer(function Qwerty({ store }: { store: IWordleGameStoreServ
 					})}
 				</View>
 			))}
-			<View style={styles.row}>
-				<Button onPress={() => store.submitGuess()}>Enviar</Button>
-				<IconButton icon="backspace" onPress={() => store.clearLastLetter()} />
-				<IconButton icon="delete" onPress={() => store.clearGuess()} />
-			</View>
 		</View>
 	);
 });
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		width: '98%',
-		flexDirection: 'column',
-		justifyContent: 'center',
-		alignItems: 'center'
+		alignSelf: "stretch",
+		marginTop: "auto",
+		backgroundColor: "#797979",
+		padding: 5,
+		paddingTop: 10,
+		paddingBottom: "10%",
+		borderRadius: 10,
 	},
-	row: {
+	options: {
 		flexDirection: 'row',
 		justifyContent: 'space-evenly',
 		alignItems: 'center',
 		marginTop: 5
 	},
+	row: {
+		alignSelf: "stretch",
+		flexDirection: "row",
+		justifyContent: "center",
+		paddingHorizontal: 5,
+	},
 	button: {
-		minWidth: 35,
+		minWidth: 20,
 		minHeight: 40,
-		borderRadius: 10,
-		marginHorizontal: 0.5
+		margin: 2,
+		borderRadius: 5,
+		justifyContent: "center",
+		alignItems: "center",
 	},
 	label: {
-		fontSize: 20,
-		fontWeight: 'bold',
+		color: "#fff",
+		fontWeight: "bold",
 		textTransform: 'uppercase',
-		textAlign: 'center',
-		marginHorizontal: 0
 	}
 });

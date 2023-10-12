@@ -1,6 +1,6 @@
 import React from 'react';
-import { DimensionValue, StyleSheet, View } from 'react-native';
-import { Button, MD3Theme, useTheme } from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
+import { Text, useTheme } from 'react-native-paper';
 interface GuessProps {
 	word: string;
 	guess: string;
@@ -8,61 +8,62 @@ interface GuessProps {
 }
 export default function Guess({ word, guess, isGuessed }: GuessProps) {
 	const theme = useTheme();
-	const width = (100 / word.length).toString() + '%';
-	const styles = useStyles(theme, width);
-	console.log(word);
+	const styles = style
 	guess = guess.toUpperCase();
 	word = word.toUpperCase();
 
+	const defineSize = (length: number) => {
+		return length > 6 ? 16 : 30
+	}
 	return (
 		<View style={styles.container}>
 			{word.split('').map((letter, index) => {
 				const bgColor = !isGuessed
-					? theme.colors.onSurface
-					: letter === guess[index]
-					? theme.colors.primary
-					: word.includes(guess[index])
 					? theme.colors.tertiary
-					: theme.colors.onSurface;
-
+					: letter === guess[index]
+						? theme.colors.primary
+						: word.includes(guess[index])
+							? "#B59F3B"
+							: theme.colors.tertiary;
 				return (
-					<Button
-						style={styles.button}
-						buttonColor={bgColor}
-						labelStyle={styles.letter}
-						key={index}
-					>
-						{guess[index]}
-					</Button>
+					<View style={{
+						...styles.cell, backgroundColor: bgColor,
+					}}>
+						<Text
+							style={[{
+								...styles.cellText,
+								fontSize: defineSize(word.length),
+								color: theme.colors.secondary
+							}]}>{guess[index]}
+						</Text>
+					</View>
 				);
 			})}
 		</View>
 	);
 }
 
-const useStyles = (theme: MD3Theme, width: string) => {
-	const fontSize = parseFloat(width) * 0.9;
-
-	return StyleSheet.create({
-		container: {
-			flexDirection: 'row',
-			justifyContent: 'center',
-			alignItems: 'center'
-		},
-		letter: {
-			fontSize: fontSize,
-			fontWeight: 'bold',
-			color: theme.colors.secondary,
-			textAlign: 'center'
-		},
-		button: {
-			width: width as DimensionValue,
-			marginHorizontal: 0,
-			marginVertical: 0,
-			padding: 15,
-			borderWidth: 1,
-			borderColor: 'white',
-			borderRadius: 0
-		}
-	});
-};
+const style = StyleSheet.create({
+	container: {
+		flexDirection: 'row',
+	},
+	row: {
+		alignSelf: 'stretch',
+		flexDirection: 'row',
+		justifyContent: 'center',
+	},
+	cell: {
+		maxWidth: 70,
+		height: 30,
+		flex: 1,
+		borderWidth: 2,
+		borderRadius: 5,
+		aspectRatio: 1,
+		margin: 3,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	cellText: {
+		fontWeight: 'bold',
+	}
+});
