@@ -1,7 +1,7 @@
 import { QueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { inject, injectable } from 'tsyringe';
-import { Token, User } from '../../domain/models/InterfacesModels';
+import { Token, User, UserRegisterResult } from '../../domain/models/InterfacesModels';
 import { IInternalStoreRepository } from '../../domain/repositories/IInternalStoreRepository';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 @injectable()
@@ -127,6 +127,33 @@ export class LoginUserUseCase {
 		return { userLoginMutation, loading, setLoading };
 	}
 
+	async setAuthUser(token: Token) {
+		await this._setTokenInStorageUseCase.setTokenInStorage(token);
+	}
+}
+
+@injectable()
+export class RegisterUserUseCase {
+	constructor(
+		@inject('SetTokenInStorage') private _setTokenInStorageUseCase: SetTokenInStorageUseCase,
+		@inject('UserRepository') private _userRepository: IUserRepository
+	) {}
+	registerUser(loginUser: () => void) {
+		const [loading, setLoading] = useState(false);
+		const userRegisterMutation = useMutation({
+			mutationFn: this._userRepository?.create,
+			onSuccess: async (data: UserRegisterResult) => {
+				await this.setAuthUser(data);
+				this._userRepository.configAuth(data);
+				setLoading(false);
+				loginUser();
+			},
+			onError: () => {
+				setLoading(false);
+			}
+		});
+		return { userRegisterMutation, loading, setLoading };
+	}
 	async setAuthUser(token: Token) {
 		await this._setTokenInStorageUseCase.setTokenInStorage(token);
 	}
