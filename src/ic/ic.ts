@@ -5,7 +5,6 @@ import {
 	LogoutUserUseCase,
 	SetTokenInStorageUseCase
 } from '../application/hooks';
-import MobXWordleGameStoreService from '../infrastructure/GameStores/Wordle/MobXWordleGameStoreService';
 import { AxiosAdoptionRepository } from '../infrastructure/repositories/AxiosAdoptionRepository';
 import { AxiosCommentsRepository } from '../infrastructure/repositories/AxiosCommentsRepository';
 import { AxiosExperienceRepository } from '../infrastructure/repositories/AxiosExperienceRepository';
@@ -17,6 +16,8 @@ import { AxiosParishRepository } from '../infrastructure/repositories/AxiosParis
 import { AxiosUserRepository } from '../infrastructure/repositories/AxiosUserRepository';
 import { ExpoFileSystemPhotoRepository } from '../infrastructure/repositories/ExpoFileSystemPhotoRepository';
 import { ExpoStoreRepository } from '../infrastructure/repositories/ExpoStoreRepository';
+import AxiosWordleGameRepository from '../infrastructure/repositories/AxiosWordleGameRespository';
+import MobXWordleGameStoreService from '../infrastructure/GameStores/Wordle/MobXWordleGameStoreService';
 
 container.registerSingleton('UserRepository', AxiosUserRepository);
 container.registerSingleton('ExperienceRepository', AxiosExperienceRepository);
@@ -34,4 +35,4 @@ container.registerSingleton('LocationRepository', AxiosParishRepository);
 container.registerSingleton('GameRepository', AxiosGameRepository);
 container.registerSingleton('MatchRepository', AxiosMatchRepository);
 container.registerSingleton('WordleGameStore', MobXWordleGameStoreService);
-// container.registerSingleton('WordleGameRepository', AxiosWordleGameRepository);
+container.registerSingleton('WordleGameRepository', AxiosWordleGameRepository);

@@ -1,25 +1,15 @@
-import { action, computed, makeObservable, observable } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 import { IWordleGameStoreService } from '../../../domain/repositories/IWordleGameStoreService';
-import testWords from './testWords.json';
 
 class MobXWordleGameStoreService implements IWordleGameStoreService {
 	word = '';
 	guesses = [] as string[];
+	words = [] as string[];
 	currentGuess = 0;
+	score = 5;
 
 	constructor() {
-		makeObservable(this, {
-			word: observable,
-			guesses: observable,
-			currentGuess: observable,
-			won: computed,
-			lost: computed,
-			init: action,
-			submitGuess: action,
-			handlerKeyup: action,
-			clearLastLetter: action,
-			clearGuess: action
-		});
+		makeAutoObservable(this);
 	}
 
 	get won() {
@@ -31,14 +21,25 @@ class MobXWordleGameStoreService implements IWordleGameStoreService {
 	}
 
 	init(_data?: string[]) {
-		const words = _data ?? testWords;
-		this.word = words[Math.floor(Math.random() * words.length)];
+		if (_data?.length) {
+			this.words = _data;
+			const words = _data
+			this.word = words[Math.floor(Math.random() * words.length)];
+			this.guesses = new Array(this.word.length).fill('');
+			console.log(this.guesses);
+			this.currentGuess = 0;
+		}
+	}
 
+	restartGame() {
+		this.word = this.words[Math.floor(Math.random() * this.words.length)];
 		this.guesses = new Array(this.word.length).fill('');
 		this.currentGuess = 0;
+		this.score = 5;
 	}
 
 	submitGuess() {
+		if (this.score > 0) this.score--;
 		this.currentGuess++;
 	}
 	get allGuesses() {
@@ -58,10 +59,14 @@ class MobXWordleGameStoreService implements IWordleGameStoreService {
 		});
 	}
 
+	get attempts() {
+		return this.word.length - this.currentGuess;
+	}
+
 	handlerKeyup(key: string) {
 		if (this.won || this.lost) return;
 		if (key === 'Enter') this.submitGuess();
-		if (this.guesses[this.currentGuess].length < 5 && key.match(/[A-z]/)) {
+		if (this.guesses[this.currentGuess].length < this.word.length && key.match(/[A-z]/)) {
 			this.guesses[this.currentGuess] += key;
 		}
 	}
