@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
+import LottieView from 'lottie-react-native';
 import { observer } from 'mobx-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -128,17 +129,18 @@ export default observer(function WordleGameScreen() {
 			<Portal>
 				<Modal
 					visible={((store.won || store.lost) && visibleModal) || initVisibleModal}
-					contentContainerStyle={styles.modal}
+					contentContainerStyle={{
+						...styles.modal,
+						height: store.won || store.lost ? '60%' : styles.modal.height
+					}}
 				>
 					<View style={styles.subCard}>
 						{store.won && (
-							<Text style={styles.title}>
-								¡Felicidades adivinaste la palabra!{'\n'}Ganaste{'\n'} sigue aprediendo
-							</Text>
+							<Text style={styles.title}>¡Felicidades Ganaste !{'\n'} sigue aprediendo</Text>
 						)}
 						{store.lost && (
 							<Text style={styles.title}>
-								Perdiste, pero no te preocupes, puedes volver a Jugar
+								Perdiste, pero no te preocupes, puedes volver a jugar
 							</Text>
 						)}
 						{initVisibleModal &&
@@ -153,13 +155,29 @@ export default observer(function WordleGameScreen() {
 									<Text variant="bodyLarge" style={styles.textDescription}>
 										{wordle.match_game_onboarding}
 									</Text>
-									<Text style={styles.subtitle}>Descripción:</Text>
+									<Text style={styles.subtitle}>Descripción del tema:</Text>
 									<Text variant="bodyLarge" style={styles.textDescription}>
 										{wordle.wordle_game_description}
 									</Text>
 								</>
 							))}
 						<Text style={styles.title}>Tu puntuación: {store.score}</Text>
+						{store.won && (
+							<LottieView
+								source={require('../../../../../assets/won.json')}
+								autoPlay
+								loop
+								style={styles.winnerAnimation}
+							/>
+						)}
+						{store.lost && (
+							<LottieView
+								source={require('../../../../../assets/lost.json')}
+								autoPlay
+								loop
+								style={styles.loserAnimation}
+							/>
+						)}
 					</View>
 
 					<Button
@@ -223,7 +241,7 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold'
 	},
 	modal: {
-		height: '90%',
+		height: '98%',
 		width: '90%',
 		borderRadius: 20,
 		justifyContent: 'space-between',
@@ -291,5 +309,17 @@ const styles = StyleSheet.create({
 		color: '#000',
 		textAlign: 'justify',
 		padding: 10
+	},
+	winnerAnimation: {
+		width: '100%',
+		height: '70%',
+		alignSelf: 'center',
+		justifyContent: 'center'
+	},
+	loserAnimation: {
+		width: '100%',
+		height: '65%',
+		alignSelf: 'center',
+		justifyContent: 'center'
 	}
 });
