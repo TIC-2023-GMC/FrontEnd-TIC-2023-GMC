@@ -19,6 +19,8 @@ import {
 	ExpoFileSystemPhotoRepository,
 	ExpoStoreRepository
 } from '../infrastructure/repositories/';
+import AxiosWordSearchMatchRepository from '../infrastructure/repositories/AxiosWordSearchMatchRepository';
+import MobxWordSearchStore from '../infrastructure/GameStores/Wordle/MobxWordSearchStore';
 import MobXWordleGameStoreService from '../infrastructure/GameStores/Wordle/MobXWordleGameStoreService';
 import AxiosWordleGameRepository from '../infrastructure/repositories/AxiosWordleGameRespository';
 container.register('UserRepository', { useClass: AxiosUserRepository });
@@ -37,5 +39,11 @@ container.registerSingleton('OrganizationRepository', AxiosOrganizationRepositor
 //Game Section
 container.registerSingleton('GameRepository', AxiosGameRepository);
 container.registerSingleton('MatchRepository', AxiosMatchRepository);
+//WordleStore
 container.registerSingleton('WordleGameStore', MobXWordleGameStoreService);
+//WordleGame
 container.registerSingleton('WordleGameRepository', AxiosWordleGameRepository);
+//WordSearchGame
+container.registerSingleton('WordSearchMatchRepository', AxiosWordSearchMatchRepository);
+//WordSearchStore
+container.registerSingleton('WordSearchStore', MobxWordSearchStore);

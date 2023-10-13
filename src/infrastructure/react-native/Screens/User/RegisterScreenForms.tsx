@@ -114,7 +114,7 @@ export function RegisterScreenForm({
 						Registro de Nuevo Usuario
 					</Text>
 					<View style={{ ...styles.inputsView }}>
-						<PhotoSelection image={image} setImage={setImage} />
+						<PhotoSelection image={image} setImage={setImage} aspect={[1, 1]} />
 						{image === undefined && <HelperText type="error">La foto es requerida</HelperText>}
 						<Controller
 							control={control}

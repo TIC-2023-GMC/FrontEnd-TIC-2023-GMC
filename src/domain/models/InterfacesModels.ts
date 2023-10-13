@@ -162,6 +162,24 @@ export interface QuizGameMatch extends Match {
 	match_game_questions: Question[];
 }
 
+export interface Statement {
+	orientation: string;
+	number: number;
+	clue: string;
+	answer: string;
+	position?: [number, number];
+}
+
+export interface Topic {
+	title: string;
+	info: string;
+	statements: Statement[];
+}
+
+export interface WordSearchMatch extends Match {
+	match_game_topic: Topic;
+}
+
 export interface UserScore {
 	user_first_name: string;
 	user_last_name: string;
