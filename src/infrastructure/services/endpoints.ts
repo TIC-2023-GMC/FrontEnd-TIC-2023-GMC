@@ -140,7 +140,7 @@ export function getLoginEndpoint() {
 }
 
 export function getAddCommentEndpoint() {
-	return 'user/token';
+	return 'comments/add_comment';
 }
 
 export function getWordleGameEndpoint() {

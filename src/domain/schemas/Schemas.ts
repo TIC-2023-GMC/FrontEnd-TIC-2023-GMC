@@ -10,14 +10,14 @@ export const UserSchema = z.object({
 		.nonempty('El nombre es requerido')
 		.regex(
 			/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*(\s+[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*)*$/,
-			'Por favor, ingrese su nombre iniciando con mayúscula (evite caracteres especiales)'
+			'Por favor, ingrese su nombre iniciando con mayúscula (evite caracteres especiales y espacios al final)'
 		),
 	last_name: z
 		.string()
 		.nonempty('El apellido es requerido')
 		.regex(
 			/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*(\s+[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ'-]*)*$/,
-			'Por favor, ingrese su apellido iniciando con mayúscula (evite caracteres especiales)'
+			'Por favor, ingrese su apellido iniciando con mayúscula (evite caracteres especiales y espacios al final)'
 		),
 	mobile_phone: z.string().regex(/^09\d{8}$/, 'Por favor, ingrese un número de teléfono válido'),
 	neighborhood: z.string().nonempty('El sector es requerido'),
