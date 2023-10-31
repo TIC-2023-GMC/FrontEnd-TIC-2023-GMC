@@ -15,20 +15,25 @@ const config: ExpoConfig = {
 	},
 	assetBundlePatterns: ['**/*'],
 	ios: {
-		supportsTablet: true
+		supportsTablet: true,
+		bundleIdentifier: 'com.pawsitivequito.app'
 	},
 	android: {
 		adaptiveIcon: {
-			foregroundImage: './src/assets/adaptive-icon.png',
+			foregroundImage: './src/assets/icon.png',
 			backgroundColor: '#ffffff'
-		}
+		},
+		package: 'com.pawsitivequito.app'
 	},
 	web: {
 		favicon: './src/assets/favicon.png'
 	},
 	updates: {
 		fallbackToCacheTimeout: 0,
-		useClassicUpdates: true
+		url: 'https://u.expo.dev/e60e9442-4acd-4c46-9eef-592cee8b408a'
+	},
+	runtimeVersion: {
+		policy: 'appVersion'
 	},
 	extra: {
 		eas: {

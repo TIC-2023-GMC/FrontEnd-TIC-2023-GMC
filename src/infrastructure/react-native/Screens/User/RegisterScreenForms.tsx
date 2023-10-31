@@ -399,7 +399,7 @@ export function RegisterScreenForm({
 					</View>
 					<View style={styles.buttonView}>
 						<Button
-							style={styles.button}
+							style={styles.button1}
 							mode="elevated"
 							buttonColor={theme.colors.primary}
 							textColor={theme.colors.secondary}
@@ -409,7 +409,7 @@ export function RegisterScreenForm({
 							Crear Cuenta
 						</Button>
 						<Button
-							style={styles.button}
+							style={styles.button2}
 							mode="text"
 							compact={true}
 							onPress={() => navigation.navigate('Login')}

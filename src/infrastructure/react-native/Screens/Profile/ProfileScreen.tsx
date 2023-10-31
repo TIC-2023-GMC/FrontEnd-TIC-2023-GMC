@@ -135,15 +135,21 @@ export function ProfileScreen({ route }: any) {
 										textColor={theme.colors.secondary}
 										icon="whatsapp"
 										onPress={() => {
-											Linking.canOpenURL(`whatsapp://send?phone=${profileUser.mobile_phone}`).then(
-												(supported) => {
-													if (supported) {
-														Linking.openURL(`whatsapp://send?phone=${profileUser.mobile_phone}`);
-													} else {
-														setSnackbarVisible(true);
-													}
+											Linking.canOpenURL(
+												`http://api.whatsapp.com/send?phone=${
+													'+593' + profileUser.mobile_phone.slice(1)
+												}`
+											).then((supported) => {
+												if (supported) {
+													Linking.openURL(
+														`http://api.whatsapp.com/send?phone=${
+															'+593' + profileUser.mobile_phone.slice(1)
+														}`
+													);
+												} else {
+													setSnackbarVisible(true);
 												}
-											);
+											});
 										}}
 									>
 										Enviar mensaje a {profileUser.first_name}
