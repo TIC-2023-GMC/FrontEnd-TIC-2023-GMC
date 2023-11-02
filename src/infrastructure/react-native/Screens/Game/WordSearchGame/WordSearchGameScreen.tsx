@@ -10,18 +10,18 @@ import {
 	useTheme
 } from 'react-native-paper';
 
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import LottieView from 'lottie-react-native';
 import { observer } from 'mobx-react';
 import { useTimer } from 'react-timer-hook';
-import WordSearchBoard from '../../../components/WordSearchBoard';
 import { container } from 'tsyringe';
+import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
 import {
 	GetWordSearchGameMatchUseCase,
 	GetWordSearchStoreUseCase
 } from '../../../../../application/hooks/useWordSearchMatch';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { GameTabNavigation } from '../../../../../domain/types/types';
-import { UserContext, UserContextParams } from '../../../../../application/auth/user.auth';
-import LottieView from 'lottie-react-native';
+import WordSearchBoard from '../../../components/WordSearchBoard';
 
 const getWordSearchGameMatch = container.resolve(GetWordSearchGameMatchUseCase);
 const getWordSearchStore = container.resolve(GetWordSearchStoreUseCase);
@@ -227,7 +227,6 @@ function WordSearchScreen() {
 									source={require('../../../../../assets/lost.json')}
 									autoPlay
 									loop
-									autoSize
 									style={styles.loserAnimation}
 								/>
 							</Dialog.Content>
