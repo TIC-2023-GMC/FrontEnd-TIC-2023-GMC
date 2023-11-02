@@ -123,7 +123,7 @@ export function ProfileScreen({ route }: any) {
 										textColor={theme.colors.secondary}
 										icon="phone"
 										onPress={() => {
-											Linking.openURL(`tel:${profileUser.mobile_phone}`);
+											Linking.openURL(`tel:+593${profileUser.mobile_phone.slice(1)}`);
 										}}
 									>
 										Llamar a {profileUser.first_name}

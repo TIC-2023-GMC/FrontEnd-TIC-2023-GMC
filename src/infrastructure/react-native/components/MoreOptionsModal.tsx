@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Dimensions, Linking, StyleSheet, TouchableOpacity } from 'react-native';
 import { Divider, IconButton, List, Modal, Portal, Snackbar, useTheme } from 'react-native-paper';
 import { AdoptionPublication } from '../../../domain/models/InterfacesModels';
@@ -52,7 +51,7 @@ const MoreOptionsModal = ({
 				<TouchableOpacity
 					style={styles.viewList}
 					onPress={() => {
-						Linking.openURL(`tel:${publication.user.mobile_phone}`);
+						Linking.openURL(`tel:+593${publication.user.mobile_phone.slice(1)}`);
 					}}
 				>
 					<List.Item
@@ -75,15 +74,17 @@ const MoreOptionsModal = ({
 				<TouchableOpacity
 					style={styles.viewList}
 					onPress={() => {
-						Linking.canOpenURL(`whatsapp://send?phone=${publication.user.mobile_phone}`).then(
-							(supported) => {
-								if (supported) {
-									Linking.openURL(`whatsapp://send?phone=${publication.user.mobile_phone}`);
-								} else {
-									setSnackbarVisible(true);
-								}
+						Linking.canOpenURL(
+							`http://api.whatsapp.com/send?phone=
+													'+593' + ${publication.user.mobile_phone.slice(1)}`
+						).then((supported) => {
+							if (supported) {
+								Linking.openURL(`http://api.whatsapp.com/send?phone=
+													'+593' + ${publication.user.mobile_phone.slice(1)}`);
+							} else {
+								setSnackbarVisible(true);
 							}
-						);
+						});
 					}}
 				>
 					<List.Item

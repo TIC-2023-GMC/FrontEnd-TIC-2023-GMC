@@ -30,7 +30,7 @@ const config: ExpoConfig = {
 	},
 	updates: {
 		fallbackToCacheTimeout: 0,
-		url: 'https://u.expo.dev/e60e9442-4acd-4c46-9eef-592cee8b408a'
+		useClassicUpdates: true
 	},
 	runtimeVersion: {
 		policy: 'appVersion'
