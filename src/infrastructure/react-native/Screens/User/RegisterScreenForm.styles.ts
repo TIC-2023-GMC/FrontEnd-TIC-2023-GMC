@@ -36,9 +36,14 @@ export const styles = StyleSheet.create({
 		gap: 10,
 		marginVertical: 10
 	},
-	button: {
+	button1: {
 		width: '50%'
 	},
+	button2: {
+		width: '50%',
+		marginBottom: 25
+	},
+
 	errorText: {
 		marginBottom: 10
 	},

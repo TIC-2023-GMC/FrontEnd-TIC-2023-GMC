@@ -14,12 +14,12 @@ import {
 	TextInput,
 	useTheme
 } from 'react-native-paper';
+import { container } from 'tsyringe';
 import { UserContext, UserContextParams } from '../../../application/auth/user.auth';
 import { ListCommentsUseCase } from '../../../application/hooks';
 import { AddCommentProps, Comment, CommentText } from '../../../domain/models/InterfacesModels';
 import { CommentTextSchema } from '../../../domain/schemas/Schemas';
 import { CommentComponent } from './CommentComponent';
-import { container } from 'tsyringe';
 
 const listComments = container.resolve(ListCommentsUseCase);
 
@@ -91,7 +91,7 @@ export function CommentSection({ onDismiss, visible, onAddComment, pubId }: Comm
 	return (
 		<Modal
 			animationType="slide"
-			transparent
+			presentationStyle="pageSheet"
 			visible={visible}
 			onRequestClose={() => {
 				onDismiss && onDismiss();
