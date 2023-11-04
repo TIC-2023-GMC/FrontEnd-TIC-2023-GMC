@@ -302,7 +302,7 @@ export function RegisterScreenForm({
 											...styles.input,
 											backgroundColor: theme.colors.secondary,
 											height: '5%',
-											marginBottom: '8%'
+											marginBottom: errors.birth_date ? 0 : '6%'
 										}}
 									>
 										<DatePickerInput
@@ -316,6 +316,11 @@ export function RegisterScreenForm({
 											left={<TextInput.Icon icon="cake-variant" />}
 										/>
 									</View>
+									{errors.birth_date && (
+										<HelperText type="error" style={{ ...styles.errorText, textAlign: 'center' }}>
+											{errors.birth_date?.message}
+										</HelperText>
+									)}
 								</>
 							)}
 							name="birth_date"

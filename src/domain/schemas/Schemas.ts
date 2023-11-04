@@ -21,7 +21,22 @@ export const UserSchema = z.object({
 		),
 	mobile_phone: z.string().regex(/^09\d{8}$/, 'Por favor, ingrese un número de teléfono válido'),
 	neighborhood: z.string().nonempty('El sector es requerido'),
-	birth_date: z.date(),
+	birth_date: z.date().refine(
+		(value) => {
+			const birthDate = new Date(value);
+			const todayDate = new Date();
+			const oldestDate = new Date('1900-01-01');
+			const minAge = 18;
+
+			return (
+				todayDate.getFullYear() - birthDate.getFullYear() >= minAge &&
+				birthDate.getTime() >= oldestDate.getTime()
+			);
+		},
+		{
+			message: 'Por favor, ingrese una fecha de nacimiento válida (debes ser mayor de 18 años)'
+		}
+	),
 	email: z.string().email('Por favor, ingrese un correo electrónico válido'),
 	password: z.string().nonempty('La contraseña es requerida'),
 	num_previous_pets: z
