@@ -21,6 +21,7 @@ import { AuthStackParamsList } from '../../../../domain/types/types';
 import PhotoSelection from '../../components/PhotoSelection';
 import { SnackBarError } from '../../components/SnackBarError';
 import { styles } from './RegisterScreenForm.styles';
+
 const registeruser = container.resolve(RegisterUserUseCase);
 const uploadImg = container.resolve(UploadImageUseCase);
 const parish = container.resolve(GetParishUseCase);
@@ -72,6 +73,7 @@ export function RegisterScreenForm({
 			}
 		}
 	});
+
 	useEffect(() => {
 		reset();
 	}, [reset]);
@@ -93,8 +95,9 @@ export function RegisterScreenForm({
 				motivation: ''
 			};
 			userRegisterMutation.mutate(newUser, {
-				onError: () => {
-					setError('Error al registrar usuario');
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				onError: (error: any) => {
+					setError(error.response.data.detail);
 					setLoading(false);
 				},
 				onSuccess: () => {
@@ -127,7 +130,7 @@ export function RegisterScreenForm({
 										textColor={theme.colors.shadow}
 										placeholder="Ingrese su nombre"
 										onBlur={onBlur}
-										onChangeText={(text) => onChange(text.replace(/\s/g, ''))}
+										onChangeText={onChange}
 										value={value}
 										mode="outlined"
 										label={'Nombre'}
@@ -299,7 +302,7 @@ export function RegisterScreenForm({
 											...styles.input,
 											backgroundColor: theme.colors.secondary,
 											height: '5%',
-											marginBottom: '8%'
+											marginBottom: errors.birth_date ? 0 : '6%'
 										}}
 									>
 										<DatePickerInput
@@ -313,6 +316,11 @@ export function RegisterScreenForm({
 											left={<TextInput.Icon icon="cake-variant" />}
 										/>
 									</View>
+									{errors.birth_date && (
+										<HelperText type="error" style={{ ...styles.errorText, textAlign: 'center' }}>
+											{errors.birth_date?.message}
+										</HelperText>
+									)}
 								</>
 							)}
 							name="birth_date"
@@ -418,8 +426,22 @@ export function RegisterScreenForm({
 						</Button>
 					</View>
 				</View>
-				<SnackBarError setFailUpload={setFailUpload} failUpload={failUpload} reset={reset} />
-				<SnackBarError failUpload={error} setFailUpload={setError} reset={reset} />
+				<SnackBarError
+					setFailUpload={setFailUpload}
+					failUpload={failUpload}
+					reset={() => {
+						reset();
+						setLocation('');
+					}}
+				/>
+				<SnackBarError
+					failUpload={error}
+					setFailUpload={setError}
+					reset={() => {
+						reset();
+						setLocation('');
+					}}
+				/>
 			</ScrollView>
 		</>
 	);

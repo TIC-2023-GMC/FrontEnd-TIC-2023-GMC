@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { LoginScreenForm } from '../Screens/User/LoginScreenForm';
-import { RegisterScreenForm } from '../Screens/User/RegisterScreenForms';
+import { RegisterScreenForm } from '../Screens/User/RegisterScreenForm';
 
 const AuthStack = createNativeStackNavigator();
 
