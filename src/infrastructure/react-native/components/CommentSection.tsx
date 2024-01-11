@@ -189,16 +189,13 @@ export function CommentSection({ onDismiss, visible, onAddComment, pubId }: Comm
 							name="comment_text"
 						/>
 
-						{loading ? (
-							<ActivityIndicator size={45} style={styles.activityIndicator} />
-						) : (
-							<IconButton
-								icon="send-circle"
-								size={45}
-								iconColor={theme.colors.primary}
-								onPress={handleSubmit(onSubmitComment)}
-							/>
-						)}
+						<IconButton
+							icon="send-circle"
+							size={45}
+							iconColor={theme.colors.primary}
+							onPress={handleSubmit(onSubmitComment)}
+							loading={loading}
+						/>
 					</View>
 				</View>
 			</View>
