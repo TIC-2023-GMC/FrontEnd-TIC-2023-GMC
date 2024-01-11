@@ -39,6 +39,7 @@ export function CommentSection({ onDismiss, visible, onAddComment, pubId }: Comm
 	const theme = useTheme();
 	const styles = createStyles(theme);
 	const [loading, setLoading] = useState<boolean>(false);
+	const [commentState, setCommentState] = useState<string | undefined>(undefined);
 
 	const {
 		control,
@@ -80,9 +81,15 @@ export function CommentSection({ onDismiss, visible, onAddComment, pubId }: Comm
 		if (onAddComment !== undefined) {
 			onAddComment(addCommentRequest, {
 				onSuccess: () => {
-					setLoading(false);
 					reset();
 					refetch();
+					setCommentState('Success');
+				},
+				onError: () => {
+					setCommentState('Error');
+				},
+				onSettled: () => {
+					setLoading(false);
 				}
 			});
 		}
@@ -187,19 +194,24 @@ export function CommentSection({ onDismiss, visible, onAddComment, pubId }: Comm
 							size={45}
 							iconColor={theme.colors.primary}
 							onPress={handleSubmit(onSubmitComment)}
-							disabled={loading}
+							loading={loading}
 						/>
 					</View>
 				</View>
 			</View>
 			<Snackbar
 				theme={theme}
-				visible={false}
-				onDismiss={() => reset()}
+				visible={commentState !== undefined}
+				onDismiss={() => setCommentState(undefined)}
+				onIconPress={() => setCommentState(undefined)}
 				duration={2000}
-				style={{ marginBottom: 150 }}
+				style={styles.snackbarStyle}
+				icon="close"
 			>
-				Comentario agregado
+				<Text style={styles.snackbarText}>
+					{commentState === 'Error' && 'Error al agregar el comentario. Intente de nuevo...'}
+					{commentState === 'Success' && '¡Comentario agregado correctamente!'}
+				</Text>
 			</Snackbar>
 		</Modal>
 	);
@@ -273,5 +285,13 @@ const createStyles = (theme: MD3Theme) =>
 		errorText: {
 			marginTop: -10,
 			marginBottom: 10
+		},
+		snackbarStyle: {
+			width: '90%',
+			alignSelf: 'center',
+			marginBottom: 100
+		},
+		snackbarText: {
+			color: theme.colors.secondary
 		}
 	});
