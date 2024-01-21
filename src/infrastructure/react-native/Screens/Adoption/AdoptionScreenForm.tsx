@@ -430,6 +430,7 @@ export function AdoptionScreenForm() {
 					textColor={theme.colors.secondary}
 					onPress={handleSubmit(onSubmit)}
 					loading={loading}
+					disabled={loading}
 				>
 					Publicar
 				</Button>

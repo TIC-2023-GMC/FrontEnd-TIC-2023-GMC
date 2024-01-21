@@ -377,6 +377,7 @@ export function UserAptitudeScreenForm() {
 					textColor={theme.colors.secondary}
 					onPress={handleSubmit(onSubmit)}
 					loading={loading}
+					disabled={loading}
 				>
 					Guardar
 				</Button>
