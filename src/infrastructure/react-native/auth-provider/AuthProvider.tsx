@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { container } from 'tsyringe';
@@ -12,11 +12,14 @@ import {
 import { User } from '../../../domain/models/InterfacesModels';
 import { ExpireToken } from '../../../utils/utils';
 import AuthNavigator from '../navigation/AuthNavigator';
+import { GameNavigationStack } from '../navigation/GameNavigator';
+import { TabsNavigation } from '../navigation/SocialNavigator';
 const logout = container.resolve(LogoutUserUseCase);
 const getUserByToken = container.resolve(GetAuthUserUseCase);
 const configAuth = container.resolve(ConfigAuthUseCase);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = () => {
+	const [socialActive, setSocialActive] = useState<boolean>(true);
 	const [initializing, setInitializing] = useState(true);
 	const { data, isLoading, isError, refetch, isSuccess } = getUserByToken.useQueryAuthUser();
 	const [error, setError] = useState<string>('');
@@ -57,7 +60,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				}
 			}}
 		>
-			{children}
+			{socialActive ? (
+				<TabsNavigation visible={socialActive} setVisible={setSocialActive} />
+			) : (
+				<GameNavigationStack visible={socialActive} setVisible={setSocialActive} />
+			)}
 		</UserContext.Provider>
 	) : (
 		<AuthNavigator
