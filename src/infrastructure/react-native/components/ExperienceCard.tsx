@@ -93,7 +93,7 @@ const ExperienceCard = (props: Publication & CardProps) => {
 				onAddComment={onAddComment}
 				pubId={experience._id}
 			/>
-			<View ref={ref} collapsable={false}>
+			<View ref={ref}>
 				<Card style={styles.card}>
 					<Card.Title
 						title={
@@ -104,6 +104,8 @@ const ExperienceCard = (props: Publication & CardProps) => {
 										params: { userId: user._id || '' }
 									});
 								}}
+								style={{ padding: 0, margin: 0 }}
+								compact={true}
 							>
 								{user.first_name + ' ' + user.last_name}
 							</Button>
@@ -117,6 +119,8 @@ const ExperienceCard = (props: Publication & CardProps) => {
 							/>
 						}
 						left={(props) => <LeftContent {...props} photo={user.photo.img_path} />}
+						titleStyle={{ paddingTop: 10 }}
+						theme={theme}
 					/>
 					<Card.Cover
 						theme={{ ...theme, roundness: 0.5 }}

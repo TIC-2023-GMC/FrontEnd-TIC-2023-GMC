@@ -135,6 +135,7 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 										params: { userId: user._id || '' }
 									});
 								}}
+								compact={true}
 							>
 								{user.first_name + ' ' + user.last_name}
 							</Button>
@@ -153,6 +154,8 @@ const PublicationCard = (props: AdoptionPublication & CardProps) => {
 								? () => <IconButton icon="dots-vertical" onPress={() => onOpenModal(adoption)} />
 								: undefined
 						}
+						titleStyle={{ paddingTop: 10 }}
+						theme={theme}
 					/>
 					<Card.Cover
 						theme={{ ...theme, roundness: 0.5 }}

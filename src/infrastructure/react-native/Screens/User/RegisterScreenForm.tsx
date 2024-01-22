@@ -413,6 +413,7 @@ export function RegisterScreenForm({
 							textColor={theme.colors.secondary}
 							onPress={handleSubmit(onSubmit)}
 							loading={loading}
+							disabled={loading}
 						>
 							Crear Cuenta
 						</Button>
