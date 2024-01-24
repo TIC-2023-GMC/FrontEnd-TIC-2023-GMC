@@ -33,8 +33,7 @@ export const styles = StyleSheet.create({
 		width: '100%',
 		alignItems: 'center',
 		justifyContent: 'center',
-		gap: 10,
-		marginVertical: 10
+		gap: 10
 	},
 	button1: {
 		width: '50%'
