@@ -91,36 +91,36 @@ export function RegisterScreenForm({
 	}, [reset]);
 
 	const onSubmit: SubmitHandler<User> = async (data) => {
-		if (checked) {
-			return;
-		} else {
+		if (!checked) {
 			setCheckError(true);
-		}
-		if (image) {
-			setLoading(true);
-			const new_photo: Photo = (await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);
-			const newUser: User = {
-				...data,
-				photo: new_photo,
-				num_previous_pets: -1,
-				num_current_pets: -1,
-				outdoor_hours: -1,
-				house_space: -1,
-				has_yard: false,
-				main_pet_food: '',
-				pet_expenses: -1,
-				motivation: ''
-			};
-			userRegisterMutation.mutate(newUser, {
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				onError: (error: any) => {
-					setError(error.response.data.detail);
-					setLoading(false);
-				},
-				onSuccess: () => {
-					navigation.navigate('Login');
-				}
-			});
+		} else {
+			if (image) {
+				setLoading(true);
+				const new_photo: Photo =
+					(await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);
+				const newUser: User = {
+					...data,
+					photo: new_photo,
+					num_previous_pets: -1,
+					num_current_pets: -1,
+					outdoor_hours: -1,
+					house_space: -1,
+					has_yard: false,
+					main_pet_food: '',
+					pet_expenses: -1,
+					motivation: ''
+				};
+				userRegisterMutation.mutate(newUser, {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					onError: (error: any) => {
+						setError(error.response.data.detail);
+						setLoading(false);
+					},
+					onSuccess: () => {
+						navigation.navigate('Login');
+					}
+				});
+			}
 		}
 	};
 
