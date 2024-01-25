@@ -7,7 +7,15 @@ import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Image, ScrollView, View } from 'react-native';
 import DropDownPicker, { ItemType } from 'react-native-dropdown-picker';
-import { Avatar, Button, HelperText, Text, TextInput, useTheme } from 'react-native-paper';
+import {
+	Avatar,
+	Button,
+	Checkbox,
+	HelperText,
+	Text,
+	TextInput,
+	useTheme
+} from 'react-native-paper';
 import { DatePickerInput } from 'react-native-paper-dates';
 import { container } from 'tsyringe';
 import {
@@ -18,6 +26,7 @@ import {
 import { Photo, User } from '../../../../domain/models/InterfacesModels';
 import { RegisterSchema } from '../../../../domain/schemas/Schemas';
 import { AuthStackParamsList } from '../../../../domain/types/types';
+import { ModalPersonalData } from '../../components/ModalPersonalData';
 import PhotoSelection from '../../components/PhotoSelection';
 import { SnackBarError } from '../../components/SnackBarError';
 import { styles } from './RegisterScreenForm.styles';
@@ -35,6 +44,9 @@ export function RegisterScreenForm({
 	loginUser: () => void;
 }) {
 	const [failUpload, setFailUpload] = useState<string>('');
+	const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+	const [checkError, setCheckError] = useState<boolean>(false);
+	const [checked, setChecked] = useState(false);
 	const [location, setLocation] = useState<string>('');
 	const [openLocation, setOpenLocation] = useState(false);
 	const { isLoading, itemsLocation, setItemsLocation } = parish.useQueryParish();
@@ -79,36 +91,41 @@ export function RegisterScreenForm({
 	}, [reset]);
 
 	const onSubmit: SubmitHandler<User> = async (data) => {
-		if (image) {
-			setLoading(true);
-			const new_photo: Photo = (await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);
-			const newUser: User = {
-				...data,
-				photo: new_photo,
-				num_previous_pets: -1,
-				num_current_pets: -1,
-				outdoor_hours: -1,
-				house_space: -1,
-				has_yard: false,
-				main_pet_food: '',
-				pet_expenses: -1,
-				motivation: ''
-			};
-			userRegisterMutation.mutate(newUser, {
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				onError: (error: any) => {
-					setError(error.response.data.detail);
-					setLoading(false);
-				},
-				onSuccess: () => {
-					navigation.navigate('Login');
-				}
-			});
+		if (!checked) {
+			setCheckError(true);
+		} else {
+			if (image) {
+				setLoading(true);
+				const new_photo: Photo =
+					(await uploadImg.uploadImage(image, setFailUpload)) ?? ({} as Photo);
+				const newUser: User = {
+					...data,
+					photo: new_photo,
+					num_previous_pets: -1,
+					num_current_pets: -1,
+					outdoor_hours: -1,
+					house_space: -1,
+					has_yard: false,
+					main_pet_food: '',
+					pet_expenses: -1,
+					motivation: ''
+				};
+				userRegisterMutation.mutate(newUser, {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					onError: (error: any) => {
+						setError(error.response.data.detail);
+						setLoading(false);
+					},
+					onSuccess: () => {
+						navigation.navigate('Login');
+					}
+				});
+			}
 		}
 	};
 
 	return (
-		<>
+		<ModalPersonalData modalVisible={isModalVisible} setModalVisible={setIsModalVisible}>
 			<ScrollView>
 				<StatusBar style="dark" />
 				<View style={{ ...styles.container, backgroundColor: theme.colors.secondary }}>
@@ -404,6 +421,25 @@ export function RegisterScreenForm({
 							)}
 							name="password"
 						/>
+						<Checkbox.Item
+							status={checked ? 'checked' : 'unchecked'}
+							onPress={() => {
+								setChecked(!checked);
+								setCheckError(false);
+							}}
+							label="He leído y acepto los términos y condiciones"
+							position="leading"
+							labelVariant="labelMedium"
+						/>
+
+						<Button onPress={() => setIsModalVisible(!isModalVisible)} style={{ margin: 0 }}>
+							Ver términos y condiciones
+						</Button>
+						{checkError && (
+							<HelperText type="error" style={styles.errorText}>
+								Debes aceptar los términos y condiciones para poder registrarte
+							</HelperText>
+						)}
 					</View>
 					<View style={styles.buttonView}>
 						<Button
@@ -417,6 +453,7 @@ export function RegisterScreenForm({
 						>
 							Crear Cuenta
 						</Button>
+
 						<Button
 							style={styles.button2}
 							mode="text"
@@ -444,6 +481,6 @@ export function RegisterScreenForm({
 					}}
 				/>
 			</ScrollView>
-		</>
+		</ModalPersonalData>
 	);
 }
